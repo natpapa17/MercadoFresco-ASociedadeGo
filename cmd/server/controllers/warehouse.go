@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
@@ -53,7 +54,30 @@ func (wc *WarehouseController) GetAllWarehouses(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{
+	ctx.JSON(http.StatusOK, gin.H{
+		"data": w,
+	})
+}
+
+func (wc *WarehouseController) GetByIdWarehouse(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Param("id"))
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid id",
+		})
+		return
+	}
+
+	w, err := wc.service.GetById(id)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"error": "can't find element with this id",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
 		"data": w,
 	})
 }

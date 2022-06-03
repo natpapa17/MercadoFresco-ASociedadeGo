@@ -3,6 +3,7 @@ package warehouses
 type Service interface {
 	Create(warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (Warehouse, error)
 	GetAll() ([]Warehouse, error)
+	GetById(id int) (Warehouse, error)
 }
 
 type service struct {
@@ -33,4 +34,14 @@ func (s *service) GetAll() ([]Warehouse, error) {
 	}
 
 	return ws, nil
+}
+
+func (s *service) GetById(id int) (Warehouse, error) {
+	w, err := s.repository.GetById(id)
+
+	if err != nil {
+		return Warehouse{}, err
+	}
+
+	return w, nil
 }

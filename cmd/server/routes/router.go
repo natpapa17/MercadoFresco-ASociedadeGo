@@ -17,6 +17,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 		warehouse := mux.Group("warehouses")
 		{
 			warehouse.GET("/", wc.GetAllWarehouses)
+			warehouse.GET("/:id", wc.GetByIdWarehouse)
 			warehouse.POST("/", wc.CreateWarehouse)
 		}
 	}
