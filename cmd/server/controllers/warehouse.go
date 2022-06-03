@@ -12,12 +12,6 @@ type WarehouseController struct {
 	service warehouses.Service
 }
 
-func Ping(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{
-		"value": "ok",
-	})
-}
-
 func CreateWarehouseController(ws warehouses.Service) *WarehouseController {
 	return &WarehouseController{
 		service: ws,
