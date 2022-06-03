@@ -1,14 +1,23 @@
 package routes
 
 import (
+	"log"
+	"path/filepath"
+
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
 
 func ConfigRoutes(r *gin.Engine) *gin.Engine {
 
-	wr := warehouses.CreateRepository()
+	warehouseFilePath, err := filepath.Abs("" + filepath.Join("data", "warehouses.json"))
+	if err != nil {
+		log.Fatal("can't load warehouse data file")
+	}
+	warehouseFile := store.New(store.FileType, warehouseFilePath)
+	wr := warehouses.CreateRepository(warehouseFile)
 	ws := warehouses.CreateService(wr)
 	wc := controllers.CreateWarehouseController(ws)
 
