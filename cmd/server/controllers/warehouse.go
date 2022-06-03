@@ -1,8 +1,11 @@
 package controllers
 
 import (
+	"errors"
 	"net/http"
+	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
@@ -19,11 +22,19 @@ func CreateWarehouseController(ws warehouses.Service) *WarehouseController {
 }
 
 func (wc *WarehouseController) CreateWarehouse(ctx *gin.Context) {
-	var req createWarehouseRequest
+	var req warehouseRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"message": "Invalid inputs",
+		ctx.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{
+			"error": err.Error(),
 		})
+		return
+	}
+
+	if err := req.Validate(); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
 	}
 
 	w, err := wc.service.Create(req.WarehouseCode, req.Address, req.Telephone, req.MinimumCapacity, req.MinimumTemperature)
@@ -86,11 +97,18 @@ func (wc *WarehouseController) UpdateByIdWarehouse(ctx *gin.Context) {
 		return
 	}
 
-	var req updateWarehouseRequest
+	var req warehouseRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"message": "Invalid inputs",
+		ctx.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{
+			"error": err.Error(),
 		})
+	}
+
+	if err := req.Validate(); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
 	}
 
 	w, err := wc.service.UpdateById(id, req.WarehouseCode, req.Address, req.Telephone, req.MinimumCapacity, req.MinimumTemperature)
@@ -127,7 +145,7 @@ func (wc *WarehouseController) DeleteByIdWarehouse(ctx *gin.Context) {
 	ctx.JSON(http.StatusNoContent, gin.H{})
 }
 
-type createWarehouseRequest struct {
+type warehouseRequest struct {
 	WarehouseCode      string  `json:"warehouse_code" binding:"required"`
 	Address            string  `json:"address" binding:"required"`
 	Telephone          string  `json:"telephone" binding:"required"`
@@ -135,10 +153,29 @@ type createWarehouseRequest struct {
 	MinimumTemperature float64 `json:"minimum_temperature" binding:"required"`
 }
 
-type updateWarehouseRequest struct {
-	WarehouseCode      string  `json:"warehouse_code" binding:"required"`
-	Address            string  `json:"address" binding:"required"`
-	Telephone          string  `json:"telephone" binding:"required"`
-	MinimumCapacity    int     `json:"minimum_capacity" binding:"required"`
-	MinimumTemperature float64 `json:"minimum_temperature" binding:"required"`
+func (wr *warehouseRequest) Validate() error {
+	if strings.TrimSpace(wr.WarehouseCode) == "" {
+		return errors.New("warehouse_code can't be empty")
+	}
+
+	if strings.TrimSpace(wr.Address) == "" {
+		return errors.New("address can't be empty")
+
+	}
+
+	if strings.TrimSpace(wr.Telephone) == "" {
+		return errors.New("telephone can't be empty")
+
+	}
+
+	if match, err := regexp.MatchString("^\\([1-9]{2}\\)\\s[0-9]{4,5}-[0-9]{4}$", wr.Telephone); err != nil || !match {
+		return errors.New("telephone must respect the pattern (xx) xxxxx-xxxx or (xx) xxxx-xxxx")
+
+	}
+
+	if wr.MinimumCapacity <= 0 {
+		return errors.New("minimum_capacity must be greater than 0")
+	}
+
+	return nil
 }
