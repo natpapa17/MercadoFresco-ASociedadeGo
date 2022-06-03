@@ -2,6 +2,7 @@ package sellers
 
 type Service interface {
 	GetAll() ([]Seller, error)
+	GetById(id int) (Seller, error)
 	Store( cid int, companyName string, address string , telephone string ) (Seller, error)
 	Update(id , cid int, companyName, address, telephone string) (Seller, error)
 	Delete(id int) error
@@ -25,6 +26,14 @@ func (s service) GetAll() ([]Seller, error) {
 	}
 	return sl, nil
 
+}
+
+func (s service) GetById (id int) (Seller, error){
+	seller , err := s.repository.GetById(id)
+	if err != nil{
+		return Seller{}, err
+	}
+	return seller, nil
 }
 
 

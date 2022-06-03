@@ -1,6 +1,7 @@
 package sellers
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
@@ -11,6 +12,7 @@ var sl []Seller = []Seller{}
 
 type Repository interface{
 	GetAll() ([]Seller, error)
+	GetById(id int) (Seller, error)
 	Store(id int, cid int, companyName string, address string , telephone string ) (Seller , error)
 	LastID() (int, error)
 	Update(id , cid int, companyName, address, telephone string) (Seller, error)
@@ -20,7 +22,7 @@ type Repository interface{
 }
 
 type repository struct{
-	
+
 	db store.Store
 }
 
@@ -45,6 +47,21 @@ func (r *repository) GetAll() ([]Seller, error) {
 	return sl, nil
 }
 
+func (r *repository) GetById(id int) (Seller, error){
+	result, found := Seller{}, false
+	for _, s := range sl{
+		if s.Id == id{
+			result, found = s, true
+			break
+		}
+	}
+
+	if !found{
+		return Seller{}, errors.New("Nào foi possivel encontrar vendedor com este id")
+
+	}
+	return result, nil
+}
 
 func (r *repository) Store(id int, cid int, companyName string, address string , telephone string) (Seller, error) {
 	var sl []Seller 

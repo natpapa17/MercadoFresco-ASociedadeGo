@@ -22,6 +22,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 		seller := mux.Group("seller")
 	{
 		seller.GET("/", sellerControllers.GetAll())
+		seller.GET("/:id", sellerControllers.GetByIdSeller)
 		seller.POST("/", sellerControllers.Store())
 		seller.DELETE("/:id", sellerControllers.Delete())
 		seller.PATCH("/:id", sellerControllers.Update())
