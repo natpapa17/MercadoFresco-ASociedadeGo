@@ -9,6 +9,7 @@ type Repository interface {
 	GetAll() ([]Warehouse, error)
 	GetById(id int) (Warehouse, error)
 	UpdateById(id int, warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (Warehouse, error)
+	DeleteById(id int) error
 }
 
 type repository struct{}
@@ -74,4 +75,24 @@ func (r *repository) UpdateById(id int, warehouseCode string, address string, te
 	}
 
 	return result, nil
+}
+
+func (r *repository) DeleteById(id int) error {
+	found := false
+	for i, w := range ws {
+		if w.Id == id {
+			newWs := []Warehouse{}
+			newWs = append(newWs, ws[:i]...)
+			newWs = append(newWs, ws[i+1:]...)
+			ws = newWs
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return errors.New("can't find element with this id")
+	}
+
+	return nil
 }
