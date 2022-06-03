@@ -1,5 +1,7 @@
 package warehouses
 
+import "errors"
+
 type Service interface {
 	Create(warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (Warehouse, error)
 	GetAll() ([]Warehouse, error)
@@ -19,6 +21,12 @@ func CreateService(r Repository) Service {
 }
 
 func (s *service) Create(warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (Warehouse, error) {
+	_, err := s.repository.GetByWarehouseCode(warehouseCode)
+
+	if err == nil {
+		return Warehouse{}, errors.New("this warehouse_code is already in use")
+	}
+
 	warehouse, err := s.repository.Create(warehouseCode, address, telephone, minimumCapacity, minimumTemperature)
 
 	if err != nil {
@@ -49,6 +57,14 @@ func (s *service) GetById(id int) (Warehouse, error) {
 }
 
 func (s *service) UpdateById(id int, warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (Warehouse, error) {
+	isWareHouseCodeInUse, err := s.repository.GetByWarehouseCode(warehouseCode)
+
+	if err == nil {
+		if isWareHouseCodeInUse.Id != id {
+			return Warehouse{}, errors.New("this warehouse_code is already in use")
+		}
+	}
+
 	w, err := s.repository.UpdateById(id, warehouseCode, address, telephone, minimumCapacity, minimumTemperature)
 
 	if err != nil {

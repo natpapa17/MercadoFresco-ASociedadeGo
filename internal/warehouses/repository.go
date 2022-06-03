@@ -12,6 +12,7 @@ type Repository interface {
 	GetById(id int) (Warehouse, error)
 	UpdateById(id int, warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (Warehouse, error)
 	DeleteById(id int) error
+	GetByWarehouseCode(code string) (Warehouse, error)
 }
 
 type repository struct {
@@ -69,6 +70,27 @@ func (r *repository) GetById(id int) (Warehouse, error) {
 
 	if !found {
 		return Warehouse{}, errors.New("can't find element with this id")
+	}
+
+	return result, nil
+}
+
+func (r *repository) GetByWarehouseCode(code string) (Warehouse, error) {
+	var ws []Warehouse
+	if err := r.file.Read(&ws); err != nil {
+		return Warehouse{}, nil
+	}
+
+	result, found := Warehouse{}, false
+	for _, w := range ws {
+		if w.WarehouseCode == code {
+			result, found = w, true
+			break
+		}
+	}
+
+	if !found {
+		return Warehouse{}, errors.New("can't find element with this warehouse_code")
 	}
 
 	return result, nil
