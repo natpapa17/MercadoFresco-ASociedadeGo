@@ -18,6 +18,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 		{
 			warehouse.GET("/", wc.GetAllWarehouses)
 			warehouse.GET("/:id", wc.GetByIdWarehouse)
+			warehouse.PATCH("/:id", wc.UpdateByIdWarehouse)
 			warehouse.POST("/", wc.CreateWarehouse)
 		}
 	}
