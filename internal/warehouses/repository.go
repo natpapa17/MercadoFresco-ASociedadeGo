@@ -4,6 +4,7 @@ var ws []Warehouse = []Warehouse{}
 
 type Repository interface {
 	Create(warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (Warehouse, error)
+	GetAll() ([]Warehouse, error)
 }
 
 type repository struct{}
@@ -25,4 +26,8 @@ func (r *repository) Create(warehouseCode string, address string, telephone stri
 	ws = append(ws, w)
 
 	return w, nil
+}
+
+func (r *repository) GetAll() ([]Warehouse, error) {
+	return ws, nil
 }

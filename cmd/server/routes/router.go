@@ -14,9 +14,9 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 
 	mux := r.Group("api/")
 	{
-		warehouse := mux.Group("warehouse")
+		warehouse := mux.Group("warehouses")
 		{
-			warehouse.GET("/", controllers.Ping)
+			warehouse.GET("/", wc.GetAllWarehouses)
 			warehouse.POST("/", wc.CreateWarehouse)
 		}
 	}

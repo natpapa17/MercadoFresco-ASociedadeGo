@@ -2,6 +2,7 @@ package warehouses
 
 type Service interface {
 	Create(warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (Warehouse, error)
+	GetAll() ([]Warehouse, error)
 }
 
 type service struct {
@@ -22,4 +23,14 @@ func (s *service) Create(warehouseCode string, address string, telephone string,
 	}
 
 	return warehouse, nil
+}
+
+func (s *service) GetAll() ([]Warehouse, error) {
+	ws, err := s.repository.GetAll()
+
+	if err != nil {
+		return []Warehouse{}, err
+	}
+
+	return ws, nil
 }

@@ -44,6 +44,20 @@ func (wc *WarehouseController) CreateWarehouse(ctx *gin.Context) {
 	})
 }
 
+func (wc *WarehouseController) GetAllWarehouses(ctx *gin.Context) {
+	w, err := wc.service.GetAll()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "internal server error",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{
+		"data": w,
+	})
+}
+
 type createWarehouseRequest struct {
 	WarehouseCode      string  `json:"warehouse_code" binding:"required"`
 	Address            string  `json:"address" binding:"required"`
