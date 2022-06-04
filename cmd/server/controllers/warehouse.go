@@ -114,6 +114,7 @@ func (wc *WarehouseController) UpdateByIdWarehouse(ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{
 			"error": err.Error(),
 		})
+		return
 	}
 
 	if err := req.Validate(); err != nil {
