@@ -24,7 +24,7 @@ func (s *service) Create(warehouseCode string, address string, telephone string,
 	_, err := s.repository.GetByWarehouseCode(warehouseCode)
 
 	if err == nil {
-		return Warehouse{}, errors.New("this warehouse_code is already in use")
+		return Warehouse{}, &BusinessRuleError{errors.New("this warehouse_code is already in use")}
 	}
 
 	warehouse, err := s.repository.Create(warehouseCode, address, telephone, minimumCapacity, minimumTemperature)
@@ -61,7 +61,7 @@ func (s *service) UpdateById(id int, warehouseCode string, address string, telep
 
 	if err == nil {
 		if isWareHouseCodeInUse.Id != id {
-			return Warehouse{}, errors.New("this warehouse_code is already in use")
+			return Warehouse{}, &BusinessRuleError{errors.New("this warehouse_code is already in use")}
 		}
 	}
 

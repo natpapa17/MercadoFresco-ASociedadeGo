@@ -1,18 +1,1 @@
-[
-  {
-    "Id": 1,
-    "WarehouseCode": "XPTO",
-    "Address": "Rua Brasil 870",
-    "Telephone": "(44) 9999-9999",
-    "MinimumCapacity": 10,
-    "MinimumTemperature": 8.7
-  },
-  {
-    "Id": 1,
-    "WarehouseCode": "XPTO",
-    "Address": "Rua Brasil 870",
-    "Telephone": "(44) 9999-9999",
-    "MinimumCapacity": 10,
-    "MinimumTemperature": 8.7
-  }
-]
+[]

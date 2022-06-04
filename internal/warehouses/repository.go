@@ -69,7 +69,7 @@ func (r *repository) GetById(id int) (Warehouse, error) {
 	}
 
 	if !found {
-		return Warehouse{}, errors.New("can't find element with this id")
+		return Warehouse{}, &NoElementInFileError{errors.New("can't find element with this id")}
 	}
 
 	return result, nil
@@ -90,7 +90,7 @@ func (r *repository) GetByWarehouseCode(code string) (Warehouse, error) {
 	}
 
 	if !found {
-		return Warehouse{}, errors.New("can't find element with this warehouse_code")
+		return Warehouse{}, &NoElementInFileError{errors.New("can't find element with this warehouse_code")}
 	}
 
 	return result, nil
@@ -119,7 +119,7 @@ func (r *repository) UpdateById(id int, warehouseCode string, address string, te
 	}
 
 	if !updated {
-		return Warehouse{}, errors.New("can't find element with this id")
+		return Warehouse{}, &NoElementInFileError{errors.New("can't find element with this id")}
 	}
 
 	if err := r.file.Write(ws); err != nil {
@@ -148,7 +148,7 @@ func (r *repository) DeleteById(id int) error {
 	}
 
 	if !deleted {
-		return errors.New("can't find element with this id")
+		return &NoElementInFileError{errors.New("can't find element with this id")}
 	}
 
 	if err := r.file.Write(ws); err != nil {

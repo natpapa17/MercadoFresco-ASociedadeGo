@@ -39,6 +39,12 @@ func (wc *WarehouseController) CreateWarehouse(ctx *gin.Context) {
 
 	w, err := wc.service.Create(req.WarehouseCode, req.Address, req.Telephone, req.MinimumCapacity, req.MinimumTemperature)
 	if err != nil {
+		if isCustomError(err) {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "internal server error",
 		})
@@ -76,8 +82,14 @@ func (wc *WarehouseController) GetByIdWarehouse(ctx *gin.Context) {
 
 	w, err := wc.service.GetById(id)
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"error": "can't find element with this id",
+		if isCustomError(err) {
+			ctx.JSON(http.StatusNotFound, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "internal server error",
 		})
 		return
 	}
@@ -113,8 +125,14 @@ func (wc *WarehouseController) UpdateByIdWarehouse(ctx *gin.Context) {
 
 	w, err := wc.service.UpdateById(id, req.WarehouseCode, req.Address, req.Telephone, req.MinimumCapacity, req.MinimumTemperature)
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"error": "can't find element with this id",
+		if isCustomError(err) {
+			ctx.JSON(http.StatusNotFound, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "internal server error",
 		})
 		return
 	}
@@ -136,8 +154,14 @@ func (wc *WarehouseController) DeleteByIdWarehouse(ctx *gin.Context) {
 
 	err = wc.service.DeleteById(id)
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"error": "can't find element with this id",
+		if isCustomError(err) {
+			ctx.JSON(http.StatusNotFound, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "internal server error",
 		})
 		return
 	}
@@ -178,4 +202,19 @@ func (wr *warehouseRequest) Validate() error {
 	}
 
 	return nil
+}
+
+func isCustomError(e error) bool {
+	var be *warehouses.BusinessRuleError
+	var fe *warehouses.NoElementInFileError
+
+	if errors.As(e, &be) {
+		return true
+	}
+
+	if errors.As(e, &fe) {
+		return true
+	}
+
+	return false
 }
