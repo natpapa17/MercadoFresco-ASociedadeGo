@@ -30,8 +30,15 @@ func (r *repository) Create(warehouseCode string, address string, telephone stri
 	if err := r.file.Read(&ws); err != nil {
 		return Warehouse{}, err
 	}
+
+	lastId, err := r.lastId()
+
+	if err != nil {
+		return Warehouse{}, err
+	}
+
 	w := Warehouse{
-		Id:                 1,
+		Id:                 lastId + 1,
 		WarehouseCode:      warehouseCode,
 		Address:            address,
 		Telephone:          telephone,
@@ -156,4 +163,17 @@ func (r *repository) DeleteById(id int) error {
 	}
 
 	return nil
+}
+
+func (r *repository) lastId() (int, error) {
+	var ws []Warehouse
+	if err := r.file.Read(&ws); err != nil {
+		return 0, err
+	}
+
+	if len(ws) == 0 {
+		return 0, nil
+	}
+
+	return ws[len(ws)-1].Id, nil
 }
