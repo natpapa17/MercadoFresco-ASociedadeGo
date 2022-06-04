@@ -1,8 +1,10 @@
 package warehouses
 
-import "errors"
+import (
+	"errors"
 
-var ws []Warehouse = []Warehouse{}
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
+)
 
 type Repository interface {
 	Create(warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (Warehouse, error)
@@ -10,34 +12,61 @@ type Repository interface {
 	GetById(id int) (Warehouse, error)
 	UpdateById(id int, warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (Warehouse, error)
 	DeleteById(id int) error
+	GetByWarehouseCode(code string) (Warehouse, error)
 }
 
-type repository struct{}
+type repository struct {
+	file store.Store
+}
 
-func CreateRepository() Repository {
-	return &repository{}
+func CreateRepository(file store.Store) Repository {
+	return &repository{
+		file: file,
+	}
 }
 
 func (r *repository) Create(warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (Warehouse, error) {
+	var ws []Warehouse
+	if err := r.file.Read(&ws); err != nil {
+		return Warehouse{}, err
+	}
+
+	lastId, err := r.lastId()
+
+	if err != nil {
+		return Warehouse{}, err
+	}
+
 	w := Warehouse{
-		Id:                 1,
+		Id:                 lastId + 1,
 		WarehouseCode:      warehouseCode,
 		Address:            address,
 		Telephone:          telephone,
 		MinimumCapacity:    minimumCapacity,
 		MinimumTemperature: minimumTemperature,
 	}
-
 	ws = append(ws, w)
 
+	if err := r.file.Write(ws); err != nil {
+		return Warehouse{}, err
+	}
 	return w, nil
 }
 
 func (r *repository) GetAll() ([]Warehouse, error) {
+	var ws []Warehouse
+	if err := r.file.Read(&ws); err != nil {
+		return []Warehouse{}, nil
+	}
 	return ws, nil
 }
 
 func (r *repository) GetById(id int) (Warehouse, error) {
+	var ws []Warehouse
+	if err := r.file.Read(&ws); err != nil {
+		return Warehouse{}, nil
+	}
+
 	result, found := Warehouse{}, false
 	for _, w := range ws {
 		if w.Id == id {
@@ -47,17 +76,43 @@ func (r *repository) GetById(id int) (Warehouse, error) {
 	}
 
 	if !found {
-		return Warehouse{}, errors.New("can't find element with this id")
+		return Warehouse{}, &NoElementInFileError{errors.New("can't find element with this id")}
+	}
+
+	return result, nil
+}
+
+func (r *repository) GetByWarehouseCode(code string) (Warehouse, error) {
+	var ws []Warehouse
+	if err := r.file.Read(&ws); err != nil {
+		return Warehouse{}, nil
+	}
+
+	result, found := Warehouse{}, false
+	for _, w := range ws {
+		if w.WarehouseCode == code {
+			result, found = w, true
+			break
+		}
+	}
+
+	if !found {
+		return Warehouse{}, &NoElementInFileError{errors.New("can't find element with this warehouse_code")}
 	}
 
 	return result, nil
 }
 
 func (r *repository) UpdateById(id int, warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (Warehouse, error) {
-	result, found := Warehouse{}, false
+	var ws []Warehouse
+	if err := r.file.Read(&ws); err != nil {
+		return Warehouse{}, nil
+	}
+
+	result, updated := Warehouse{}, false
 	for i, w := range ws {
 		if w.Id == id {
-			ws[i], found = Warehouse{
+			ws[i], updated = Warehouse{
 				Id:                 id,
 				WarehouseCode:      warehouseCode,
 				Address:            address,
@@ -70,29 +125,55 @@ func (r *repository) UpdateById(id int, warehouseCode string, address string, te
 		}
 	}
 
-	if !found {
-		return Warehouse{}, errors.New("can't find element with this id")
+	if !updated {
+		return Warehouse{}, &NoElementInFileError{errors.New("can't find element with this id")}
+	}
+
+	if err := r.file.Write(ws); err != nil {
+		return Warehouse{}, err
 	}
 
 	return result, nil
 }
 
 func (r *repository) DeleteById(id int) error {
-	found := false
+	var ws []Warehouse
+	if err := r.file.Read(&ws); err != nil {
+		return nil
+	}
+
+	deleted := false
 	for i, w := range ws {
 		if w.Id == id {
 			newWs := []Warehouse{}
 			newWs = append(newWs, ws[:i]...)
 			newWs = append(newWs, ws[i+1:]...)
 			ws = newWs
-			found = true
+			deleted = true
 			break
 		}
 	}
 
-	if !found {
-		return errors.New("can't find element with this id")
+	if !deleted {
+		return &NoElementInFileError{errors.New("can't find element with this id")}
+	}
+
+	if err := r.file.Write(ws); err != nil {
+		return err
 	}
 
 	return nil
+}
+
+func (r *repository) lastId() (int, error) {
+	var ws []Warehouse
+	if err := r.file.Read(&ws); err != nil {
+		return 0, err
+	}
+
+	if len(ws) == 0 {
+		return 0, nil
+	}
+
+	return ws[len(ws)-1].Id, nil
 }
