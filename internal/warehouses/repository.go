@@ -63,23 +63,18 @@ func (r *repository) GetAll() ([]Warehouse, error) {
 
 func (r *repository) GetById(id int) (Warehouse, error) {
 	var ws []Warehouse
+
 	if err := r.file.Read(&ws); err != nil {
 		return Warehouse{}, nil
 	}
 
-	result, found := Warehouse{}, false
 	for _, w := range ws {
 		if w.Id == id {
-			result, found = w, true
-			break
+			return w, nil
 		}
 	}
 
-	if !found {
-		return Warehouse{}, &NoElementInFileError{errors.New("can't find element with this id")}
-	}
-
-	return result, nil
+	return Warehouse{}, &NoElementInFileError{errors.New("can't find element with this id")}
 }
 
 func (r *repository) GetByWarehouseCode(code string) (Warehouse, error) {
@@ -88,19 +83,13 @@ func (r *repository) GetByWarehouseCode(code string) (Warehouse, error) {
 		return Warehouse{}, nil
 	}
 
-	result, found := Warehouse{}, false
 	for _, w := range ws {
 		if w.WarehouseCode == code {
-			result, found = w, true
-			break
+			return w, nil
 		}
 	}
 
-	if !found {
-		return Warehouse{}, &NoElementInFileError{errors.New("can't find element with this warehouse_code")}
-	}
-
-	return result, nil
+	return Warehouse{}, &NoElementInFileError{errors.New("can't find element with this warehouse_code")}
 }
 
 func (r *repository) UpdateById(id int, warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (Warehouse, error) {
