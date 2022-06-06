@@ -1,11 +1,8 @@
 package section
 
 import (
-	"io/ioutil"
 	"net/http"
-	"reflect"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
@@ -60,43 +57,10 @@ func (c SectionController) GetById() gin.HandlerFunc {
 func (c *SectionController) Add() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		body := ctx.Request.Body
-		data, _ := ioutil.ReadAll(body)
-
 		var obj sections.Section
 
-		sect := reflect.TypeOf(obj)
-		for i := 0; i < sect.NumField(); i++ {
-			field := sect.Field(i)
-			if !strings.Contains(string(data), field.Tag.Get("json")) && field.Tag.Get("json") != "id" {
-				ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": "missing field"})
-				return
-			}
-		}
-
 		if err := ctx.ShouldBindJSON(&obj); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		id, err := c.service.LastID()
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		id++
-
-		obj.ID = id
-
-		has, err := c.service.HasSectionNumber(obj.SectionNumber)
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		if has {
-			ctx.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+			ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 			return
 		}
 

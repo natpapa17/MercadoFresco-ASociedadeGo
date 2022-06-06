@@ -1,5 +1,7 @@
 package sections
 
+import "errors"
+
 var ss []Section = []Section{}
 
 type Service interface {
@@ -55,6 +57,24 @@ func (s *service) HasSectionNumber(number int) (bool, error) {
 }
 
 func (s *service) Add(section Section) (Section, error) {
+	has, err := s.HasSectionNumber(section.SectionNumber)
+	if err != nil {
+		return Section{}, errors.New("unable to add")
+	}
+
+	if has {
+		return Section{}, errors.New("section already exists")
+	}
+
+	id, err := s.LastID()
+	if err != nil {
+		return Section{}, errors.New("unable to add")
+	}
+
+	id++
+
+	section.ID = id
+
 	ss, err := s.repository.Add(section)
 	if err != nil {
 		return Section{}, err
@@ -63,6 +83,15 @@ func (s *service) Add(section Section) (Section, error) {
 }
 
 func (s *service) UpdateById(id int, section Section) (Section, error) {
+	has, err := s.HasSectionNumber(section.SectionNumber)
+	if err != nil {
+		return Section{}, errors.New("unable to update")
+	}
+
+	if !has {
+		return Section{}, errors.New("inexistent section")
+	}
+
 	ss, err := s.repository.UpdateById(id, section)
 	if err != nil {
 		return Section{}, err
