@@ -1,11 +1,26 @@
 package routes
 
 import (
+	"log"
+	"path/filepath"
+
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
 
 func ConfigRoutes(r *gin.Engine) *gin.Engine {
+
+	buyersFilePath, err := filepath.Abs("" + filepath.Join("data", "buyers.json"))
+	if err != nil {
+		log.Fatal("can't load warehouse data file")
+	}
+	buyerFile := store.New(store.FileType, buyersFilePath)
+	br := buyers.CreateRepository(buyerFile)
+	bs := buyers.CreateService(br)
+	bc := controllers.CreateBuyerController(bs)
+
 	mux := r.Group("api/")
 	{
 		warehouse := mux.Group("warehouse")
@@ -16,11 +31,11 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	{
 		buyers := mux.Group("buyers")
 		{
-			buyers.GET("/buyers", controllers.GetBuyers)
-			buyers.GET("/buyers/:id", controllers.GetBuyers)
-			buyers.POST("/buyers", controllers.GetBuyers)
-			buyers.PATCH("/buyers/:id", controllers.GetBuyers)
-			buyers.DELETE("/buyers/:id", controllers.GetBuyers)
+			buyers.GET("/", bc.GetAllBuyers)
+			buyers.GET("/:id", bc.GetBuyer)
+			buyers.POST("/", bc.SendBuyer)
+			buyers.PATCH("/:id", bc.UpdateBuyer)
+			buyers.DELETE("/:id", bc.DeleteBuyer)
 		}
 	}
 
