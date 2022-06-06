@@ -5,6 +5,7 @@ import (
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/section"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
 
 func ConfigRoutes(r *gin.Engine) *gin.Engine {
@@ -15,7 +16,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			warehouse.GET("/", controllers.Ping)
 		}
 
-		sdb := sections.New(sections.FileType, "data/sections.json")
+		sdb := store.New(store.FileType, "data/sections.json")
 		sr := sections.NewRepository(sdb)
 		ss := sections.NewService(sr)
 		sc := section.NewSection(ss)

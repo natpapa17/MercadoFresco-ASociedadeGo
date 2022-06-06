@@ -2,6 +2,8 @@ package sections
 
 import (
 	"log"
+
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
 
 type Repository interface {
@@ -15,10 +17,10 @@ type Repository interface {
 }
 
 type repository struct {
-	db Store
+	db store.Store
 }
 
-func NewRepository(db Store) Repository {
+func NewRepository(db store.Store) Repository {
 	return &repository{
 		db: db,
 	}
