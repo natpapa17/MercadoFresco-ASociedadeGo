@@ -1,5 +1,0 @@
-type Buyers struct {
-	ID int `json:"id"`
-	first_name string `json:"nome"`
-	last_name string `json:"sobrenome"`
-}

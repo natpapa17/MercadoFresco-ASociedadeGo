@@ -2,8 +2,8 @@ package buyers
 
 type Buyer struct {
 	ID int `json:"id"`
-	First_name string `json:"firstName"`
-	Last_name string `json:"lastName"`
+	FirstName string `json:"first_name"`
+	LastName string `json:"last_name"`
 	Address string `json:"address"`
-	Document_number string `json:"document"`
+	DocumentNumber string `json:"document_number"`
 }

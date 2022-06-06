@@ -174,19 +174,19 @@ func (bc *BuyerController) DeleteBuyer(ctx *gin.Context) {
 
 type buyerRequest struct {
 	ID int `json:"id" binding:"required"`
-	First_name string `json:"nome" binding:"required"`
-	Last_name string `json:"sobrenome" binding:"required"`
+	FirstName string `json:"first_name" binding:"required"`
+	LastName string `json:"last_name" binding:"required"`
 	Address string `json:"address" binding:"required"`
-	Document_number string `json:"document" binding:"required"`
+	DocumentNumber string `json:"document" binding:"required"`
 
 }
 
 func (br *buyerRequest) Validate() error {
-	if strings.TrimSpace(br.First_name) == "" {
+	if strings.TrimSpace(br.FirstName) == "" {
 		return errors.New("first name can't be empty")
 	}
 
-	if strings.TrimSpace(br.Last_name) == "" {
+	if strings.TrimSpace(br.LastName) == "" {
 		return errors.New("last name can't be empty")
 	}
 
@@ -194,7 +194,7 @@ func (br *buyerRequest) Validate() error {
 		return errors.New("address can't be empty")
 	}
 
-	if strings.TrimSpace(br.Document_number) == "" {
+	if strings.TrimSpace(br.DocumentNumber) == "" {
 		return errors.New("document number can't be empty")
 	}
 
