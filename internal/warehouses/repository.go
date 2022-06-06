@@ -56,7 +56,7 @@ func (r *repository) Create(warehouseCode string, address string, telephone stri
 func (r *repository) GetAll() ([]Warehouse, error) {
 	var ws []Warehouse
 	if err := r.file.Read(&ws); err != nil {
-		return []Warehouse{}, nil
+		return []Warehouse{}, err
 	}
 	return ws, nil
 }
@@ -65,7 +65,7 @@ func (r *repository) GetById(id int) (Warehouse, error) {
 	var ws []Warehouse
 
 	if err := r.file.Read(&ws); err != nil {
-		return Warehouse{}, nil
+		return Warehouse{}, err
 	}
 
 	for _, w := range ws {
@@ -80,7 +80,7 @@ func (r *repository) GetById(id int) (Warehouse, error) {
 func (r *repository) GetByWarehouseCode(code string) (Warehouse, error) {
 	var ws []Warehouse
 	if err := r.file.Read(&ws); err != nil {
-		return Warehouse{}, nil
+		return Warehouse{}, err
 	}
 
 	for _, w := range ws {
@@ -95,7 +95,7 @@ func (r *repository) GetByWarehouseCode(code string) (Warehouse, error) {
 func (r *repository) UpdateById(id int, warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (Warehouse, error) {
 	var ws []Warehouse
 	if err := r.file.Read(&ws); err != nil {
-		return Warehouse{}, nil
+		return Warehouse{}, err
 	}
 
 	result, updated := Warehouse{}, false
@@ -128,7 +128,7 @@ func (r *repository) UpdateById(id int, warehouseCode string, address string, te
 func (r *repository) DeleteById(id int) error {
 	var ws []Warehouse
 	if err := r.file.Read(&ws); err != nil {
-		return nil
+		return err
 	}
 
 	deleted := false
