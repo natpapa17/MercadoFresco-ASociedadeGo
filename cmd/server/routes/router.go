@@ -8,7 +8,7 @@ import (
 )
 
 func ConfigRoutes(r *gin.Engine) *gin.Engine {
-	sellersDb := store.New(store.FileType, "../../../data/sellers.json")
+	sellersDb := store.New(store.FileType, "data/sellers.json")
 	sellerRepo := sellers.NewRepository(sellersDb)
 	sellerService := sellers.NewService(sellerRepo)
 	sellerControllers := controllers.NewSeller(sellerService)

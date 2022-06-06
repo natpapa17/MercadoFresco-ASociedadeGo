@@ -77,7 +77,7 @@ func (r *repository) Store(id int, cid int, companyName string, address string ,
 }
 
 func (repository) Update(id , cid int, companyName, address, telephone string) (Seller, error) {
-	s := Seller{Id: id, Cid: cid, CompanyName: companyName, Addres: address, Telephone: telephone}
+	s := Seller{Id: id, Cid: cid, CompanyName: companyName, Address: address, Telephone: telephone}
 	updated := false
 	for i := range sl {
 		if sl[i].Id == id {

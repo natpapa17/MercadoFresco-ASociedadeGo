@@ -1,9 +1,9 @@
 package sellers
 
 type Seller struct{
-	Id	int `json:"id"`
-	Cid int `json:"cid"`
+	Id	int `json:"Id"`
+	Cid int `json:"Cid"`
 	CompanyName string `json:"CompanyName"`
-	Addres string `json:"Addres"`
-	Telephone string `json:"telephone"`
+	Address string `json:"Address"`
+	Telephone string `json:"Telephone"`
 }

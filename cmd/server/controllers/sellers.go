@@ -48,7 +48,7 @@ func (c *SellerController) Store() gin.HandlerFunc {
 			return
 		}
 
-		s, err := c.service.Store(req.Id, req.CompanyName, req.Addres, req.Telephone)
+		s, err := c.service.Store( req.Cid, req.CompanyName, req.Address, req.Telephone)
 		if err != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
@@ -62,7 +62,7 @@ func (c *SellerController) Store() gin.HandlerFunc {
 }
 
 func (sl *SellerController) GetByIdSeller(ctx *gin.Context) {
-	id, err := strconv.Atoi(ctx.Param("id"))
+	id, err := strconv.Atoi(ctx.Param("Id"))
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -87,7 +87,7 @@ func (sl *SellerController) GetByIdSeller(ctx *gin.Context) {
 
 func (c *SellerController) Update() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
+		id, err := strconv.ParseInt(ctx.Param("Id"), 10, 64)
 		if err != nil {
 			ctx.JSON(400, gin.H{"error": "invalid ID"})
 			return
@@ -103,7 +103,7 @@ func (c *SellerController) Update() gin.HandlerFunc {
 			ctx.JSON(400, gin.H{"error": "O nome da empresa é obrigatório"})
 			return
 		}
-		if req.Addres== "" {
+		if req.Address== "" {
 			ctx.JSON(400, gin.H{"error": "O endereco é obrigatório"})
 			return
 		}
@@ -116,7 +116,7 @@ func (c *SellerController) Update() gin.HandlerFunc {
 			return
 		}
 
-		s, err := c.service.Update(int(id), req.Cid, req.CompanyName, req.Addres, req.Telephone)
+		s, err := c.service.Update(int(id), req.Cid, req.CompanyName, req.Address, req.Telephone)
 		if err != nil {
 			ctx.JSON(404, gin.H{"error": err.Error()})
 			return
@@ -129,7 +129,7 @@ func (c *SellerController) Update() gin.HandlerFunc {
 
 func (c *SellerController) Delete() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
+		id, err := strconv.ParseInt(ctx.Param("Id"), 10, 64)
 		if err != nil {
 			ctx.JSON(400, gin.H{"error": "invalid ID"})
 			return
@@ -146,10 +146,9 @@ func (c *SellerController) Delete() gin.HandlerFunc {
 }
 
 type request struct {
-	Id	int `json:"id" binding:"required"`
-	Cid int `json:"cid" binding:"required"`
+	Cid int `json:"Cid" binding:"required"`
 	CompanyName string `json:"CompanyName" binding:"required"`
-	Addres string `json:"Addres" binding:"required"`
-	Telephone string `json:"telephone" binding:"required"`
+	Address string `json:"Address" binding:"required"`
+	Telephone string `json:"Telephone" binding:"required"`
 }
 
