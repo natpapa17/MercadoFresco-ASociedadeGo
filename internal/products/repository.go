@@ -1,17 +1,20 @@
 package products
 
 import (
+	"errors"
 	"fmt"
+
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
 
 var ps []Product = []Product{}
 
 type Repository interface {
 	GetAll() ([]Product, error)
-	GetById(id int) (*Product, error)
-	Create(Id int, ProductCode int, Description string, Width float64, Height float64, Length float64, NetWeight float64, ExpirationRate string, RecommendedFreezingTemperature float64, FreezingRate float64, ProductTypeId string, SellerId string) (Product, error)
+	GetById(id int) (Product, error)
+	Create(id int, productCode string, description string, width float64, height float64, length float64, netWeight float64, expirationRate int, recommendedFreezingTemperature float64, freezingRate int, productTypeId int, sellerId int) (Product, error)
 	LastID() (int, error)
-	Update(Id int, ProductCode int, Description string, Width float64, Height float64, Length float64, netWeight float64, ExpirationRate string, RecommendedFreezingTemperature float64, FreezingRate float64, ProductTypeId string, SellerId string) (Product, error)
+	Update(id int, productCode string, description string, width float64, height float64, length float64, netWeight float64, expirationRate int, recommendedFreezingTemperature float64, freezingRate int, productTypeId int, sellerId int) (Product, error)
 	Delete(id int) error
 }
 
@@ -21,18 +24,27 @@ type repository struct {
 
 func (r *repository) GetAll() ([]Product, error) {
 	var ps []Product
+
 	if err := r.db.Read(&ps); err != nil {
+
 		return []Product{}, nil
 	}
+
 	return ps, nil
 }
 
-func (r *repository) GetById() (*Product, error) {
-	var ps *Product
+func (r *repository) GetById(id int) (Product, error) {
+	var ps []Product
+
 	if err := r.db.Read(&ps); err != nil {
-		return &Product{}, nil
+		return Product{}, nil
 	}
-	return ps, nil
+	for _, p := range ps {
+		if p.Id == id {
+			return p, nil
+		}
+	}
+	return Product{}, errors.New("no product was found")
 }
 
 func (r *repository) LastID() (int, error) {
@@ -48,12 +60,12 @@ func (r *repository) LastID() (int, error) {
 	return ps[len(ps)-1].Id, nil
 }
 
-func (r *repository) Create(Id int, ProductCode int, Description string, Width float64, Height float64, Length float64, NetWeight float64, ExpirationRate string, RecommendedFreezingTemperature float64, FreezingRate float64, ProductTypeId string, SellerId string) (Product, error) {
+func (r *repository) Create(id int, productCode string, description string, width float64, height float64, length float64, netWeight float64, expirationRate int, recommendedFreezingTemperature float64, freezingRate int, productTypeId int, sellerId int) (Product, error) {
 	var ps []Product
 	if err := r.db.Read(&ps); err != nil {
 		return Product{}, err
 	}
-	p := Product{Id, ProductCode, Description, Width, Height, Length, NetWeight, ExpirationRate, RecommendedFreezingTemperature, FreezingRate, ProductTypeId, SellerId}
+	p := Product{id, productCode, description, width, height, length, netWeight, expirationRate, recommendedFreezingTemperature, freezingRate, productTypeId, sellerId}
 	ps = append(ps, p)
 	if err := r.db.Write(ps); err != nil {
 		return Product{}, err
@@ -61,39 +73,34 @@ func (r *repository) Create(Id int, ProductCode int, Description string, Width f
 	return p, nil
 }
 
-func (repository) Update(Id int, ProductCode int, Description string, Width float64, Height float64, Length float64, netWeight float64, ExpirationRate string, RecommendedFreezingTemperature float64, FreezingRate float64, ProductTypeId string, SellerId string) (Product, error) {
-	p := Product{Id: Id, ProductCode: ProductCode, Description: Description, Width: Width, Height: Height, Length: Length, NetWeight: netWeight, ExpirationRate: ExpirationRate, RecommendedFreezingTemperature: RecommendedFreezingTemperature, FreezingRate: FreezingRate, ProductTypeId: ProductTypeId, SellerId: SellerId}
+func (r repository) Update(id int, productCode string, description string, width float64, height float64, length float64, netWeight float64, expirationRate int, recommendedFreezingTemperature float64, freezingRate int, productTypeId int, sellerId int) (Product, error) {
+	var ps []Product
+	if err := r.db.Read(&ps); err != nil {
+		return Product{}, err
+	}
+	p := Product{Id: id, ProductCode: productCode, Description: description, Width: width, Height: height, Length: length, NetWeight: netWeight, ExpirationRate: expirationRate, RecommendedFreezingTemperature: recommendedFreezingTemperature, FreezingRate: freezingRate, ProductTypeId: productTypeId, SellerId: sellerId}
 	updated := false
 	for i := range ps {
-		if ps[i].Id == Id {
-			p.Id = Id
+		if ps[i].Id == id {
+			p.Id = id
 			ps[i] = p
 			updated = true
 		}
 	}
 	if !updated {
-		return Product{}, fmt.Errorf("produto %d não encontrado", Id)
+		return Product{}, fmt.Errorf("produto %d não encontrado", id)
+	}
+	if err := r.db.Write(ps); err != nil {
+		return Product{}, errors.New("can't write the product file")
 	}
 	return p, nil
 }
 
-func (repository) UpdateId(Id int) (Product, error) {
-	var p Product
-	updated := false
-	for i := range ps {
-		if ps[i].Id == Id {
-			ps[i].Id = Id
-			updated = true
-			p = ps[i]
-		}
+func (r repository) Delete(id int) error {
+	var ps []Product
+	if err := r.db.Read(&ps); err != nil {
+		return errors.New("can't read the product")
 	}
-	if !updated {
-		return Product{}, fmt.Errorf("produto %d no encontrado", id)
-	}
-	return p, nil
-}
-
-func (repository) Delete(id int) error {
 	deleted := false
 	var index int
 	for i := range ps {
@@ -107,6 +114,10 @@ func (repository) Delete(id int) error {
 	}
 
 	ps = append(ps[:index], ps[index+1:]...)
+	if err := r.db.Write(ps); err != nil {
+		return errors.New("can't write the product file")
+	}
+
 	return nil
 }
 

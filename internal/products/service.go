@@ -1,10 +1,12 @@
 package products
 
+import "fmt"
+
 type Service interface {
 	GetAll() ([]Product, error)
-	GetById(id int) (*Product, error)
-	Create(ProductCode int, Description string, Width float64, Height float64, Length float64, NetWeight float64, ExpirationRate string, RecommendedFreezingTemperature float64, FreezingRate float64, ProductTypeId string, SellerId string) (Product, error)
-	Update(Id int, ProductCode int, Description string, Width float64, Height float64, Length float64, NetWeight float64, ExpirationRate string, RecommendedFreezingTemperature float64, FreezingRate float64, ProductTypeId string, SellerId string) (Product, error)
+	GetById(id int) (Product, error)
+	Create(productCode string, description string, width float64, height float64, length float64, netWeight float64, expirationRate int, recommendedFreezingTemperature float64, freezingRate int, productTypeId int, sellerId int) (Product, error)
+	Update(id int, productCode string, description string, width float64, height float64, length float64, netWeight float64, expirationRate int, recommendedFreezingTemperature float64, freezingRate int, productTypeId int, sellerId int) (Product, error)
 	Delete(id int) error
 }
 
@@ -15,20 +17,22 @@ type service struct {
 func (s service) GetAll() ([]Product, error) {
 	ps, err := s.repository.GetAll()
 	if err != nil {
+		fmt.Println(ps)
 		return nil, err
 	}
+	fmt.Println(ps)
 	return ps, nil
 }
 
-func (s service) GetById(id int) (*Product, error) {
+func (s service) GetById(id int) (Product, error) {
 	ps, err := s.repository.GetById(id)
 	if err != nil {
-		return nil, err
+		return Product{}, err
 	}
 	return ps, nil
 }
 
-func (s service) Create(ProductCode int, Description string, Width float64, Height float64, Length float64, NetWeight float64, ExpirationRate string, RecommendedFreezingTemperature float64, FreezingRate float64, ProductTypeId string, SellerId string) (Product, error) {
+func (s service) Create(productCode string, description string, width float64, height float64, length float64, netWeight float64, expirationRate int, recommendedFreezingTemperature float64, freezingRate int, productTypeId int, sellerId int) (Product, error) {
 	lastID, err := s.repository.LastID()
 
 	if err != nil {
@@ -37,7 +41,7 @@ func (s service) Create(ProductCode int, Description string, Width float64, Heig
 
 	lastID++
 
-	product, err := s.repository.Create(lastID, ProductCode, Description, Width, Height, Length, NetWeight, ExpirationRate, RecommendedFreezingTemperature, FreezingRate, ProductTypeId, SellerId)
+	product, err := s.repository.Create(lastID, productCode, description, width, height, length, netWeight, expirationRate, recommendedFreezingTemperature, freezingRate, productTypeId, sellerId)
 
 	if err != nil {
 		return Product{}, err
@@ -47,8 +51,8 @@ func (s service) Create(ProductCode int, Description string, Width float64, Heig
 
 }
 
-func (s service) Update(lastId, Id int, ProductCode int, Description string, Width float64, Height float64, Length float64, NetWeight float64, ExpirationRate string, RecommendedFreezingTemperature float64, FreezingRate float64, ProductTypeId string, SellerId string) (Product, error) {
-	product, err := s.repository.Update(Id, ProductCode, Description, Width, Height, Length, NetWeight, ExpirationRate, RecommendedFreezingTemperature, FreezingRate, ProductTypeId, SellerId)
+func (s service) Update(id int, productCode string, description string, width float64, height float64, length float64, netWeight float64, expirationRate int, recommendedFreezingTemperature float64, freezingRate int, productTypeId int, sellerId int) (Product, error) {
+	product, err := s.repository.Update(id, productCode, description, width, height, length, netWeight, expirationRate, recommendedFreezingTemperature, freezingRate, productTypeId, sellerId)
 	if err != nil {
 		return Product{}, err
 	}
@@ -61,4 +65,10 @@ func (s service) Delete(id int) error {
 		return err
 	}
 	return err
+}
+
+func NewProductService(r Repository) Service {
+	return service{
+		repository: r,
+	}
 }
