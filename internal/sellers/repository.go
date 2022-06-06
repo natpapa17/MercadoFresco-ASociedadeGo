@@ -97,11 +97,11 @@ func (r repository) Update(id , cid int, companyName, address, telephone string)
 }
 
 func (r repository) Delete(id int) error {
-
+	var sl []Seller 
 	if err := r.db.Read(&sl); err != nil {
-		return Seller{}
+		return  nil
 	}
-	
+
 	deleted := false
 	var index int
 	for i := range sl {
