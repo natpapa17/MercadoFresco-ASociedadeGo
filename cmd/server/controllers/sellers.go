@@ -43,7 +43,6 @@ func (c *SellerController) Store() gin.HandlerFunc {
 		if err := ctx.ShouldBindJSON(&req); err != nil {
 			ctx.AbortWithStatusJSON(http.StatusBadRequest,
 				gin.H{
-					"error":   "VALIDATEERR-1",
 					"message": "Invalid inputs. Please check your inputs"})
 			return
 		}
@@ -64,7 +63,6 @@ func (c *SellerController) Store() gin.HandlerFunc {
 func (sl *SellerController) GetByIdSeller() gin.HandlerFunc{
 	return func (ctx *gin.Context){
 		id, err := strconv.Atoi(ctx.Param("id"))
-		fmt.Println(id)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{
 				"error": "invalid id",
@@ -90,7 +88,7 @@ func (sl *SellerController) GetByIdSeller() gin.HandlerFunc{
 
 func (c *SellerController) Update() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
+		id, err := strconv.Atoi(ctx.Param("id"))	
 		if err != nil {
 			ctx.JSON(400, gin.H{"error": "invalid ID"})
 			return
