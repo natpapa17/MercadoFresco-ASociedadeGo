@@ -86,10 +86,18 @@ func (r repository) Update(id , cid int, companyName, address, telephone string)
 	for i := range sl {
 		if sl[i].Id == id {
 			s.Id = id
-			sl[i] = s
+			sl[i] =s
 			updated = true
 		}
 	}
+
+
+	if err := r.db.Write(&sl); err != nil {
+		fmt.Println("Write Error")
+		return Seller{}, err
+	}
+
+
 	if !updated {
 		return Seller{}, fmt.Errorf("vendedor %d não encontrado", id)
 	}
@@ -115,6 +123,11 @@ func (r repository) Delete(id int) error {
 	}
 
 	sl= append(sl[:index], sl[index+1:]...)
+
+	if err := r.db.Write(&sl); err != nil {
+		fmt.Println("Write Error")
+		return err
+	}
 	return nil
 }
 
