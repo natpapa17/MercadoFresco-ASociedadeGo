@@ -48,19 +48,20 @@ func (r *repository) GetAll() ([]Seller, error) {
 }
 
 func (r *repository) GetById(id int) (Seller, error){
-	result, found := Seller{}, false
+	var sl []Seller 
+	if err := r.db.Read(&sl); err != nil {
+		return Seller{}, nil
+	}
+	
+
 	for _, s := range sl{
 		if s.Id == id{
-			result, found = s, true
-			break
+			return s, nil
 		}
 	}
 
-	if !found{
-		return Seller{}, errors.New("Nào foi possivel encontrar vendedor com este id")
-
-	}
-	return result, nil
+	
+	return Seller{},  errors.New("Nao encontrado")
 }
 
 func (r *repository) Store(id int, cid int, companyName string, address string , telephone string) (Seller, error) {
@@ -76,7 +77,10 @@ func (r *repository) Store(id int, cid int, companyName string, address string ,
 	return s, nil
 }
 
-func (repository) Update(id , cid int, companyName, address, telephone string) (Seller, error) {
+func (r repository) Update(id , cid int, companyName, address, telephone string) (Seller, error) {
+	if err := r.db.Read(&sl); err != nil {
+		return Seller{}, nil
+	}
 	s := Seller{Id: id, Cid: cid, CompanyName: companyName, Address: address, Telephone: telephone}
 	updated := false
 	for i := range sl {
@@ -92,7 +96,12 @@ func (repository) Update(id , cid int, companyName, address, telephone string) (
 	return s, nil
 }
 
-func (repository) Delete(id int) error {
+func (r repository) Delete(id int) error {
+
+	if err := r.db.Read(&sl); err != nil {
+		return Seller{}
+	}
+	
 	deleted := false
 	var index int
 	for i := range sl {

@@ -12,7 +12,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	sellerRepo := sellers.NewRepository(sellersDb)
 	sellerService := sellers.NewService(sellerRepo)
 	sellerControllers := controllers.NewSeller(sellerService)
-	
+
 	mux := r.Group("api/")
 	{
 		warehouse := mux.Group("warehouse")
@@ -20,14 +20,14 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			warehouse.GET("/", controllers.Ping)
 		}
 		seller := mux.Group("seller")
-	{
-		seller.GET("/", sellerControllers.GetAll())
-		seller.GET("/:id", sellerControllers.GetByIdSeller)
-		seller.POST("/", sellerControllers.Store())
-		seller.DELETE("/:id", sellerControllers.Delete())
-		seller.PATCH("/:id", sellerControllers.Update())
-		
-	}
+		{
+			seller.GET("/", sellerControllers.GetAll())
+			seller.GET("/:id", sellerControllers.GetByIdSeller())
+			seller.POST("/", sellerControllers.Store())
+			seller.DELETE("/:id", sellerControllers.Delete())
+			seller.PATCH("/:id", sellerControllers.Update())
+
+		}
 	}
 
 	return r

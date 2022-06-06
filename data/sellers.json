@@ -1,16 +1,51 @@
 [
-    {
-        "Id": 1,
-        "Cid": 1,
-        "CompanyName": "None",
-        "Address": "rua sem nome",
-        "Telephone": "000000"
-    },
-    {
-        "Id": 2,
-        "Cid": 4,
-        "CompanyName": "life",
-        "Address": "rua sem nome",
-        "Telephone": "000020"
-    }
+  {
+    "Id": 1,
+    "Cid": 1,
+    "CompanyName": "None",
+    "Address": "rua sem nome",
+    "Telephone": "000000"
+  },
+  {
+    "Id": 2,
+    "Cid": 4,
+    "CompanyName": "life",
+    "Address": "rua sem nome",
+    "Telephone": "000020"
+  },
+  {
+    "Id": 3,
+    "Cid": 3,
+    "CompanyName": "Life",
+    "Address": "none",
+    "Telephone": "0000"
+  },
+  {
+    "Id": 4,
+    "Cid": 3,
+    "CompanyName": "HerbaLIfe",
+    "Address": "none",
+    "Telephone": "0000"
+  },
+  {
+    "Id": 5,
+    "Cid": 3,
+    "CompanyName": "Viviansol",
+    "Address": "none",
+    "Telephone": "0000"
+  },
+  {
+    "Id": 6,
+    "Cid": 3,
+    "CompanyName": "Viviansol",
+    "Address": "none",
+    "Telephone": "0000"
+  },
+  {
+    "Id": 7,
+    "Cid": 3,
+    "CompanyName": "Viviansol",
+    "Address": "none",
+    "Telephone": "0000"
+  }
 ]

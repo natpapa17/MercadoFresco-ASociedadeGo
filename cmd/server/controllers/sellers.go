@@ -33,7 +33,7 @@ func (c *SellerController) GetAll() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, web.NewResponse(http.StatusOK, s))
+		ctx.JSON(http.StatusOK,  s)
 	}
 }
 
@@ -61,33 +61,36 @@ func (c *SellerController) Store() gin.HandlerFunc {
 	}
 }
 
-func (sl *SellerController) GetByIdSeller(ctx *gin.Context) {
-	id, err := strconv.Atoi(ctx.Param("Id"))
-
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid id",
+func (sl *SellerController) GetByIdSeller() gin.HandlerFunc{
+	return func (ctx *gin.Context){
+		id, err := strconv.Atoi(ctx.Param("id"))
+		fmt.Println(id)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"error": "invalid id",
+			})
+			return
+		}
+	
+		s, err := sl.service.GetById(id)
+		if err != nil {
+			ctx.JSON(http.StatusNotFound, gin.H{
+				"error": "can't find element with this id",
+			})
+			return
+		}
+	
+		ctx.JSON(http.StatusOK, gin.H{
+			"data": s,
 		})
-		return
 	}
-
-	s, err := sl.service.GetById(id)
-	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"error": "can't find element with this id",
-		})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"data": s,
-	})
+	
 }
 
 
 func (c *SellerController) Update() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		id, err := strconv.ParseInt(ctx.Param("Id"), 10, 64)
+		id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
 		if err != nil {
 			ctx.JSON(400, gin.H{"error": "invalid ID"})
 			return
@@ -129,7 +132,7 @@ func (c *SellerController) Update() gin.HandlerFunc {
 
 func (c *SellerController) Delete() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		id, err := strconv.ParseInt(ctx.Param("Id"), 10, 64)
+		id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
 		if err != nil {
 			ctx.JSON(400, gin.H{"error": "invalid ID"})
 			return
