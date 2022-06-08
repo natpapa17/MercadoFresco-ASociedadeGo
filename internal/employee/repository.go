@@ -2,7 +2,6 @@ package employee
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
@@ -48,17 +47,13 @@ func (r *repository) GetByCardNumberId(cardNumberId int) (Employee, error) {
 }
 
 func (r *repository) Create(cardNumberId int, firstName string, lastName string, wareHouseId int) (Employee, error) {
-	fmt.Println("entrei no repository.")
-	fmt.Println("Consolando info dentro do repository recebida pelo service...:", cardNumberId, firstName, lastName, wareHouseId)
+
 	var es []Employee
-	// if err := r.file.Read(&es); err != nil {
-	// 	return Employee{}, err
-	// }
-	fileErr := r.file.Read(&es)
-	fmt.Println("erro????", fileErr)
+	if err := r.file.Read(&es); err != nil {
+		return Employee{}, err
+	}
 
 	lastId, _ := r.lastId()
-	fmt.Sprintln("LasstID.:", lastId)
 
 	e := Employee{
 		Id:             lastId + 1,

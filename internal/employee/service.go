@@ -2,7 +2,6 @@ package employee
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
 )
@@ -28,7 +27,7 @@ func CreateService(r employeeInterface, w warehouses.Repository) EmployeeService
 }
 
 func (s *service) Create(cardNumberId int, firstName string, lastName string, wareHouseId int) (Employee, error) {
-	fmt.Println("consolando info dentro do service recebido pelo controller...:", cardNumberId, firstName, lastName, wareHouseId)
+
 	_, errCardNumberId := s.repository.GetByCardNumberId(cardNumberId)
 	_, wareHouseErr := s.wareHouseRepo.GetById(wareHouseId)
 

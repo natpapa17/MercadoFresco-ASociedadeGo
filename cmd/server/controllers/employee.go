@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -19,7 +18,7 @@ type employeeRequest struct {
 }
 
 func (er *employeeRequest) Validate() error {
-	fmt.Println("Requisição chegando no Controller:", er)
+
 	if er.Card_number_id <= 0 {
 		return errors.New("card_number_id must be greater than 0")
 	}
