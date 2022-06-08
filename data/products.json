@@ -12,5 +12,33 @@
     "freezing_rate": 2,
     "product_type_id": 2,
     "seller_id": 2
+  },
+  {
+    "id": 2,
+    "product_code": "PROD02",
+    "description": "Leite",
+    "width": 1.2,
+    "height": 6.4,
+    "length": 4.5,
+    "netweight": 3.4,
+    "expiration_rate": 1,
+    "recommended_freezing_temperature": 1.3,
+    "freezing_rate": 2,
+    "product_type_id": 2,
+    "seller_id": 4
+  },
+  {
+    "id": 3,
+    "product_code": "PROD03",
+    "description": "Água",
+    "width": 1.2,
+    "height": 6.4,
+    "length": 4.5,
+    "netweight": 3.4,
+    "expiration_rate": 1,
+    "recommended_freezing_temperature": 1.3,
+    "freezing_rate": 2,
+    "product_type_id": 2,
+    "seller_id": 4
   }
 ]

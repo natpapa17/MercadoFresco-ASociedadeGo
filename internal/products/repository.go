@@ -54,7 +54,7 @@ func (r *repository) GetByCode(productCode string) (Product, error) {
 	}
 	for _, p := range ps {
 		if p.ProductCode == productCode {
-			return p, nil
+			return p, errors.New("product code already in use")
 		}
 
 	}
