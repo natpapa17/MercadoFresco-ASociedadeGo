@@ -7,11 +7,10 @@ import (
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
 
-var ps []Product = []Product{}
-
 type Repository interface {
 	GetAll() ([]Product, error)
 	GetById(id int) (Product, error)
+	GetByCode(productCode string) (Product, error)
 	Create(id int, productCode string, description string, width float64, height float64, length float64, netWeight float64, expirationRate int, recommendedFreezingTemperature float64, freezingRate int, productTypeId int, sellerId int) (Product, error)
 	LastID() (int, error)
 	Update(id int, productCode string, description string, width float64, height float64, length float64, netWeight float64, expirationRate int, recommendedFreezingTemperature float64, freezingRate int, productTypeId int, sellerId int) (Product, error)
@@ -45,6 +44,21 @@ func (r *repository) GetById(id int) (Product, error) {
 		}
 	}
 	return Product{}, errors.New("no product was found")
+}
+
+func (r *repository) GetByCode(productCode string) (Product, error) {
+	var ps []Product
+
+	if err := r.db.Read(&ps); err != nil {
+		return Product{}, nil
+	}
+	for _, p := range ps {
+		if p.ProductCode == productCode {
+			return p, nil
+		}
+
+	}
+	return Product{}, errors.New("element not found")
 }
 
 func (r *repository) LastID() (int, error) {

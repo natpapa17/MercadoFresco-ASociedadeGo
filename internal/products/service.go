@@ -41,6 +41,12 @@ func (s service) Create(productCode string, description string, width float64, h
 
 	lastID++
 
+	ps, err := s.repository.GetByCode(productCode)
+
+	if ps.ProductCode != "" {
+		return Product{}, err
+	}
+
 	product, err := s.repository.Create(lastID, productCode, description, width, height, length, netWeight, expirationRate, recommendedFreezingTemperature, freezingRate, productTypeId, sellerId)
 
 	if err != nil {
@@ -52,7 +58,14 @@ func (s service) Create(productCode string, description string, width float64, h
 }
 
 func (s service) Update(id int, productCode string, description string, width float64, height float64, length float64, netWeight float64, expirationRate int, recommendedFreezingTemperature float64, freezingRate int, productTypeId int, sellerId int) (Product, error) {
+	codeProductInUse, err := s.repository.GetByCode(productCode)
+
+	if codeProductInUse.ProductCode != "" && codeProductInUse.ProductCode != productCode {
+		return Product{}, err
+	}
+
 	product, err := s.repository.Update(id, productCode, description, width, height, length, netWeight, expirationRate, recommendedFreezingTemperature, freezingRate, productTypeId, sellerId)
+
 	if err != nil {
 		return Product{}, err
 	}
@@ -61,13 +74,16 @@ func (s service) Update(id int, productCode string, description string, width fl
 
 func (s service) Delete(id int) error {
 	err := s.repository.Delete(id)
+
 	if err != nil {
 		return err
 	}
+
 	return err
 }
 
 func NewProductService(r Repository) Service {
+
 	return service{
 		repository: r,
 	}
