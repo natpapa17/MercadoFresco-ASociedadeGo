@@ -1,15 +1,15 @@
 [
   {
-    "id": 2,
+    "id": 1,
     "product_code": "PROD01",
-    "description": "Agua",
-    "width": 3.2,
+    "description": "Yogurt",
+    "width": 1.2,
     "height": 6.4,
     "length": 4.5,
     "netweight": 3.4,
-    "expiration_rate": 3,
+    "expiration_rate": 1,
     "recommended_freezing_temperature": 1.3,
-    "freezing_rate": 3,
+    "freezing_rate": 2,
     "product_type_id": 2,
     "seller_id": 2
   }

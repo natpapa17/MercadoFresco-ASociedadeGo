@@ -1,6 +1,8 @@
 package products
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Service interface {
 	GetAll() ([]Product, error)
@@ -61,6 +63,12 @@ func (s service) Update(id int, productCode string, description string, width fl
 	codeProductInUse, err := s.repository.GetByCode(productCode)
 
 	if codeProductInUse.ProductCode != "" && codeProductInUse.ProductCode != productCode {
+		return Product{}, err
+	}
+
+	ps, err := s.repository.GetByCode(productCode)
+
+	if ps.ProductCode != "" {
 		return Product{}, err
 	}
 
