@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/section"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/employee"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
@@ -34,7 +35,17 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	ss := sections.NewService(sr)
 	sc := section.NewSection(ss)
 
-	mux := r.Group("api/")
+	//Employee:
+	employeeFilePath, err := filepath.Abs("" + filepath.Join("data", "employee.json"))
+	if err != nil {
+		log.Fatal("can't load employee data file")
+	}
+	employeeFile := store.New(store.FileType, employeeFilePath)
+	er := employee.CreateRepository(employeeFile)
+	es := employee.CreateService(er, wr)
+	ec := controllers.CreateEmployeeController(es)
+
+	mux := r.Group("api/v1")
 	{
 		warehouse := mux.Group("warehouses")
 		{
@@ -61,6 +72,15 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			sec.GET("/:id", sc.GetById())
 			sec.PATCH("/:id", sc.UpdateById())
 			sec.DELETE("/:id", sc.Delete())
+		}
+
+		employee := mux.Group("employees")
+		{
+			employee.GET("/", ec.GetAllEmployee)
+			employee.GET("/:id", ec.GetByIdEmployee)
+			employee.PATCH("/:id", ec.UpdateByIdEmployee)
+			employee.DELETE("/:id", ec.DeleteByIdEmployee)
+			employee.POST("/", ec.CreateEmployee)
 		}
 	}
 
