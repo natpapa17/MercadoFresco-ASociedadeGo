@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/employee"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/section"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
@@ -15,8 +16,7 @@ import (
 )
 
 func ConfigRoutes(r *gin.Engine) *gin.Engine {
-
-
+//Buyers:
 	buyersFilePath, err := filepath.Abs("" + filepath.Join("data", "buyers.json"))
 	if err != nil {
 		log.Fatal("can't load warehouse data file")
@@ -26,7 +26,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	bs := buyers.CreateService(br)
 	bc := controllers.CreateBuyerController(bs)
   
-  
+  //WareHouses:
 	warehouseFilePath, err := filepath.Abs("" + filepath.Join("data", "warehouses.json"))
 	if err != nil {
 		log.Fatal("can't load warehouse data file")
@@ -36,18 +36,39 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	ws := warehouses.CreateService(wr)
 	wc := controllers.CreateWarehouseController(ws)
 
-	sellersDb := store.New(store.FileType, "data/sellers.json")
+	//Employee:
+	employeeFilePath, err := filepath.Abs("" + filepath.Join("data", "employee.json"))
+	if err != nil {
+		log.Fatal("can't load employee data file")
+	}
+	employeeFile := store.New(store.FileType, employeeFilePath)
+	er := employee.CreateRepository(employeeFile)
+	es := employee.CreateService(er, wr)
+	ec := controllers.CreateEmployeeController(es)
+
+//Sellers
+  sellersDbPath, err := filepath.Abs("" + filepath.Join("data", "employee.json"))
+	if err != nil {
+		log.Fatal("can't load employee data file")
+	}
+
+	sellersDb := store.New(store.FileType, sellersDbPath)
 	sellerRepo := sellers.NewRepository(sellersDb)
 	sellerService := sellers.NewService(sellerRepo)
 	sellerControllers := controllers.NewSeller(sellerService)
 
-	sdb := store.New(store.FileType, "data/sections.json")
+//Section
+  sectionsPath, err := filepath.Abs("" + filepath.Join("data", "employee.json"))
+	if err != nil {
+		log.Fatal("can't load employee data file")
+	}
+	sdb := store.New(store.FileType, sectionsPath)
 	sr := sections.NewRepository(sdb)
 	ss := sections.NewService(sr)
 	sc := section.NewSection(ss)
 
-
-	mux := r.Group("api/")
+///////////////////////////////////////////////////////////////////////////////////////
+	mux := r.Group("api/v1/")
 	{
 		warehouse := mux.Group("warehouses")
 		{
@@ -57,6 +78,15 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			warehouse.DELETE("/:id", wc.DeleteByIdWarehouse)
 			warehouse.POST("/", wc.CreateWarehouse)
 		}
+
+		employee := mux.Group("employees")
+		{
+			employee.GET("/", ec.GetAllEmployee)
+			employee.GET("/:id", ec.GetByIdEmployee)
+			employee.PATCH("/:id", ec.UpdateByIdEmployee)
+			employee.DELETE("/:id", ec.DeleteByIdEmployee)
+			employee.POST("/", ec.CreateEmployee)
+
 		seller := mux.Group("seller")
 		{
 			seller.GET("/", sellerControllers.GetAll())
@@ -64,7 +94,6 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			seller.POST("/", sellerControllers.Store())
 			seller.DELETE("/:id", sellerControllers.Delete())
 			seller.PATCH("/:id", sellerControllers.Update())
-
 		}
 
 		sec := mux.Group("section")
