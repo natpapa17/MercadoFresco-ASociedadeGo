@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/employee"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
@@ -22,6 +23,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	ws := warehouses.CreateService(wr)
 	wc := controllers.CreateWarehouseController(ws)
 
+
 	//Employee:
 	employeeFilePath, err := filepath.Abs("" + filepath.Join("data", "employee.json"))
 	if err != nil {
@@ -31,6 +33,19 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	er := employee.CreateRepository(employeeFile)
 	es := employee.CreateService(er, wr)
 	ec := controllers.CreateEmployeeController(es)
+
+//Sellers
+  sellersDb, err := filepath.Abs("" + filepath.Join("data", "employee.json"))
+	if err != nil {
+		log.Fatal("can't load employee data file")
+	}
+
+	sellersDb := store.New(store.FileType, "data/sellers.json")
+	sellerRepo := sellers.NewRepository(sellersDb)
+	sellerService := sellers.NewService(sellerRepo)
+	sellerControllers := controllers.NewSeller(sellerService)
+
+////////////////////////////////////////////////////////////////////////////
 
 	mux := r.Group("api/v1/")
 	{
@@ -42,6 +57,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			warehouse.DELETE("/:id", wc.DeleteByIdWarehouse)
 			warehouse.POST("/", wc.CreateWarehouse)
 		}
+
 		employee := mux.Group("employees")
 		{
 			employee.GET("/", ec.GetAllEmployee)
@@ -49,6 +65,14 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			employee.PATCH("/:id", ec.UpdateByIdEmployee)
 			employee.DELETE("/:id", ec.DeleteByIdEmployee)
 			employee.POST("/", ec.CreateEmployee)
+
+		seller := mux.Group("seller")
+		{
+			seller.GET("/", sellerControllers.GetAll())
+			seller.GET("/:id", sellerControllers.GetByIdSeller())
+			seller.POST("/", sellerControllers.Store())
+			seller.DELETE("/:id", sellerControllers.Delete())
+			seller.PATCH("/:id", sellerControllers.Update())
 		}
 	}
 

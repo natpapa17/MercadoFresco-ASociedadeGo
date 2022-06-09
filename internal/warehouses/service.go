@@ -1,6 +1,8 @@
 package warehouses
 
-import "errors"
+import (
+	"errors"
+)
 
 type Service interface {
 	Create(warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (Warehouse, error)
@@ -21,10 +23,15 @@ func CreateService(r Repository) Service {
 }
 
 func (s *service) Create(warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (Warehouse, error) {
-	_, err := s.repository.GetByWarehouseCode(warehouseCode)
+	w, err := s.repository.GetByWarehouseCode(warehouseCode)
 
-	if err == nil {
+	if w.Id != 0 {
 		return Warehouse{}, &BusinessRuleError{errors.New("this warehouse_code is already in use")}
+	}
+
+	var noContentError *NoElementInFileError
+	if err != nil && !errors.As(err, &noContentError) {
+		return Warehouse{}, err
 	}
 
 	warehouse, err := s.repository.Create(warehouseCode, address, telephone, minimumCapacity, minimumTemperature)
@@ -59,10 +66,13 @@ func (s *service) GetById(id int) (Warehouse, error) {
 func (s *service) UpdateById(id int, warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (Warehouse, error) {
 	isWareHouseCodeInUse, err := s.repository.GetByWarehouseCode(warehouseCode)
 
-	if err == nil {
-		if isWareHouseCodeInUse.Id != id {
-			return Warehouse{}, &BusinessRuleError{errors.New("this warehouse_code is already in use")}
-		}
+	if isWareHouseCodeInUse.Id != 0 && isWareHouseCodeInUse.Id != id {
+		return Warehouse{}, &BusinessRuleError{errors.New("this warehouse_code is already in use")}
+	}
+
+	var noContentError *NoElementInFileError
+	if err != nil && !errors.As(err, &noContentError) {
+		return Warehouse{}, err
 	}
 
 	w, err := s.repository.UpdateById(id, warehouseCode, address, telephone, minimumCapacity, minimumTemperature)
