@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/section"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
@@ -16,17 +15,6 @@ import (
 
 func ConfigRoutes(r *gin.Engine) *gin.Engine {
 
-
-	buyersFilePath, err := filepath.Abs("" + filepath.Join("data", "buyers.json"))
-	if err != nil {
-		log.Fatal("can't load warehouse data file")
-	}
-	buyerFile := store.New(store.FileType, buyersFilePath)
-	br := buyers.CreateRepository(buyerFile)
-	bs := buyers.CreateService(br)
-	bc := controllers.CreateBuyerController(bs)
-  
-  
 	warehouseFilePath, err := filepath.Abs("" + filepath.Join("data", "warehouses.json"))
 	if err != nil {
 		log.Fatal("can't load warehouse data file")
@@ -45,7 +33,6 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	sr := sections.NewRepository(sdb)
 	ss := sections.NewService(sr)
 	sc := section.NewSection(ss)
-
 
 	mux := r.Group("api/")
 	{
@@ -74,16 +61,6 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			sec.GET("/:id", sc.GetById())
 			sec.PATCH("/:id", sc.UpdateById())
 			sec.DELETE("/:id", sc.Delete())
-		}
-	}
-	{
-		buyers := mux.Group("buyers")
-		{
-			buyers.GET("/", bc.GetAllBuyers)
-			buyers.GET("/:id", bc.GetBuyer)
-			buyers.POST("/", bc.SendBuyer)
-			buyers.PATCH("/:id", bc.UpdateBuyer)
-			buyers.DELETE("/:id", bc.DeleteBuyer)
 		}
 	}
 
