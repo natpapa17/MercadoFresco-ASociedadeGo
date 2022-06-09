@@ -201,17 +201,17 @@ func (br *buyerRequest) Validate() error {
 	return nil
 }
 
-func isCustomError(e error) bool {
-	var be *buyers.BusinessRuleError
-	var fe *buyers.NoElementInFileError
+// func isCustomError(e error) bool {
+// 	var be *buyers.BusinessRuleError
+// 	var fe *buyers.NoElementInFileError
 
-	if errors.As(e, &be) {
-		return true
-	}
+// 	if errors.As(e, &be) {
+// 		return true
+// 	}
 
-	if errors.As(e, &fe) {
-		return true
-	}
+// 	if errors.As(e, &fe) {
+// 		return true
+// 	}
 
-	return false
-}
+// 	return false
+// }
