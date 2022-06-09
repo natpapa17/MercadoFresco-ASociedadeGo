@@ -20,7 +20,7 @@ func CreateBuyerController(bs buyers.Service) *BuyerController {
 	}
 }
 
-func (bc *BuyerController) CreateWarehouse(ctx *gin.Context) {
+func (bc *BuyerController) CreateBuyer(ctx *gin.Context) {
 	var req buyerRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{
@@ -36,7 +36,7 @@ func (bc *BuyerController) CreateWarehouse(ctx *gin.Context) {
 		return
 	}
 
-	b, err := bc.service.Create(req.First_name, req.Last_name, req.Address, req.Document_number)
+	b, err := bc.service.Create(req.FirstName, req.LastName, req.Address, req.DocumentNumber)
 	if err != nil {
 		if isCustomError(err) {
 			ctx.JSON(http.StatusBadRequest, gin.H{
@@ -122,7 +122,7 @@ func (bc *BuyerController) UpdateBuyer(ctx *gin.Context) {
 		return
 	}
 
-	b, err := bc.service.UpdateById(id, req.First_name, req.Last_name, req.Address, req.Document_number)
+	b, err := bc.service.UpdateById(id, req.FirstName, req.LastName, req.Address, req.DocumentNumber)
 	if err != nil {
 		if isCustomError(err) {
 			ctx.JSON(http.StatusNotFound, gin.H{

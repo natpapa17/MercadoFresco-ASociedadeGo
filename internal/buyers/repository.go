@@ -36,10 +36,10 @@ func (r *repository) Create(firstName string, lastName string, address string, d
 	}
 	b := Buyer{
 		ID:                 lastId + 1,
-		First_name:      firstName,
-		Last_name:          lastName,
+		FirstName:      firstName,
+		LastName:          lastName,
 		Address:            address,
-		Document_number:    document,
+		DocumentNumber:    document,
 	}
 
 	bs = append(bs, b)
@@ -84,10 +84,10 @@ func (r *repository) UpdateById(id int, firstName string, lastName string, addre
 		if b.ID == id {
 			bs[i], found = Buyer{
 				ID:                 id,
-				First_name:      firstName,
-				Last_name:          lastName,
+				FirstName:      firstName,
+				LastName:          lastName,
 				Address:            address,
-				Document_number:    document,
+				DocumentNumber:    document,
 			}, true
 			result = bs[i]
 			break
