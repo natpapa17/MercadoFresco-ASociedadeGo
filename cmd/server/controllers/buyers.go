@@ -3,26 +3,26 @@ package controllers
 import (
 	"errors"
 	"net/http"
-	"regexp"
+	_ "regexp"
 	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 )
 
-type WarehouseController struct {
-	service warehouses.Service
+type BuyerController struct {
+	service buyers.Service
 }
 
-func CreateWarehouseController(ws warehouses.Service) *WarehouseController {
-	return &WarehouseController{
-		service: ws,
+func CreateBuyerController(bs buyers.Service) *BuyerController {
+	return &BuyerController{
+		service: bs,
 	}
 }
 
-func (wc *WarehouseController) CreateWarehouse(ctx *gin.Context) {
-	var req warehouseRequest
+func (bc *BuyerController) CreateBuyer(ctx *gin.Context) {
+	var req buyerRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{
 			"error": err.Error(),
@@ -37,7 +37,7 @@ func (wc *WarehouseController) CreateWarehouse(ctx *gin.Context) {
 		return
 	}
 
-	w, err := wc.service.Create(req.WarehouseCode, req.Address, req.Telephone, req.MinimumCapacity, req.MinimumTemperature)
+	b, err := bc.service.Create(req.FirstName, req.LastName, req.Address, req.DocumentNumber)
 	if err != nil {
 		if isCustomError(err) {
 			ctx.JSON(http.StatusBadRequest, gin.H{
@@ -52,25 +52,24 @@ func (wc *WarehouseController) CreateWarehouse(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, gin.H{
-		"data": w,
+		"data": b,
 	})
 }
 
-func (wc *WarehouseController) GetAllWarehouses(ctx *gin.Context) {
-	w, err := wc.service.GetAll()
+func (bc *BuyerController) GetAllBuyers(ctx *gin.Context) {
+	b, err := bc.service.GetAll()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "internal server error",
 		})
 		return
 	}
-
 	ctx.JSON(http.StatusOK, gin.H{
-		"data": w,
+		"data": b,
 	})
 }
 
-func (wc *WarehouseController) GetByIdWarehouse(ctx *gin.Context) {
+func (bc *BuyerController) GetBuyer(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 
 	if err != nil {
@@ -80,7 +79,7 @@ func (wc *WarehouseController) GetByIdWarehouse(ctx *gin.Context) {
 		return
 	}
 
-	w, err := wc.service.GetById(id)
+	b, err := bc.service.GetById(id)
 	if err != nil {
 		if isCustomError(err) {
 			ctx.JSON(http.StatusNotFound, gin.H{
@@ -95,11 +94,11 @@ func (wc *WarehouseController) GetByIdWarehouse(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"data": w,
+		"data": b,
 	})
 }
 
-func (wc *WarehouseController) UpdateByIdWarehouse(ctx *gin.Context) {
+func (bc *BuyerController) UpdateBuyer(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 
 	if err != nil {
@@ -109,7 +108,7 @@ func (wc *WarehouseController) UpdateByIdWarehouse(ctx *gin.Context) {
 		return
 	}
 
-	var req warehouseRequest
+	var req buyerRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{
 			"error": err.Error(),
@@ -124,7 +123,7 @@ func (wc *WarehouseController) UpdateByIdWarehouse(ctx *gin.Context) {
 		return
 	}
 
-	w, err := wc.service.UpdateById(id, req.WarehouseCode, req.Address, req.Telephone, req.MinimumCapacity, req.MinimumTemperature)
+	b, err := bc.service.UpdateById(id, req.FirstName, req.LastName, req.Address, req.DocumentNumber)
 	if err != nil {
 		if isCustomError(err) {
 			ctx.JSON(http.StatusNotFound, gin.H{
@@ -137,13 +136,12 @@ func (wc *WarehouseController) UpdateByIdWarehouse(ctx *gin.Context) {
 		})
 		return
 	}
-
 	ctx.JSON(http.StatusOK, gin.H{
-		"data": w,
+		"data": b,
 	})
 }
 
-func (wc *WarehouseController) DeleteByIdWarehouse(ctx *gin.Context) {
+func (bc *BuyerController) SendBuyer(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 
 	if err != nil {
@@ -153,7 +151,7 @@ func (wc *WarehouseController) DeleteByIdWarehouse(ctx *gin.Context) {
 		return
 	}
 
-	err = wc.service.DeleteById(id)
+	err = bc.service.DeleteById(id)
 	if err != nil {
 		if isCustomError(err) {
 			ctx.JSON(http.StatusNotFound, gin.H{
@@ -166,56 +164,39 @@ func (wc *WarehouseController) DeleteByIdWarehouse(ctx *gin.Context) {
 		})
 		return
 	}
-
-	ctx.JSON(http.StatusNoContent, gin.H{})
+	ctx.JSON(http.StatusOK, gin.H{})
 }
 
-type warehouseRequest struct {
-	WarehouseCode      string  `json:"warehouse_code" binding:"required"`
-	Address            string  `json:"address" binding:"required"`
-	Telephone          string  `json:"telephone" binding:"required"`
-	MinimumCapacity    int     `json:"minimum_capacity" binding:"required"`
-	MinimumTemperature float64 `json:"minimum_temperature" binding:"required"`
+func (bc *BuyerController) DeleteBuyer(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{
+		"value": "ok",
+	})
 }
 
-func (wr *warehouseRequest) Validate() error {
-	if strings.TrimSpace(wr.WarehouseCode) == "" {
-		return errors.New("warehouse_code can't be empty")
+type buyerRequest struct {
+	ID             int    `json:"id" binding:"required"`
+	FirstName      string `json:"first_name" binding:"required"`
+	LastName       string `json:"last_name" binding:"required"`
+	Address        string `json:"address" binding:"required"`
+	DocumentNumber string `json:"document" binding:"required"`
+}
+
+func (br *buyerRequest) Validate() error {
+	if strings.TrimSpace(br.FirstName) == "" {
+		return errors.New("first name can't be empty")
 	}
 
-	if strings.TrimSpace(wr.Address) == "" {
+	if strings.TrimSpace(br.LastName) == "" {
+		return errors.New("last name can't be empty")
+	}
+
+	if strings.TrimSpace(br.Address) == "" {
 		return errors.New("address can't be empty")
-
 	}
 
-	if strings.TrimSpace(wr.Telephone) == "" {
-		return errors.New("telephone can't be empty")
-
-	}
-
-	if match, err := regexp.MatchString("^\\([1-9]{2}\\)\\s[0-9]{4,5}-[0-9]{4}$", wr.Telephone); err != nil || !match {
-		return errors.New("telephone must respect the pattern (xx) xxxxx-xxxx or (xx) xxxx-xxxx")
-
-	}
-
-	if wr.MinimumCapacity <= 0 {
-		return errors.New("minimum_capacity must be greater than 0")
+	if strings.TrimSpace(br.DocumentNumber) == "" {
+		return errors.New("document number can't be empty")
 	}
 
 	return nil
-}
-
-func isCustomError(e error) bool {
-	var be *warehouses.BusinessRuleError
-	var fe *warehouses.NoElementInFileError
-
-	if errors.As(e, &be) {
-		return true
-	}
-
-	if errors.As(e, &fe) {
-		return true
-	}
-
-	return false
 }
