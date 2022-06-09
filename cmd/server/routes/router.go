@@ -8,6 +8,7 @@ import (
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/section"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/employee"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/products"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
@@ -15,6 +16,14 @@ import (
 )
 
 func ConfigRoutes(r *gin.Engine) *gin.Engine {
+	productsFilePath, err := filepath.Abs("" + filepath.Join("data", "products.json"))
+	if err != nil {
+		log.Fatal("can't load products data file")
+	}
+	productsFile := store.New(store.FileType, productsFilePath)
+	pr := products.NewRepository(productsFile)
+	ps := products.NewProductService(pr)
+	pc := controllers.NewProductController(ps)
 
 	warehouseFilePath, err := filepath.Abs("" + filepath.Join("data", "warehouses.json"))
 	if err != nil {
@@ -82,6 +91,15 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			employee.DELETE("/:id", ec.DeleteByIdEmployee)
 			employee.POST("/", ec.CreateEmployee)
 		}
+		products := mux.Group("products")
+		{
+			products.GET("/", pc.GetAll())
+			products.GET("/:id", pc.GetById())
+			products.POST("/", pc.Create())
+			products.PATCH("/:id", pc.Update())
+			products.DELETE("/:id", pc.Delete())
+		}
+
 	}
 
 	return r
