@@ -361,10 +361,9 @@
 - url:  `localhost:8080/api/v1/employees/id`
 - método: `GET`
 - responses em caso de sucesso: 
-    - status: 200
-      - body:
+- status: 200
+- body:
         ```
-      {
         "data": {
           "id": INT,
           "card_number_id": INT,
@@ -372,7 +371,6 @@
           "Last_name": STRING,
           "warehouse_id": INT
         }
-      }
         ```
 - responses em caso de falha: 
     - status: 400
