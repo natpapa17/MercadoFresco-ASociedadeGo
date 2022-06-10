@@ -366,11 +366,11 @@
         ```
       {
         "data": {
-        "id": INT,
-        "card_number_id": INT,
-        "first_name": STRING,
-        "Last_name": STRING,
-        "warehouse_id": INT
+          "id": INT,
+          "card_number_id": INT,
+          "first_name": STRING,
+          "Last_name": STRING,
+          "warehouse_id": INT
         }
       }
         ```
