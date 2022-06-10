@@ -81,7 +81,7 @@ func (bc *BuyerController) GetBuyer(ctx *gin.Context) {
 
 	b, err := bc.service.GetById(id)
 	if err != nil {
-		if isCustomError(err) {
+		if CustomError(err) {
 			ctx.JSON(http.StatusNotFound, gin.H{
 				"error": err.Error(),
 			})
@@ -125,7 +125,7 @@ func (bc *BuyerController) UpdateBuyer(ctx *gin.Context) {
 
 	b, err := bc.service.UpdateById(id, req.FirstName, req.LastName, req.Address, req.DocumentNumber)
 	if err != nil {
-		if isCustomError(err) {
+		if CustomError(err) {
 			ctx.JSON(http.StatusNotFound, gin.H{
 				"error": err.Error(),
 			})
@@ -153,7 +153,7 @@ func (bc *BuyerController) DeleteBuyer(ctx *gin.Context) {
 
 	err = bc.service.DeleteById(id)
 	if err != nil {
-		if isCustomError(err) {
+		if CustomError(err) {
 			ctx.JSON(http.StatusNotFound, gin.H{
 				"error": err.Error(),
 			})
@@ -193,4 +193,19 @@ func (br *buyerRequest) Validate() error {
 	}
 
 	return nil
+}
+
+func CustomError(e error) bool {
+	var be *buyers.BusinessRuleError
+	var fe *buyers.NoElementInFileError
+
+	if errors.As(e, &be) {
+		return true
+	}
+
+	if errors.As(e, &fe) {
+		return true
+	}
+
+	return false
 }
