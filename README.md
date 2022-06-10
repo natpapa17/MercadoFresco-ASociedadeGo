@@ -1,7 +1,147 @@
 # API - MercadoFresco - Grupo: A Sociedade do GO
 
 ## Sellers
+### Cadastrar Seller
+- uri:  `localhost:8080/api/v1/seller`
+- método: `POST`
+- body: 
+  ```
+  {
+    "Cid": string, unique
+    "CompanyName": string
+    "Address": string
+    "Telephone": string
 
+  }
+  ```
+- responses em caso de sucesso: 
+    - status: 201
+      - body:
+        ```
+        "data": {
+          "id": number
+          "Cid": string, unique
+          "CompanyName": string
+          "Address": string
+          "Telephone": string
+        }
+        ```
+- responses em caso de falha: 
+    - status: 400
+    - status: 422
+    - status: 500
+      - body: comum para todas as requisições com falha
+        ```
+        {
+          "error": string
+        }
+        ```
+
+### Listar todas os sellers
+- uri:  `localhost:8080/api/v1/seller`
+- método: `GET`
+
+- responses em caso de sucesso: 
+    - status: 200
+      - body:
+        ```
+        "data": [
+          {
+            "id": number
+           "Cid": string, unique
+           "CompanyName": string
+           "Address": string
+           "Telephone": string
+          },
+          ...
+        ]
+        ```
+- responses em caso de falha: 
+    - status: 500
+      - body:
+        ```
+        {
+          "error": string
+        }
+        ```
+
+### Listar seller por Id
+- uri:  `localhost:8080/api/v1/seller/:id`
+- método: `GET`
+- responses em caso de sucesso: 
+    - status: 200
+      - body:
+        ```
+        "data": {
+          "id": number
+          "Cid": string, unique
+          "CompanyName": string
+          "Address": string
+          "Telephone": string
+        }
+        ```
+- responses em caso de falha: 
+    - status: 400
+    - status: 404
+    - status: 500
+      - body: comum para todas as requisições com falha
+        ```
+        {
+          "error": string
+        }
+        ```
+
+### Atualizar seller
+- uri:  `localhost:8080/api/v1/seller/:id`
+- método: `PATCH`
+- body: 
+  ```
+  {
+   
+          "Cid": string, unique
+          "CompanyName": string
+          "Address": string
+          "Telephone": string
+  }
+  ```
+- responses em caso de sucesso: 
+    - status: 200
+      - body:
+        ```
+        "data": {
+          "Cid": string, unique
+          "CompanyName": string
+          "Address": string
+          "Telephone": string
+        }
+        ```
+- responses em caso de falha: 
+    - status: 400
+    - status: 404
+    - status: 422
+    - status: 500
+      - body: comum para todas as requisições com falha
+        ```
+        {
+          "error": string
+        }
+        ```
+
+### Deletar seller
+- uri:  `localhost:8080/api/v1/seller/:id`
+- método: `DELETE`
+- responses em caso de sucesso: 
+    - status: 204
+- responses em caso de falha: 
+    - status: 400
+    - status: 404
+    - status: 500
+      - body: comum para todas as requisições com falha
+        ```
+        {
+          "error": string
+        }
+        ```
 ## Warehouses
 ### Cadastrar Warehouse
 - uri:  `localhost:8080/api/v1/warehouses`
