@@ -17,7 +17,7 @@ type repository struct{
 	file store.Store
 }
 
-func CreateRepository(file store.Store) Repository {
+func CreateBuyerRepository(file store.Store) Repository {
 	return &repository{
 		file: file,
 	}
