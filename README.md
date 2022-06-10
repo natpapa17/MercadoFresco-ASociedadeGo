@@ -363,7 +363,8 @@
 - responses em caso de sucesso: 
 - status: 200
 - body:
-        ```
+
+  ```
         "data": {
           "id": INT,
           "card_number_id": INT,
@@ -371,7 +372,7 @@
           "Last_name": STRING,
           "warehouse_id": INT
         }
-        ```
+  ```
 - responses em caso de falha: 
     - status: 400
     - status: 404
