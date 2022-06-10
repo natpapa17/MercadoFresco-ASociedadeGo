@@ -68,7 +68,7 @@ func (s service) Update(id int, productCode string, description string, width fl
 
 	ps, err := s.repository.GetByCode(productCode)
 
-	if ps.ProductCode != "" {
+	if ps.Id != id {
 		return Product{}, err
 	}
 
