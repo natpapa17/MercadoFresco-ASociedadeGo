@@ -25,6 +25,15 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	ps := products.NewProductService(pr)
 	pc := controllers.NewProductController(ps)
 
+	BuyersFilePath, err := filepath.Abs("" + filepath.Join("data", "buyers.json"))
+	if err != nil {
+		log.Fatal("can't load buyers data file")
+	}
+	buyersFile := store.New(store.FileType, BuyersFilePath)
+	br := products.NewRepository(buyersFile)
+	bs := products.NewProductService(br)
+	bc := controllers.NewProductController(bs)
+
 	warehouseFilePath, err := filepath.Abs("" + filepath.Join("data", "warehouses.json"))
 	if err != nil {
 		log.Fatal("can't load warehouse data file")
@@ -63,6 +72,14 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			warehouse.PATCH("/:id", wc.UpdateByIdWarehouse)
 			warehouse.DELETE("/:id", wc.DeleteByIdWarehouse)
 			warehouse.POST("/", wc.CreateWarehouse)
+		}
+				buyer := mux.Group("buyers")
+		{
+			buyer.GET("/", bc.GetAll())
+			buyer.GET("/:id", bc.GetById())
+			buyer.PATCH("/:id", bc.Update())
+			buyer.DELETE("/:id", bc.Delete())
+			buyer.POST("/", bc.Create())
 		}
 		seller := mux.Group("seller")
 		{
