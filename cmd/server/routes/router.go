@@ -11,6 +11,7 @@ import (
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/products"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
@@ -30,9 +31,9 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 		log.Fatal("can't load buyers data file")
 	}
 	buyersFile := store.New(store.FileType, BuyersFilePath)
-	br := products.NewRepository(buyersFile)
-	bs := products.NewProductService(br)
-	bc := controllers.NewProductController(bs)
+	br := buyers.CreateBuyerRepository(buyersFile)
+	bs := buyers.CreateBuyerService(br)
+	bc := controllers.CreateBuyerController(bs)
 
 	warehouseFilePath, err := filepath.Abs("" + filepath.Join("data", "warehouses.json"))
 	if err != nil {
@@ -73,14 +74,16 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			warehouse.DELETE("/:id", wc.DeleteByIdWarehouse)
 			warehouse.POST("/", wc.CreateWarehouse)
 		}
-				buyer := mux.Group("buyers")
+
+		buyer := mux.Group("buyers")
 		{
-			buyer.GET("/", bc.GetAll())
-			buyer.GET("/:id", bc.GetById())
-			buyer.PATCH("/:id", bc.Update())
-			buyer.DELETE("/:id", bc.Delete())
-			buyer.POST("/", bc.Create())
+			buyer.GET("/", bc.GetAllBuyers)
+			buyer.GET("/:id", bc.GetBuyer)
+			buyer.PATCH("/:id", bc.UpdateBuyer)
+			buyer.DELETE("/:id", bc.DeleteBuyer)
+			buyer.POST("/", bc.CreateBuyer)
 		}
+
 		seller := mux.Group("seller")
 		{
 			seller.GET("/", sellerControllers.GetAll())
@@ -108,6 +111,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			employee.DELETE("/:id", ec.DeleteByIdEmployee)
 			employee.POST("/", ec.CreateEmployee)
 		}
+
 		products := mux.Group("products")
 		{
 			products.GET("/", pc.GetAll())

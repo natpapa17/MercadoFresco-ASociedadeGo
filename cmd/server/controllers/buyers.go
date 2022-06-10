@@ -141,7 +141,7 @@ func (bc *BuyerController) UpdateBuyer(ctx *gin.Context) {
 	})
 }
 
-func (bc *BuyerController) SendBuyer(ctx *gin.Context) {
+func (bc *BuyerController) DeleteBuyer(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 
 	if err != nil {
@@ -164,13 +164,7 @@ func (bc *BuyerController) SendBuyer(ctx *gin.Context) {
 		})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{})
-}
-
-func (bc *BuyerController) DeleteBuyer(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{
-		"value": "ok",
-	})
+	ctx.JSON(http.StatusNoContent, gin.H{})
 }
 
 type buyerRequest struct {
