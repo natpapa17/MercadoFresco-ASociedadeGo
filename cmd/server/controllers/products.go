@@ -63,10 +63,7 @@ func (c *ProductController) Create() gin.HandlerFunc {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": "O código do produto é obrigatório"})
 			return
 		}
-		/*if req.ProductCode != "" {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "O código do produto já está em uso"})
-			return
-		}*/
+
 		if req.Description == "" {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": "A descrição do produto é obrigatória"})
 			return
