@@ -328,7 +328,7 @@
         }
         ```
 
-### Listar todas os Employees
+### Listar todos os Employees
 - url:  `localhost:8080/api/v1/employees`
 - método: `GET`
 
