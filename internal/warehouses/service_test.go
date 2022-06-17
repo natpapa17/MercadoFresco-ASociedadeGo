@@ -14,6 +14,10 @@ func makeCreateParams() (string, string, string, int, float64) {
 	return "valid_code", "valid_address", "(99) 99999-9999", 10, 5.0
 }
 
+func makeUpdateByIdParams() (int, string, string, string, int, float64) {
+	return 1, "valid_code", "updated_address", "(99) 99999-9999", 20, 15.0
+}
+
 func makeWarehouse() warehouses.Warehouse {
 	return warehouses.Warehouse{
 		Id:                 1,
@@ -22,6 +26,17 @@ func makeWarehouse() warehouses.Warehouse {
 		Telephone:          "(99) 99999-9999",
 		MinimumCapacity:    10,
 		MinimumTemperature: 5.0,
+	}
+}
+
+func makeUpdatedWarehouse() warehouses.Warehouse {
+	return warehouses.Warehouse{
+		Id:                 1,
+		WarehouseCode:      "valid_code",
+		Address:            "updated_address",
+		Telephone:          "(99) 99999-9999",
+		MinimumCapacity:    20,
+		MinimumTemperature: 15.0,
 	}
 }
 
@@ -178,6 +193,87 @@ func TestGetById(t *testing.T) {
 		w, err := sut.GetById(1)
 
 		assert.Equal(t, makeWarehouse(), w)
+		assert.Nil(t, err)
+	})
+}
+
+func TestUpdateById(t *testing.T) {
+	mockWarehouseRepository := mocks.NewRepository(t)
+	sut := warehouses.CreateService(mockWarehouseRepository)
+
+	t.Run("Should call GetByWarehouseCode from Warehouse Repository with correct code", func(t *testing.T) {
+		mockWarehouseRepository.
+			On("GetByWarehouseCode", mock.AnythingOfType("string")).
+			Return(warehouses.Warehouse{}, &warehouses.NoElementInFileError{errors.New("can't find element with this id")}).
+			Once()
+		mockWarehouseRepository.
+			On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).
+			Return(makeUpdatedWarehouse(), nil).
+			Once()
+
+		sut.UpdateById(makeUpdateByIdParams())
+
+		mockWarehouseRepository.AssertCalled(t, "GetByWarehouseCode", "valid_code")
+	})
+
+	t.Run("Should return error if new warehouse code provided is in use", func(t *testing.T) {
+		dbWarehouse := makeWarehouse()
+		dbWarehouse.Id = 3
+		mockWarehouseRepository.On("GetByWarehouseCode", mock.AnythingOfType("string")).Return(dbWarehouse, nil).Once()
+
+		_, err := sut.UpdateById(makeUpdateByIdParams())
+
+		assert.EqualError(t, err, "this warehouse_code is already in use")
+	})
+
+	t.Run("Should return error if GetByWarehouseCode from Warehouse Repository returns an error other than noElementInFile", func(t *testing.T) {
+		mockWarehouseRepository.On("GetByWarehouseCode", mock.AnythingOfType("string")).Return(warehouses.Warehouse{}, errors.New("any_error")).Once()
+
+		_, err := sut.UpdateById(makeUpdateByIdParams())
+
+		assert.EqualError(t, err, "any_error")
+	})
+
+	t.Run("Should call UpdateById from Warehouse Repository with correct values", func(t *testing.T) {
+		mockWarehouseRepository.
+			On("GetByWarehouseCode", mock.AnythingOfType("string")).
+			Return(warehouses.Warehouse{}, &warehouses.NoElementInFileError{errors.New("can't find element with this id")}).
+			Once()
+		mockWarehouseRepository.
+			On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).
+			Return(makeUpdatedWarehouse(), nil).Once()
+
+		sut.UpdateById(makeUpdateByIdParams())
+
+		mockWarehouseRepository.AssertCalled(t, "UpdateById", 1, "valid_code", "updated_address", "(99) 99999-9999", 20, 15.0)
+	})
+
+	t.Run("Should return error if UpdateById from Warehouse Repository returns an error", func(t *testing.T) {
+		mockWarehouseRepository.
+			On("GetByWarehouseCode", mock.AnythingOfType("string")).
+			Return(warehouses.Warehouse{}, &warehouses.NoElementInFileError{errors.New("can't find element with this id")}).
+			Once()
+		mockWarehouseRepository.
+			On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).
+			Return(warehouses.Warehouse{}, errors.New("any_error")).Once()
+		_, err := sut.UpdateById(makeUpdateByIdParams())
+
+		assert.EqualError(t, err, "any_error")
+	})
+
+	t.Run("Should return an Updated Warehouse on success", func(t *testing.T) {
+		mockWarehouseRepository.
+			On("GetByWarehouseCode", mock.AnythingOfType("string")).
+			Return(warehouses.Warehouse{}, &warehouses.NoElementInFileError{errors.New("can't find element with this id")}).
+			Once()
+		mockWarehouseRepository.
+			On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).
+			Return(makeUpdatedWarehouse(), nil).
+			Once()
+
+		w, err := sut.UpdateById(makeUpdateByIdParams())
+
+		assert.Equal(t, makeUpdatedWarehouse(), w)
 		assert.Nil(t, err)
 	})
 }
