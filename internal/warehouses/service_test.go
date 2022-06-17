@@ -277,3 +277,41 @@ func TestUpdateById(t *testing.T) {
 		assert.Nil(t, err)
 	})
 }
+
+func TestDeleteById(t *testing.T) {
+	mockWarehouseRepository := mocks.NewRepository(t)
+	sut := warehouses.CreateService(mockWarehouseRepository)
+
+	t.Run("Should call DeleteById from Warehouse Repository with correct id", func(t *testing.T) {
+		mockWarehouseRepository.
+			On("DeleteById", mock.AnythingOfType("int")).
+			Return(nil).
+			Once()
+
+		sut.DeleteById(1)
+
+		mockWarehouseRepository.AssertCalled(t, "DeleteById", 1)
+	})
+
+	t.Run("Should return an error if DeleteById from Warehouse Repository returns an error", func(t *testing.T) {
+		mockWarehouseRepository.
+			On("DeleteById", mock.AnythingOfType("int")).
+			Return(errors.New("any_error")).
+			Once()
+
+		err := sut.DeleteById(1)
+
+		assert.EqualError(t, err, "any_error")
+	})
+
+	t.Run("Should return nil on success", func(t *testing.T) {
+		mockWarehouseRepository.
+			On("DeleteById", mock.AnythingOfType("int")).
+			Return(nil).
+			Once()
+
+		err := sut.DeleteById(1)
+
+		assert.Nil(t, err)
+	})
+}
