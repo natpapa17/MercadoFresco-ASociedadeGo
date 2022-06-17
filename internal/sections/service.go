@@ -1,6 +1,8 @@
 package sections
 
-import "errors"
+import (
+	"errors"
+)
 
 var ss []Section = []Section{}
 
@@ -9,7 +11,7 @@ type Service interface {
 	GetById(id int) (Section, error)
 	LastID() (int, error)
 	HasSectionNumber(number int) (bool, error)
-	Add(section Section) (Section, error)
+	Add(sectionNumber int, currentTemperature float32, minimumTemprarature float32, currentCapacity int, minimumCapacity int, maximumCapacity int, warehouseID int, productTypeID int) (Section, error)
 	UpdateById(id int, section Section) (Section, error)
 	Delete(id int) error
 }
@@ -56,8 +58,8 @@ func (s *service) HasSectionNumber(number int) (bool, error) {
 	return has, nil
 }
 
-func (s *service) Add(section Section) (Section, error) {
-	has, err := s.HasSectionNumber(section.SectionNumber)
+func (s *service) Add(sectionNumber int, currentTemperature float32, minimumTemprarature float32, currentCapacity int, minimumCapacity int, maximumCapacity int, warehouseID int, productTypeID int) (Section, error) {
+	has, err := s.HasSectionNumber(sectionNumber)
 	if err != nil {
 		return Section{}, errors.New("unable to add")
 	}
@@ -73,7 +75,17 @@ func (s *service) Add(section Section) (Section, error) {
 
 	id++
 
-	section.ID = id
+	section := Section{
+		ID:                  id,
+		SectionNumber:       sectionNumber,
+		CurrentTemperature:  currentTemperature,
+		MinimumTemprarature: minimumTemprarature,
+		CurrentCapacity:     currentCapacity,
+		MinimumCapacity:     minimumCapacity,
+		MaximumCapacity:     maximumCapacity,
+		WarehouseID:         warehouseID,
+		ProductTypeID:       productTypeID,
+	}
 
 	ss, err := s.repository.Add(section)
 	if err != nil {
@@ -83,7 +95,8 @@ func (s *service) Add(section Section) (Section, error) {
 }
 
 func (s *service) UpdateById(id int, section Section) (Section, error) {
-	has, err := s.HasSectionNumber(section.SectionNumber)
+	has, err := s.HasSectionNumber(id)
+
 	if err != nil {
 		return Section{}, errors.New("unable to update")
 	}

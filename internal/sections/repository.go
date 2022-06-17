@@ -1,7 +1,7 @@
 package sections
 
 import (
-	"log"
+	"errors"
 
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
@@ -37,7 +37,7 @@ func (r *repository) GetAll() ([]Section, error) {
 func (r *repository) GetById(id int) (Section, error) {
 	var ss []Section
 	if err := r.db.Read(&ss); err != nil {
-		return Section{}, nil
+		return Section{}, errors.New("Unable to read database.")
 	}
 
 	for _, s := range ss {
@@ -46,7 +46,7 @@ func (r *repository) GetById(id int) (Section, error) {
 		}
 	}
 
-	return Section{}, nil
+	return Section{}, errors.New("Id not found.")
 }
 
 func (r *repository) LastID() (int, error) {
@@ -135,13 +135,11 @@ func (r *repository) UpdateById(id int, section Section) (Section, error) {
 	}(&ss, section)
 
 	if err := r.db.Write(nss); err != nil {
-		log.Println("Write Error")
 		return Section{}, err
 	}
 
 	ns, err := r.GetById(id)
 	if err != nil {
-		log.Println("GetById Error")
 		return Section{}, err
 	}
 
@@ -154,18 +152,25 @@ func (r *repository) Delete(id int) error {
 		return err
 	}
 
-	nss := func(old *[]Section) *[]Section {
+	found := false
+	nss := func(old *[]Section, found *bool) *[]Section {
+
 		for i, s := range ss {
 			if s.ID == id {
 				ss = append(ss[:i], ss[i+1:]...)
+				*found = true
 			}
 		}
+
 		return &ss
 
-	}(&ss)
+	}(&ss, &found)
+
+	if !found {
+		return errors.New("Id not found")
+	}
 
 	if err := r.db.Write(nss); err != nil {
-		log.Println("Write Error")
 		return err
 	}
 
