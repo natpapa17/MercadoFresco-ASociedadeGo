@@ -113,7 +113,7 @@ func (c *SellerController) Update() gin.HandlerFunc {
 			return
 		}
 		if req.Cid== 0 {
-			ctx.JSON(400, gin.H{"error": "A cidade  é obrigatória"})
+			ctx.JSON(400, gin.H{"error": "O CID é obrigatório"})
 			return
 		}
 
