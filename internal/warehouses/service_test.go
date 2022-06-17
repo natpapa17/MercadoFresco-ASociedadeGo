@@ -103,3 +103,42 @@ func TestCreate(t *testing.T) {
 		assert.Nil(t, err)
 	})
 }
+
+func TestGetAll(t *testing.T) {
+	mockWarehouseRepository := mocks.NewRepository(t)
+	sut := warehouses.CreateService(mockWarehouseRepository)
+
+	t.Run("Should call GetAll from Warehouse Repository", func(t *testing.T) {
+		mockWarehouseRepository.
+			On("GetAll").
+			Return([]warehouses.Warehouse{makeWarehouse()}, nil).
+			Once()
+
+		sut.GetAll()
+
+		mockWarehouseRepository.AssertCalled(t, "GetAll")
+	})
+
+	t.Run("Should return an error if GetAll from Warehouse Repository returns an error", func(t *testing.T) {
+		mockWarehouseRepository.
+			On("GetAll").
+			Return([]warehouses.Warehouse{}, errors.New("any_error")).
+			Once()
+
+		_, err := sut.GetAll()
+
+		assert.EqualError(t, err, "any_error")
+	})
+
+	t.Run("Should return an slice of Warehouses on success", func(t *testing.T) {
+		mockWarehouseRepository.
+			On("GetAll").
+			Return([]warehouses.Warehouse{makeWarehouse()}, nil).
+			Once()
+
+		ws, err := sut.GetAll()
+
+		assert.Equal(t, []warehouses.Warehouse{makeWarehouse()}, ws)
+		assert.Nil(t, err)
+	})
+}
