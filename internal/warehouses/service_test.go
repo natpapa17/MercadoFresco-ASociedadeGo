@@ -142,3 +142,42 @@ func TestGetAll(t *testing.T) {
 		assert.Nil(t, err)
 	})
 }
+
+func TestGetById(t *testing.T) {
+	mockWarehouseRepository := mocks.NewRepository(t)
+	sut := warehouses.CreateService(mockWarehouseRepository)
+
+	t.Run("Should call GetById from Warehouse Repository with correct id", func(t *testing.T) {
+		mockWarehouseRepository.
+			On("GetById", mock.AnythingOfType("int")).
+			Return(makeWarehouse(), nil).
+			Once()
+
+		sut.GetById(1)
+
+		mockWarehouseRepository.AssertCalled(t, "GetById", 1)
+	})
+
+	t.Run("Should return an error if GetById from Warehouse Repository returns an error", func(t *testing.T) {
+		mockWarehouseRepository.
+			On("GetById", mock.AnythingOfType("int")).
+			Return(warehouses.Warehouse{}, errors.New("any_error")).
+			Once()
+
+		_, err := sut.GetById(1)
+
+		assert.EqualError(t, err, "any_error")
+	})
+
+	t.Run("Should return an Warehouses on success", func(t *testing.T) {
+		mockWarehouseRepository.
+			On("GetById", mock.AnythingOfType("int")).
+			Return(makeWarehouse(), nil).
+			Once()
+
+		w, err := sut.GetById(1)
+
+		assert.Equal(t, makeWarehouse(), w)
+		assert.Nil(t, err)
+	})
+}
