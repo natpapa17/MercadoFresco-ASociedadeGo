@@ -225,3 +225,61 @@ func TestGetAllWarehouse(t *testing.T) {
 		assert.Equal(t, "{\"data\":[{\"id\":1,\"warehouse_code\":\"valid_code\",\"address\":\"valid_address\",\"telephone\":\"(99) 99999-9999\",\"minimum_capacity\":10,\"minimum_temperature\":5}]}", rr.Body.String())
 	})
 }
+
+func TestGetByIdWarehouse(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	mockWarehouseService := mocks.NewService(t)
+	sut := controllers.CreateWarehouseController(mockWarehouseService)
+
+	r := gin.Default()
+	r.GET("/warehouses/:id", sut.GetByIdWarehouse)
+
+	t.Run("Should return an error and 400 status if a invalid id is provided", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/warehouses/invalid_id", nil)
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		assert.Equal(t, "{\"error\":\"invalid id\"}", rr.Body.String())
+	})
+
+	t.Run("Should call GetById from Warehouse Service with correct id", func(t *testing.T) {
+		mockWarehouseService.On("GetById", mock.AnythingOfType("int")).Return(makeDBWarehouse(), nil).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/warehouses/1", nil)
+		r.ServeHTTP(rr, req)
+
+		mockWarehouseService.AssertCalled(t, "GetById", 1)
+	})
+
+	t.Run("Should return an error and 404 status if GetById from Warehouse Service returns not find the correspondent element", func(t *testing.T) {
+		mockWarehouseService.On("GetById", mock.AnythingOfType("int")).Return(warehouses.Warehouse{}, &warehouses.NoElementInFileError{Err: errors.New("any_message")}).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/warehouses/404", nil)
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+		assert.Equal(t, "{\"error\":\"any_message\"}", rr.Body.String())
+	})
+
+	t.Run("Should return an error and 500 status if GetById from Warehouse Service returns an error", func(t *testing.T) {
+		mockWarehouseService.On("GetById", mock.AnythingOfType("int")).Return(warehouses.Warehouse{}, errors.New("any_message")).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/warehouses/1", nil)
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+		assert.Equal(t, "{\"error\":\"internal server error\"}", rr.Body.String())
+	})
+
+	t.Run("Should 200 status and data on success", func(t *testing.T) {
+		mockWarehouseService.On("GetById", mock.AnythingOfType("int")).Return(makeDBWarehouse(), nil).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/warehouses/1", nil)
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, "{\"data\":{\"id\":1,\"warehouse_code\":\"valid_code\",\"address\":\"valid_address\",\"telephone\":\"(99) 99999-9999\",\"minimum_capacity\":10,\"minimum_temperature\":5}}", rr.Body.String())
+	})
+}
