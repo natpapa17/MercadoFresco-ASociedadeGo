@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func makeUnprocessableCreateBody() *bytes.Buffer {
+func makeUnprocessableCreateAndUpdateBody() *bytes.Buffer {
 	return bytes.NewBuffer([]byte(`
 		{
 			"warehouse_code": "XPTO",
@@ -30,6 +30,18 @@ func makeValidCreateBody() *bytes.Buffer {
 	{
     "warehouse_code": "valid_code",
     "address": "valid_address",
+    "telephone": "(44) 99909-9999",
+    "minimum_capacity": 10,
+    "minimum_temperature": 8.7
+	}
+`))
+}
+
+func makeValidUpdateBody() *bytes.Buffer {
+	return bytes.NewBuffer([]byte(`
+	{
+    "warehouse_code": "valid_code",
+    "address": "updated_address",
     "telephone": "(44) 99909-9999",
     "minimum_capacity": 10,
     "minimum_temperature": 8.7
@@ -118,6 +130,17 @@ func makeDBWarehouse() warehouses.Warehouse {
 	}
 }
 
+func makeUpdatedDBWarehouse() warehouses.Warehouse {
+	return warehouses.Warehouse{
+		Id:                 1,
+		WarehouseCode:      "valid_code",
+		Address:            "updated_address",
+		Telephone:          "(99) 99999-9999",
+		MinimumCapacity:    10,
+		MinimumTemperature: 5.0,
+	}
+}
+
 func TestCreateWarehouse(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
@@ -129,7 +152,7 @@ func TestCreateWarehouse(t *testing.T) {
 
 	t.Run("Should return an error and 422 status if body request contains unprocessable data", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		req, _ := http.NewRequest(http.MethodPost, "/warehouses", makeUnprocessableCreateBody())
+		req, _ := http.NewRequest(http.MethodPost, "/warehouses", makeUnprocessableCreateAndUpdateBody())
 		r.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusUnprocessableEntity, rr.Code)
@@ -281,5 +304,83 @@ func TestGetByIdWarehouse(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.Equal(t, "{\"data\":{\"id\":1,\"warehouse_code\":\"valid_code\",\"address\":\"valid_address\",\"telephone\":\"(99) 99999-9999\",\"minimum_capacity\":10,\"minimum_temperature\":5}}", rr.Body.String())
+	})
+}
+
+func TestUpdateWarehouse(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	mockWarehouseService := mocks.NewService(t)
+	sut := controllers.CreateWarehouseController(mockWarehouseService)
+
+	r := gin.Default()
+	r.PATCH("/warehouses/:id", sut.UpdateByIdWarehouse)
+
+	t.Run("Should return an error and 400 status if a invalid id is provided", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodPatch, "/warehouses/invalid_id", makeValidUpdateBody())
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		assert.Equal(t, "{\"error\":\"invalid id\"}", rr.Body.String())
+	})
+
+	t.Run("Should return an error and 422 status if body request contains unprocessable data", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodPatch, "/warehouses/1", makeUnprocessableCreateAndUpdateBody())
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnprocessableEntity, rr.Code)
+		assert.Contains(t, rr.Body.String(), "{\"error\":")
+	})
+
+	t.Run("Should return an error and 400 status if body request contains invalid data", func(t *testing.T) {
+		testCases := makeInvalidCreateAndUpdateBodiesTestCases()
+		for _, tc := range testCases {
+			rr := httptest.NewRecorder()
+			req, _ := http.NewRequest(http.MethodPatch, "/warehouses/1", bytes.NewBuffer([]byte(tc.RequestBody)))
+			r.ServeHTTP(rr, req)
+			assert.Equal(t, http.StatusBadRequest, rr.Code)
+			assert.Equal(t, tc.ExpectedResponseBody, rr.Body.String())
+		}
+	})
+
+	t.Run("Should call UpdateById from Warehouse Service with correct values", func(t *testing.T) {
+		mockWarehouseService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(makeUpdatedDBWarehouse(), nil).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodPatch, "/warehouses/1", makeValidUpdateBody())
+		r.ServeHTTP(rr, req)
+
+		mockWarehouseService.AssertCalled(t, "UpdateById", 1, "valid_code", "updated_address", "(44) 99909-9999", 10, 8.7)
+	})
+
+	t.Run("Should return an error and 404 status if UpdateById from Warehouse Service returns an Business Rule error", func(t *testing.T) {
+		mockWarehouseService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(warehouses.Warehouse{}, &warehouses.BusinessRuleError{Err: errors.New("any_message")}).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodPatch, "/warehouses/1", makeValidUpdateBody())
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+		assert.Equal(t, "{\"error\":\"any_message\"}", rr.Body.String())
+	})
+
+	t.Run("Should return an error and 500 status if UpdateById from Warehouse Service did not returns an custom error", func(t *testing.T) {
+		mockWarehouseService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(warehouses.Warehouse{}, errors.New("any_message")).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodPatch, "/warehouses/1", makeValidUpdateBody())
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+		assert.Equal(t, "{\"error\":\"internal server error\"}", rr.Body.String())
+	})
+
+	t.Run("Should 200 status and data on success", func(t *testing.T) {
+		mockWarehouseService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(makeUpdatedDBWarehouse(), nil).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodPatch, "/warehouses/1", makeValidCreateBody())
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, "{\"data\":{\"id\":1,\"warehouse_code\":\"valid_code\",\"address\":\"updated_address\",\"telephone\":\"(99) 99999-9999\",\"minimum_capacity\":10,\"minimum_temperature\":5}}", rr.Body.String())
 	})
 }
