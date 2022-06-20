@@ -186,3 +186,42 @@ func TestCreateWarehouse(t *testing.T) {
 		assert.Equal(t, "{\"data\":{\"id\":1,\"warehouse_code\":\"valid_code\",\"address\":\"valid_address\",\"telephone\":\"(99) 99999-9999\",\"minimum_capacity\":10,\"minimum_temperature\":5}}", rr.Body.String())
 	})
 }
+
+func TestGetAllWarehouse(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	mockWarehouseService := mocks.NewService(t)
+	sut := controllers.CreateWarehouseController(mockWarehouseService)
+
+	r := gin.Default()
+	r.GET("/warehouses", sut.GetAllWarehouses)
+
+	t.Run("Should call GetAll from Warehouse Service", func(t *testing.T) {
+		mockWarehouseService.On("GetAll").Return([]warehouses.Warehouse{makeDBWarehouse()}, nil).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/warehouses", nil)
+		r.ServeHTTP(rr, req)
+
+		mockWarehouseService.AssertNumberOfCalls(t, "GetAll", 1)
+	})
+
+	t.Run("Should return an error and 500 status if GetAll from Warehouse Service returns an error", func(t *testing.T) {
+		mockWarehouseService.On("GetAll").Return([]warehouses.Warehouse{}, errors.New("any_message")).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/warehouses", nil)
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+		assert.Equal(t, "{\"error\":\"internal server error\"}", rr.Body.String())
+	})
+
+	t.Run("Should 200 status and data on success", func(t *testing.T) {
+		mockWarehouseService.On("GetAll").Return([]warehouses.Warehouse{makeDBWarehouse()}, nil).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/warehouses", nil)
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, "{\"data\":[{\"id\":1,\"warehouse_code\":\"valid_code\",\"address\":\"valid_address\",\"telephone\":\"(99) 99999-9999\",\"minimum_capacity\":10,\"minimum_temperature\":5}]}", rr.Body.String())
+	})
+}
