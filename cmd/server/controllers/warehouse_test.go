@@ -384,3 +384,61 @@ func TestUpdateWarehouse(t *testing.T) {
 		assert.Equal(t, "{\"data\":{\"id\":1,\"warehouse_code\":\"valid_code\",\"address\":\"updated_address\",\"telephone\":\"(99) 99999-9999\",\"minimum_capacity\":10,\"minimum_temperature\":5}}", rr.Body.String())
 	})
 }
+
+func TestDeleteByIdWarehouse(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	mockWarehouseService := mocks.NewService(t)
+	sut := controllers.CreateWarehouseController(mockWarehouseService)
+
+	r := gin.Default()
+	r.DELETE("/warehouses/:id", sut.DeleteByIdWarehouse)
+
+	t.Run("Should return an error and 400 status if a invalid id is provided", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodDelete, "/warehouses/invalid_id", nil)
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		assert.Equal(t, "{\"error\":\"invalid id\"}", rr.Body.String())
+	})
+
+	t.Run("Should call DeleteById from Warehouse Service with correct id", func(t *testing.T) {
+		mockWarehouseService.On("DeleteById", mock.AnythingOfType("int")).Return(nil).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodDelete, "/warehouses/1", nil)
+		r.ServeHTTP(rr, req)
+
+		mockWarehouseService.AssertCalled(t, "DeleteById", 1)
+	})
+
+	t.Run("Should return an error and 404 status if DeleteById from Warehouse Service returns not find the correspondent element", func(t *testing.T) {
+		mockWarehouseService.On("DeleteById", mock.AnythingOfType("int")).Return(&warehouses.NoElementInFileError{Err: errors.New("any_message")}).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodDelete, "/warehouses/404", nil)
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+		assert.Equal(t, "{\"error\":\"any_message\"}", rr.Body.String())
+	})
+
+	t.Run("Should return an error and 500 status if DeleteById from Warehouse Service returns an error", func(t *testing.T) {
+		mockWarehouseService.On("DeleteById", mock.AnythingOfType("int")).Return(errors.New("any_message")).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodDelete, "/warehouses/1", nil)
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+		assert.Equal(t, "{\"error\":\"internal server error\"}", rr.Body.String())
+	})
+
+	t.Run("Should 200 status and data on success", func(t *testing.T) {
+		mockWarehouseService.On("DeleteById", mock.AnythingOfType("int")).Return(nil).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodDelete, "/warehouses/1", nil)
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNoContent, rr.Code)
+		assert.Empty(t, rr.Body.String())
+	})
+}
