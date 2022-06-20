@@ -2,7 +2,7 @@ package sellers_test
 
 import (
 	"errors"
-	"fmt"
+	
 
 	"testing"
 
@@ -103,32 +103,73 @@ func TestStore(t *testing.T){
 		Telephone: "00000",
 	}
 
-	t.Run("crete_ok: Se contiver os campos necessários, será criado", func(t *testing.T) {
-		
-		mockRepo.On("Store", int(219), "Name", "Addres", "telephone").Return(expectSeller, nil)
+	t.Run("create_ok: if the fields are correct, the new seller will be stored", func(t *testing.T) {
+		mockRepo.On("LastID").Return(1, nil).Once()
+		mockRepo.On("Store",  mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(expectSeller, nil).Once()
 
 		service := sellers.NewService(mockRepo)
 
-		result, _ := service.Store(int(219), "Name", "Addres", "telephone")
-
+		result, _ := service.Store(219, "Name", "Addres", "telephone")
+		
 		assert.Equal(t, expectSeller, result)
 	})
 
-	t.Run("create_conflict: Se o Cid já existir, ele não pode ser criado", func(t *testing.T) {
+}
 
-		
-
-		mockRepo.On("Store", int(219), "Name", "Addres", "telephone").Return(expectSeller, fmt.Errorf("Card number id is not unique."))
-
+func TestUpdate(t *testing.T){
+	mockRepo := mocks.NewRepository(t)
+	expectSeller := sellers.Seller{
+		Id:    1,
+		Cid:  1,
+		CompanyName:  "None",
+		Address: "none",
+		Telephone: "00000",
+	}
+	t.Run("update_ok: return the updated information", func(t*testing.T){
+	
+		mockRepo.On("Update", mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(expectSeller, nil).Once()
 		service := sellers.NewService(mockRepo)
+		result, _ := service.Update( int(1),int(219), "Name", "Addres", "telephone")
+		
+		assert.Equal(t, expectSeller, result)
 
-		seller, err := service.Store(int(219), "Name", "Addres", "telephone")
+	})
+}
 
-		assert.NotNil(t, err)
-		assert.Empty(t, seller)
-		assert.Equal(t, err.Error(), "Cid is not unique.")
+
+func TestGetById(t *testing.T){
+	mockRepo := mocks.NewRepository(t)
+
+	expectedSellersList := []sellers.Seller{
+		{
+			Id:          1,
+			Cid:         219,
+			CompanyName: "Meta",
+			Address:     " SP",
+			Telephone:   "00000000",
+		},
+		{
+			Id:          2,
+			Cid:         422,
+			CompanyName: "Herbalife",
+			Address:     "None",
+			Telephone:   "0000000",
+		},
+	}
+	t.Run("find_by_id_existent: if the Id exists, it will return the element with its information", func(t *testing.T) {
+		mockRepo.On("GetById", int(2)).Return(expectedSellersList[1], nil)
+		service := sellers.NewService(mockRepo)
+	
+		result, err := service.GetById(int(2))
+	
+		assert.Nil(t, err)
+		assert.Equal(t, expectedSellersList[1], result)
+
+
 
 	})
 	
 
 }
+
+
