@@ -10,9 +10,9 @@ type SellerRepository struct {
 }
 
 func (s *SellerRepository) Delete(id int) error{
-	args:= s.Called()
+	args:= s.Called(id)
 	var err error
-	if rf, ok := args.Get(0).(func(id int) error); ok{
+	if rf, ok := args.Get(0).(func(int) error); ok{
 		err = rf(id)
 	}else{
 		err = args.Error(0)
@@ -21,7 +21,7 @@ func (s *SellerRepository) Delete(id int) error{
 }
 
 func (s *SellerRepository)Update(id int,Cid int, CompanyName string, Addres, Telephone string) (sellers.Seller, error){
-	args := s.Called()
+	args := s.Called(id, Cid, CompanyName, Addres, Telephone )
 	var seller sellers.Seller
 
 	if rf, ok := args.Get(0).(func(
@@ -141,4 +141,19 @@ func (s *SellerRepository) Store(id , Cid int,CompanyName, Addres, Telephone str
 	}
 
 	return seller, err
+}
+
+type mockConstructorTestingTNewRepository interface {
+	mock.TestingT
+	Cleanup(func())
+}
+
+// NewRepository creates a new instance of Repository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
+func NewRepository(t mockConstructorTestingTNewRepository) *SellerRepository {
+	mock := &SellerRepository{}
+	mock.Mock.Test(t)
+
+	t.Cleanup(func() { mock.AssertExpectations(t) })
+
+	return mock
 }
