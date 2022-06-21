@@ -11,7 +11,6 @@ import (
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/mocks"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
