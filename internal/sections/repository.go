@@ -11,7 +11,7 @@ type Repository interface {
 	GetById(id int) (Section, error)
 	LastID() (int, error)
 	HasSectionNumber(number int) (bool, error)
-	Add(section Section) (Section, error)
+	Add(id int, sectionNumber int, currentTemperature float32, minimumTemprarature float32, currentCapacity int, minimumCapacity int, maximumCapacity int, warehouseID int, productTypeID int) (Section, error)
 	UpdateById(id int, section Section) (Section, error)
 	Delete(id int) error
 }
@@ -81,10 +81,22 @@ func (r *repository) HasSectionNumber(number int) (bool, error) {
 	return false, nil
 }
 
-func (r *repository) Add(section Section) (Section, error) {
+func (r *repository) Add(id int, sectionNumber int, currentTemperature float32, minimumTemprarature float32, currentCapacity int, minimumCapacity int, maximumCapacity int, warehouseID int, productTypeID int) (Section, error) {
 	var ss []Section
 	if err := r.db.Read(&ss); err != nil {
 		return Section{}, err
+	}
+
+	section := Section{
+		ID:                  id,
+		SectionNumber:       sectionNumber,
+		CurrentTemperature:  currentTemperature,
+		MinimumTemprarature: minimumTemprarature,
+		CurrentCapacity:     currentCapacity,
+		MinimumCapacity:     minimumCapacity,
+		MaximumCapacity:     maximumCapacity,
+		WarehouseID:         warehouseID,
+		ProductTypeID:       productTypeID,
 	}
 
 	ss = append(ss, section)

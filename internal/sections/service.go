@@ -75,19 +75,7 @@ func (s *service) Add(sectionNumber int, currentTemperature float32, minimumTemp
 
 	id++
 
-	section := Section{
-		ID:                  id,
-		SectionNumber:       sectionNumber,
-		CurrentTemperature:  currentTemperature,
-		MinimumTemprarature: minimumTemprarature,
-		CurrentCapacity:     currentCapacity,
-		MinimumCapacity:     minimumCapacity,
-		MaximumCapacity:     maximumCapacity,
-		WarehouseID:         warehouseID,
-		ProductTypeID:       productTypeID,
-	}
-
-	ss, err := s.repository.Add(section)
+	ss, err := s.repository.Add(id, sectionNumber, currentTemperature, minimumTemprarature, currentCapacity, minimumCapacity, maximumCapacity, warehouseID, productTypeID)
 	if err != nil {
 		return Section{}, err
 	}
