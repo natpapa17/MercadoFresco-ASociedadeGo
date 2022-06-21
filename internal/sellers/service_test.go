@@ -103,7 +103,7 @@ func TestStore(t *testing.T){
 		Telephone: "00000",
 	}
 
-	t.Run("create_ok: if the fields are correct, the new seller will be stored", func(t *testing.T) {
+	t.Run("if the fields are correct, the new seller will be stored", func(t *testing.T) {
 		mockRepo.On("LastID").Return(1, nil).Once()
 		mockRepo.On("Store",  mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(expectSeller, nil).Once()
 
@@ -125,7 +125,7 @@ func TestUpdate(t *testing.T){
 		Address: "none",
 		Telephone: "00000",
 	}
-	t.Run("update_ok: return the updated information", func(t*testing.T){
+	t.Run("return the updated information", func(t*testing.T){
 	
 		mockRepo.On("Update", mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(expectSeller, nil).Once()
 		service := sellers.NewService(mockRepo)
@@ -135,7 +135,7 @@ func TestUpdate(t *testing.T){
 
 	})
 
-	t.Run("update_non_existent: If the element with the specified id not exists, return nil", func(t *testing.T) {
+	t.Run(" If the element with the specified id not exists, return nil", func(t *testing.T) {
 		mockRepo.On("Update", int(3), int(219),"None", "None", "None").Return(sellers.Seller{}, fmt.Errorf("Seller not found"))
 		service := sellers.NewService(mockRepo)
 
@@ -168,7 +168,7 @@ func TestGetById(t *testing.T){
 			Telephone:   "0000000",
 		},
 	}
-	t.Run("find_by_id_existent: if the Id exists, it will return the element with its information", func(t *testing.T) {
+	t.Run(" if the Id exists, it will return the element with its information", func(t *testing.T) {
 		mockRepo.On("GetById", int(2)).Return(expectedSellersList[1], nil)
 		service := sellers.NewService(mockRepo)
 	
@@ -181,7 +181,7 @@ func TestGetById(t *testing.T){
 
 	})
 
-	t.Run("find_by_id_non_existent: if the element with the specified Id not exists,, return nil", func(t *testing.T) {
+	t.Run("fif the element with the specified Id not exists,, return nil", func(t *testing.T) {
 		mockRepo.On("GetById", int(1)).Return(sellers.Seller{}, fmt.Errorf("Seller not found."))
 		service := sellers.NewService(mockRepo)
 
