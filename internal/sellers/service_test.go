@@ -2,7 +2,7 @@ package sellers_test
 
 import (
 	"errors"
-	
+	"fmt"
 
 	"testing"
 
@@ -134,6 +134,18 @@ func TestUpdate(t *testing.T){
 		assert.Equal(t, expectSeller, result)
 
 	})
+
+	t.Run("update_non_existent: If the element with the specified id not exists, return nil", func(t *testing.T) {
+		mockRepo.On("Update", int(3), int(219),"None", "None", "None").Return(sellers.Seller{}, fmt.Errorf("Seller not found"))
+		service := sellers.NewService(mockRepo)
+
+		result, err := service.Update(int(3), int(219),"None", "None", "None")
+
+		assert.Equal(t, sellers.Seller{}, result)
+		assert.NotNil(t, err)
+
+	})
+
 }
 
 
@@ -167,6 +179,16 @@ func TestGetById(t *testing.T){
 
 
 
+	})
+
+	t.Run("find_by_id_non_existent: if the element with the specified Id not exists,, return nil", func(t *testing.T) {
+		mockRepo.On("GetById", int(1)).Return(sellers.Seller{}, fmt.Errorf("Seller not found."))
+		service := sellers.NewService(mockRepo)
+
+		result, err := service.GetById(int(1))
+
+		assert.Error(t, err)
+		assert.Equal(t, sellers.Seller{}, result)
 	})
 	
 
