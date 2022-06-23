@@ -1,2 +1,133 @@
 package controllers_test
 
+import (
+	"bytes"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	"github.com/gin-gonic/gin"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/mocks"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+)
+func UpdateBody() *bytes.Buffer{
+	return bytes.NewBuffer(([]byte(`
+	{
+		"Id": 1,
+		"Cid": 1,
+		"CompanyName": "None",
+		"Address": "rua sem nome",
+		"Telephone": "000000"
+	}
+	`)))
+}
+
+func TestGetAllController(t *testing.T){
+	gin.SetMode(gin.TestMode)
+	service := mocks.NewService(t)
+	sellerController := controllers.NewSeller(service)
+
+	r:=gin.Default()
+	r.GET("sellers/", sellerController.GetAll() )
+
+	t.Run("retorna todos os sellers", func(t *testing.T){
+		s := sellers.Seller{
+			Id:    1,
+			Cid:  1,
+			CompanyName:  "None",
+			Address: "none",
+			Telephone: "00000",
+		}
+
+		sList := make([]sellers.Seller, 0)
+		sList = append(sList, s)
+		
+		service.On("GetAll").Return(sList, nil ).Once()
+		response := httptest.NewRecorder()
+		request, _ := http.NewRequest(http.MethodGet, "sellers/", nil)
+
+		r.ServeHTTP(response, request)
+		assert.Equal(t, http.StatusOK, response.Code)
+		assert.Equal(t,"{\"data\": [{\"Id\": 1, \"Cid\": 1, \"CompanyName\": \"None\", \"Address\": \"none\", \"Telephone\": \"00000\"}]}",response.Body.String() )
+		
+	})
+
+}
+
+
+func TestDeleteByIdController (t *testing.T){
+	gin.SetMode(gin.TestMode)
+
+	mockService := mocks.NewService(t)
+	service := controllers.NewSeller(mockService)
+	r := gin.Default()
+
+	r.DELETE("/sellers/:id", service.Delete())
+
+	t.Run("delete the seller with the specified id", func(t *testing.T){
+		mockService.On("Delete", mock.AnythingOfType("int")).Return(nil).Once()
+		response := httptest.NewRecorder()
+		request, _ := http.NewRequest(http.MethodDelete, "/sellers/1", nil)
+		r.ServeHTTP(response, request)
+		mockService.AssertCalled(t, "Delete", 1)
+	})
+
+	t.Run("return an error if the specified id not exists", func(t *testing.T){
+		
+		response := httptest.NewRecorder()
+		request, _ := http.NewRequest(http.MethodDelete, "/sellers/id", nil)
+		r.ServeHTTP(response, request)
+		assert.Equal(t, http.StatusBadRequest, response.Code)
+	})
+}
+
+func TestStoreController( t *testing.T){
+	
+	gin.SetMode(gin.TestMode)
+	mockService := mocks.NewService(t)
+	sellerController := controllers.NewSeller(mockService)
+
+	r := gin.Default()
+	r.POST("/sellers", sellerController.Store())
+	expectSeller := sellers.Seller{
+		Id:    1,
+		Cid:  1,
+		CompanyName:  "None",
+		Address: "none",
+		Telephone: "00000",
+	}
+	t.Run("Create a new seller", func(t*testing.T){
+		mockService.On("Store", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(expectSeller, nil).Once()
+		request := httptest.NewRecorder()
+		response, _ := http.NewRequest(http.MethodPost, "/sellers", nil)
+		r.ServeHTTP(request, response)
+	})
+}
+
+
+func TestUpdate(t *testing.T){
+	gin.SetMode(gin.TestMode)
+
+	mockService := mocks.NewService(t)
+	service := controllers.NewSeller(mockService)
+	r := gin.Default()
+	expectSeller := sellers.Seller{
+		Id:    1,
+		Cid:  1,
+		CompanyName:  "None",
+		Address: "none",
+		Telephone: "00000",
+	}
+	r.PATCH("/sellers/:id", service.Update())
+	t.Run("return the seller with the updated data", func(t *testing.T){
+		mockService.On("Update", mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(expectSeller, nil).Once()
+		response := httptest.NewRecorder()
+		request, _ := http.NewRequest(http.MethodPatch, "/sellers/1", UpdateBody())
+		r.ServeHTTP(response, request)
+		assert.Equal(t, http.StatusOK, response.Code)
+
+	})
+}

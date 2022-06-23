@@ -69,7 +69,7 @@ func TestDelete(t *testing.T) {
 		mockRepo.AssertCalled(t, "Delete", 1)
 	})
 
-	t.Run("Should return an error if Delete from seller repository returns an error", func(t *testing.T) {
+	t.Run("return an error if Delete from seller repository returns an error", func(t *testing.T) {
 		mockRepo.
 			On("Delete", mock.AnythingOfType("int")).
 			Return(errors.New("any_error")).
@@ -80,7 +80,7 @@ func TestDelete(t *testing.T) {
 		assert.EqualError(t, err, "any_error")
 	})
 
-	t.Run("Should return nil on success", func(t *testing.T) {
+	t.Run(" return nil on success", func(t *testing.T) {
 		mockRepo.
 			On("Delete", mock.AnythingOfType("int")).
 			Return(nil).
