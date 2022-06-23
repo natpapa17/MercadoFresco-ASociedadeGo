@@ -25,6 +25,18 @@ func UpdateBody() *bytes.Buffer{
 	`)))
 }
 
+func validSeller() *bytes.Buffer{
+	return bytes.NewBuffer(([]byte(`
+	{
+		"Id": 1,
+		"Cid": 1,
+		"CompanyName": "None",
+		"Address": "rua sem nome",
+		"Telephone": "000000"
+	}
+	`)))
+}
+
 func TestGetAllController(t *testing.T){
 	gin.SetMode(gin.TestMode)
 	service := mocks.NewService(t)
@@ -102,7 +114,7 @@ func TestStoreController( t *testing.T){
 	t.Run("Create a new seller", func(t*testing.T){
 		mockService.On("Store", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(expectSeller, nil).Once()
 		request := httptest.NewRecorder()
-		response, _ := http.NewRequest(http.MethodPost, "/sellers", nil)
+		response, _ := http.NewRequest(http.MethodPost, "/sellers", validSeller())
 		r.ServeHTTP(request, response)
 	})
 }
@@ -130,4 +142,6 @@ func TestUpdate(t *testing.T){
 		assert.Equal(t, http.StatusOK, response.Code)
 
 	})
+
+
 }
