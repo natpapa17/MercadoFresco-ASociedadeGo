@@ -9,14 +9,14 @@ import (
 )
 
 type SectionRequest struct {
-	SectionNumber       int     `json:"section_number" binding:"required"`
-	CurrentTemperature  float32 `json:"current_temperature" binding:"required"`
-	MinimumTemprarature float32 `json:"minimum_temperature" binding:"required"`
-	CurrentCapacity     int     `json:"current_capacity" binding:"required"`
-	MinimumCapacity     int     `json:"minimum_capacity" binding:"required"`
-	MaximumCapacity     int     `json:"maximum_capacity" binding:"required"`
-	WarehouseID         int     `json:"warehouse_id" binding:"required"`
-	ProductTypeID       int     `json:"product_type_id" binding:"required"`
+	SectionNumber      int     `json:"section_number" binding:"required"`
+	CurrentTemperature float32 `json:"current_temperature" binding:"required"`
+	MinimumTemperature float32 `json:"minimum_temperature" binding:"required"`
+	CurrentCapacity    int     `json:"current_capacity" binding:"required"`
+	MinimumCapacity    int     `json:"minimum_capacity" binding:"required"`
+	MaximumCapacity    int     `json:"maximum_capacity" binding:"required"`
+	WarehouseID        int     `json:"warehouse_id" binding:"required"`
+	ProductTypeID      int     `json:"product_type_id" binding:"required"`
 }
 
 type SectionController struct {
@@ -75,13 +75,13 @@ func (c *SectionController) Add() gin.HandlerFunc {
 			return
 		}
 
-		s, err := c.service.Add(obj.SectionNumber, obj.CurrentTemperature, obj.MinimumTemprarature, obj.CurrentCapacity, obj.MinimumCapacity, obj.MaximumCapacity, obj.WarehouseID, obj.ProductTypeID)
+		s, err := c.service.Add(obj.SectionNumber, obj.CurrentTemperature, obj.MinimumTemperature, obj.CurrentCapacity, obj.MinimumCapacity, obj.MaximumCapacity, obj.WarehouseID, obj.ProductTypeID)
 		if err != nil {
 			ctx.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 			return
 		}
 
-		ctx.JSON(http.StatusOK, s)
+		ctx.JSON(http.StatusCreated, s)
 	}
 }
 

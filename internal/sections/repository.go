@@ -81,22 +81,22 @@ func (r *repository) HasSectionNumber(number int) (bool, error) {
 	return false, nil
 }
 
-func (r *repository) Add(id int, sectionNumber int, currentTemperature float32, minimumTemprarature float32, currentCapacity int, minimumCapacity int, maximumCapacity int, warehouseID int, productTypeID int) (Section, error) {
+func (r *repository) Add(id int, sectionNumber int, currentTemperature float32, minimumTemperature float32, currentCapacity int, minimumCapacity int, maximumCapacity int, warehouseID int, productTypeID int) (Section, error) {
 	var ss []Section
 	if err := r.db.Read(&ss); err != nil {
 		return Section{}, err
 	}
 
 	section := Section{
-		ID:                  id,
-		SectionNumber:       sectionNumber,
-		CurrentTemperature:  currentTemperature,
-		MinimumTemprarature: minimumTemprarature,
-		CurrentCapacity:     currentCapacity,
-		MinimumCapacity:     minimumCapacity,
-		MaximumCapacity:     maximumCapacity,
-		WarehouseID:         warehouseID,
-		ProductTypeID:       productTypeID,
+		ID:                 id,
+		SectionNumber:      sectionNumber,
+		CurrentTemperature: currentTemperature,
+		MinimumTemperature: minimumTemperature,
+		CurrentCapacity:    currentCapacity,
+		MinimumCapacity:    minimumCapacity,
+		MaximumCapacity:    maximumCapacity,
+		WarehouseID:        warehouseID,
+		ProductTypeID:      productTypeID,
 	}
 
 	ss = append(ss, section)
@@ -121,8 +121,8 @@ func (r *repository) UpdateById(id int, section Section) (Section, error) {
 				if section.CurrentTemperature != 0.0 {
 					s.CurrentTemperature = section.CurrentTemperature
 				}
-				if section.MinimumTemprarature != 0.0 {
-					s.MinimumTemprarature = section.MinimumTemprarature
+				if section.MinimumTemperature != 0.0 {
+					s.MinimumTemperature = section.MinimumTemperature
 				}
 				if section.CurrentCapacity != 0 {
 					s.CurrentCapacity = section.CurrentCapacity

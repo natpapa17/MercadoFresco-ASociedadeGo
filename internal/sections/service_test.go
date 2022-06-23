@@ -18,31 +18,31 @@ func createSectionParamsUpdated() (int, float32, float32, int, int, int, int, in
 	return 1, 3.0, 1.0, 3, 1, 4, 1, 1
 }
 
-func createSectionFromParams(sectionNumber int, currentTemperature float32, minimumTemprarature float32, currentCapacity int, minimumCapacity int, maximumCapacity int, warehouseID int, productTypeID int) sections.Section {
+func createSectionFromParams(sectionNumber int, currentTemperature float32, minimumTemperature float32, currentCapacity int, minimumCapacity int, maximumCapacity int, warehouseID int, productTypeID int) sections.Section {
 	return sections.Section{
-		ID:                  1,
-		SectionNumber:       sectionNumber,
-		CurrentTemperature:  currentTemperature,
-		MinimumTemprarature: minimumTemprarature,
-		CurrentCapacity:     currentCapacity,
-		MinimumCapacity:     minimumCapacity,
-		MaximumCapacity:     maximumCapacity,
-		WarehouseID:         warehouseID,
-		ProductTypeID:       productTypeID,
+		ID:                 1,
+		SectionNumber:      sectionNumber,
+		CurrentTemperature: currentTemperature,
+		MinimumTemperature: minimumTemperature,
+		CurrentCapacity:    currentCapacity,
+		MinimumCapacity:    minimumCapacity,
+		MaximumCapacity:    maximumCapacity,
+		WarehouseID:        warehouseID,
+		ProductTypeID:      productTypeID,
 	}
 }
 
-func createSectionFromParamsWithID(id int, sectionNumber int, currentTemperature float32, minimumTemprarature float32, currentCapacity int, minimumCapacity int, maximumCapacity int, warehouseID int, productTypeID int) sections.Section {
+func createSectionFromParamsWithID(id int, sectionNumber int, currentTemperature float32, minimumTemperature float32, currentCapacity int, minimumCapacity int, maximumCapacity int, warehouseID int, productTypeID int) sections.Section {
 	return sections.Section{
-		ID:                  id,
-		SectionNumber:       sectionNumber,
-		CurrentTemperature:  currentTemperature,
-		MinimumTemprarature: minimumTemprarature,
-		CurrentCapacity:     currentCapacity,
-		MinimumCapacity:     minimumCapacity,
-		MaximumCapacity:     maximumCapacity,
-		WarehouseID:         warehouseID,
-		ProductTypeID:       productTypeID,
+		ID:                 id,
+		SectionNumber:      sectionNumber,
+		CurrentTemperature: currentTemperature,
+		MinimumTemperature: minimumTemperature,
+		CurrentCapacity:    currentCapacity,
+		MinimumCapacity:    minimumCapacity,
+		MaximumCapacity:    maximumCapacity,
+		WarehouseID:        warehouseID,
+		ProductTypeID:      productTypeID,
 	}
 }
 
@@ -55,26 +55,26 @@ func TestGetAll(t *testing.T) {
 			On("GetAll").
 			Return([]sections.Section{
 				sections.Section{
-					ID:                  1,
-					SectionNumber:       1,
-					CurrentTemperature:  1.0,
-					MinimumTemprarature: 1.0,
-					CurrentCapacity:     1,
-					MinimumCapacity:     1,
-					MaximumCapacity:     1,
-					WarehouseID:         1,
-					ProductTypeID:       1,
+					ID:                 1,
+					SectionNumber:      1,
+					CurrentTemperature: 1.0,
+					MinimumTemperature: 1.0,
+					CurrentCapacity:    1,
+					MinimumCapacity:    1,
+					MaximumCapacity:    1,
+					WarehouseID:        1,
+					ProductTypeID:      1,
 				},
 				sections.Section{
-					ID:                  2,
-					SectionNumber:       2,
-					CurrentTemperature:  1.0,
-					MinimumTemprarature: 1.0,
-					CurrentCapacity:     1,
-					MinimumCapacity:     1,
-					MaximumCapacity:     1,
-					WarehouseID:         1,
-					ProductTypeID:       1,
+					ID:                 2,
+					SectionNumber:      2,
+					CurrentTemperature: 1.0,
+					MinimumTemperature: 1.0,
+					CurrentCapacity:    1,
+					MinimumCapacity:    1,
+					MaximumCapacity:    1,
+					WarehouseID:        1,
+					ProductTypeID:      1,
 				},
 			}, nil)
 
