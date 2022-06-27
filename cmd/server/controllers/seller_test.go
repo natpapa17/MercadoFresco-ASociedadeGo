@@ -2,6 +2,10 @@ package controllers_test
 
 import (
 	"bytes"
+	"errors"
+
+	"fmt"
+
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -47,6 +51,21 @@ func dbSeller()sellers.Seller{
 	}
 }
 
+func ValidSellerWithParams(Id, Cid int, CompanyName, Address, Telephone string) sellers.Seller{
+	return sellers.Seller{
+		Id : Id,
+		Cid : Cid,
+		CompanyName: CompanyName,
+		Address: Address,
+		Telephone: Telephone,
+	}
+}
+
+func createValidJSONWithParams(Id, Cid int, CompanyName, Address, Telephone string) string {
+	return fmt.Sprintf("{\"Id\":%d,\"Cid\":%d,\"CompanyName\":%s,\"Address\":%s,\"Telephone\":%s}", Id, Cid, CompanyName, Address, Telephone)
+}
+
+
 func TestGetById( t *testing.T){
 	gin.SetMode(gin.TestMode)
 	service := mocks.NewService(t)
@@ -66,6 +85,16 @@ func TestGetById( t *testing.T){
 
 	})
 
+	
+	t.Run("should return an error if the id doesn't exists", func(t *testing.T) {
+		response := httptest.NewRecorder()
+		request, _ := http.NewRequest(http.MethodGet, "/sellers/invalid_id", nil)
+		r.ServeHTTP(response, request)
+
+		assert.Equal(t, http.StatusBadRequest, response.Code)
+		assert.Equal(t, "{\"error\":\"invalid id\"}", response.Body.String())
+	})
+
 }
 
 func TestGetAllController(t *testing.T){
@@ -76,7 +105,7 @@ func TestGetAllController(t *testing.T){
 	r:=gin.Default()
 	r.GET("/sellers", sellerController.GetAll() )
 
-	t.Run("retorna todos os sellers", func(t *testing.T){
+	t.Run("return all sellers", func(t *testing.T){
 		s := sellers.Seller{
 			Id:    1,
 			Cid:  1,
@@ -97,6 +126,17 @@ func TestGetAllController(t *testing.T){
 		//assert.Equal(t,"{\"data\": [{\"Id\": 1, \"Cid\": 1, \"CompanyName\": \"None\", \"Address\": \"none\", \"Telephone\": \"00000\"}]}",response.Body.String() )
 		
 	})
+	t.Run("return an error if GetAll returns an error", func(t *testing.T) {
+		service.On("GetAll").Return([]sellers.Seller{}, errors.New("any_message")).Once()
+		response := httptest.NewRecorder()
+		request, _ := http.NewRequest(http.MethodGet, "/sellers", nil)
+		r.ServeHTTP(response, request)
+
+		assert.Equal(t, http.StatusInternalServerError, response.Code)
+		//assert.Equal(t, "{\"error\":\"any_message\"}", rr.Body.String())
+	})
+
+
 
 }
 
@@ -149,6 +189,8 @@ func TestStoreController( t *testing.T){
 		response, _ := http.NewRequest(http.MethodPost, "/sellers", validSeller())
 		r.ServeHTTP(request, response)
 	})
+
+
 }
 
 
@@ -174,6 +216,5 @@ func TestUpdate(t *testing.T){
 		assert.Equal(t, http.StatusOK, response.Code)
 
 	})
-
 
 }

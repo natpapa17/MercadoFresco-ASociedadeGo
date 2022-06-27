@@ -27,8 +27,8 @@ func (c *SellerController) GetAll() gin.HandlerFunc {
 
 		s, err := c.service.GetAll()
 		if err != nil {
-			ctx.JSON(404, gin.H{
-				"error": err.Error(),
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"error": "internal server error",
 			})
 			return
 		}
