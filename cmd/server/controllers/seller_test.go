@@ -18,64 +18,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type TestCase struct {
-	RequestBody          string
-	ExpectedResponseBody string
-}
 
-func makeInvalidCreateAndUpdateBodiesTestCases() []TestCase {
-	return []TestCase{
-		{
-			RequestBody: `
-			{
-				
-		"Cid":  ,
-		"CompanyName": "None",
-		"Address": "rua sem nome",
-		"Telephone": "000000"
-			}
-			`,
-			ExpectedResponseBody: "{\"message\":\"Invalid inputs. Please check your inputs\"}",
-		},
-		{
-			RequestBody: `
-			{
-				
-		"Cid": 1,
-		"CompanyName": ,
-		"Address": "rua sem nome",
-		"Telephone": "000000"
-			}
-			`,
-			ExpectedResponseBody: "{\"message\":\"Invalid inputs. Please check your inputs\"}",
-		},
-		{
-			RequestBody: `
-			{
-				"Id": 1,
-		"Cid": 1,
-		"CompanyName": "None",
-		"Address": " ",
-		"Telephone": "000000"
-			}
-			`,
-			ExpectedResponseBody: "{\"message\":\"Invalid inputs. Please check your inputs\"}",
-		},
-		{
-			RequestBody: `
-			{
-				"Id": 1,
-		"Cid": 1,
-		"CompanyName": "None",
-		"Address": "rua sem nome",
-		"Telephone": " "
-			}
-			`,
-			ExpectedResponseBody: "{\"message\":\"Invalid inputs. Please check your inputs\"}",
-		},
-		
-	}
-}
 
 func UpdateBody() *bytes.Buffer{
 	return bytes.NewBuffer(([]byte(`
