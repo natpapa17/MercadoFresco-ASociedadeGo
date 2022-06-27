@@ -76,9 +76,6 @@ func ValidSellerWithParams(Id, Cid int, CompanyName, Address, Telephone string) 
 	}
 }
 
-func createValidJSONWithParams(Id, Cid int, CompanyName, Address, Telephone string) string {
-	return fmt.Sprintf("{\"Id\":%d,\"Cid\":%d,\"CompanyName\":%s,\"Address\":%s,\"Telephone\":%s}", Id, Cid, CompanyName, Address, Telephone)
-}
 
 
 func TestGetById( t *testing.T){
