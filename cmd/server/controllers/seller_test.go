@@ -17,6 +17,66 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
+
+type TestCase struct {
+	RequestBody          string
+	ExpectedResponseBody string
+}
+
+func makeInvalidCreateAndUpdateBodiesTestCases() []TestCase {
+	return []TestCase{
+		{
+			RequestBody: `
+			{
+				
+		"Cid":  ,
+		"CompanyName": "None",
+		"Address": "rua sem nome",
+		"Telephone": "000000"
+			}
+			`,
+			ExpectedResponseBody: "{\"message\":\"Invalid inputs. Please check your inputs\"}",
+		},
+		{
+			RequestBody: `
+			{
+				
+		"Cid": 1,
+		"CompanyName": ,
+		"Address": "rua sem nome",
+		"Telephone": "000000"
+			}
+			`,
+			ExpectedResponseBody: "{\"message\":\"Invalid inputs. Please check your inputs\"}",
+		},
+		{
+			RequestBody: `
+			{
+				"Id": 1,
+		"Cid": 1,
+		"CompanyName": "None",
+		"Address": " ",
+		"Telephone": "000000"
+			}
+			`,
+			ExpectedResponseBody: "{\"message\":\"Invalid inputs. Please check your inputs\"}",
+		},
+		{
+			RequestBody: `
+			{
+				"Id": 1,
+		"Cid": 1,
+		"CompanyName": "None",
+		"Address": "rua sem nome",
+		"Telephone": " "
+			}
+			`,
+			ExpectedResponseBody: "{\"message\":\"Invalid inputs. Please check your inputs\"}",
+		},
+		
+	}
+}
+
 func UpdateBody() *bytes.Buffer{
 	return bytes.NewBuffer(([]byte(`
 	{
@@ -34,6 +94,18 @@ func validSeller() *bytes.Buffer{
 	{
 		"Id": 1,
 		"Cid": 1,
+		"CompanyName": "None",
+		"Address": "rua sem nome",
+		"Telephone": "000000"
+	}
+	`)))
+}
+
+func InvalidSeller() *bytes.Buffer{
+	return bytes.NewBuffer(([]byte(`
+	{
+		"Id": 1,
+		"Cid":  ,
 		"CompanyName": "None",
 		"Address": "rua sem nome",
 		"Telephone": "000000"
@@ -186,11 +258,21 @@ func TestStoreController( t *testing.T){
 	t.Run("Create a new seller", func(t*testing.T){
 		mockService.On("Store", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(expectSeller, nil).Once()
 		request := httptest.NewRecorder()
-		response, _ := http.NewRequest(http.MethodPost, "/sellers", validSeller())
+		response, _ := http.NewRequest(http.MethodPost, "/sellers",validSeller())
 		r.ServeHTTP(request, response)
+		assert.Equal(t, http.StatusOK, request.Code)
+	})
+	t.Run("if any any data is missing, return an error", func(t *testing.T){
+		
+		request := httptest.NewRecorder()
+		response, _ := http.NewRequest(http.MethodPost, "/sellers", InvalidSeller())
+		r.ServeHTTP(request, response)
+		assert.Equal(t, http.StatusBadRequest, request.Code)
 	})
 
 
+
+	
 }
 
 
@@ -216,5 +298,14 @@ func TestUpdate(t *testing.T){
 		assert.Equal(t, http.StatusOK, response.Code)
 
 	})
+	
+	t.Run("if any any data is missing, return an error", func(t *testing.T){
+		
+		request := httptest.NewRecorder()
+		response, _ := http.NewRequest(http.MethodPost, "/sellers/1", InvalidSeller())
+		r.ServeHTTP(request, response)
+		assert.Equal(t, http.StatusNotFound, request.Code)
+	})
+
 
 }
