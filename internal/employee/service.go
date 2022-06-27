@@ -3,7 +3,7 @@ package employee
 import (
 	"errors"
 
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/usecases"
 )
 
 type EmployeeServiceInterface interface {
@@ -16,10 +16,10 @@ type EmployeeServiceInterface interface {
 
 type service struct {
 	repository    employeeInterface
-	wareHouseRepo warehouses.Repository
+	wareHouseRepo usecases.Repository
 }
 
-func CreateService(r employeeInterface, w warehouses.Repository) EmployeeServiceInterface {
+func CreateService(r employeeInterface, w usecases.Repository) EmployeeServiceInterface {
 	return &service{
 		repository:    r,
 		wareHouseRepo: w,

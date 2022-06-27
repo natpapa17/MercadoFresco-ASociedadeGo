@@ -1,4 +1,4 @@
-package warehouses
+package usecases
 
 type BusinessRuleError struct {
 	Err error
@@ -8,10 +8,10 @@ func (b *BusinessRuleError) Error() string {
 	return b.Err.Error()
 }
 
-type NoElementInFileError struct {
+type NoElementFoundError struct {
 	Err error
 }
 
-func (b *NoElementInFileError) Error() string {
+func (b *NoElementFoundError) Error() string {
 	return b.Err.Error()
 }

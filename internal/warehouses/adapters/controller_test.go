@@ -1,4 +1,4 @@
-package controllers_test
+package adapters_test
 
 import (
 	"bytes"
@@ -8,9 +8,10 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/mocks"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/adapters"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/domain"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/usecases"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/usecases/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -119,8 +120,8 @@ func makeInvalidCreateAndUpdateBodiesTestCases() []TestCase {
 	}
 }
 
-func makeDBWarehouse() warehouses.Warehouse {
-	return warehouses.Warehouse{
+func makeDBWarehouse() domain.Warehouse {
+	return domain.Warehouse{
 		Id:                 1,
 		WarehouseCode:      "valid_code",
 		Address:            "valid_address",
@@ -130,8 +131,8 @@ func makeDBWarehouse() warehouses.Warehouse {
 	}
 }
 
-func makeUpdatedDBWarehouse() warehouses.Warehouse {
-	return warehouses.Warehouse{
+func makeUpdatedDBWarehouse() domain.Warehouse {
+	return domain.Warehouse{
 		Id:                 1,
 		WarehouseCode:      "valid_code",
 		Address:            "updated_address",
@@ -145,7 +146,7 @@ func TestCreateWarehouse(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	mockWarehouseService := mocks.NewService(t)
-	sut := controllers.CreateWarehouseController(mockWarehouseService)
+	sut := adapters.CreateWarehouseController(mockWarehouseService)
 
 	r := gin.Default()
 	r.POST("/warehouses", sut.CreateWarehouse)
@@ -180,7 +181,7 @@ func TestCreateWarehouse(t *testing.T) {
 	})
 
 	t.Run("Should return an error and 400 status if Create from Warehouse Service returns an Business Rule error", func(t *testing.T) {
-		mockWarehouseService.On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(warehouses.Warehouse{}, &warehouses.BusinessRuleError{Err: errors.New("any_message")}).Once()
+		mockWarehouseService.On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(domain.Warehouse{}, &usecases.BusinessRuleError{Err: errors.New("any_message")}).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodPost, "/warehouses", makeValidCreateBody())
 		r.ServeHTTP(rr, req)
@@ -190,7 +191,7 @@ func TestCreateWarehouse(t *testing.T) {
 	})
 
 	t.Run("Should return an error and 500 status if Create from Warehouse Service did not returns an custom error", func(t *testing.T) {
-		mockWarehouseService.On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(warehouses.Warehouse{}, errors.New("any_message")).Once()
+		mockWarehouseService.On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(domain.Warehouse{}, errors.New("any_message")).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodPost, "/warehouses", makeValidCreateBody())
 		r.ServeHTTP(rr, req)
@@ -214,13 +215,13 @@ func TestGetAllWarehouse(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	mockWarehouseService := mocks.NewService(t)
-	sut := controllers.CreateWarehouseController(mockWarehouseService)
+	sut := adapters.CreateWarehouseController(mockWarehouseService)
 
 	r := gin.Default()
 	r.GET("/warehouses", sut.GetAllWarehouses)
 
 	t.Run("Should call GetAll from Warehouse Service", func(t *testing.T) {
-		mockWarehouseService.On("GetAll").Return([]warehouses.Warehouse{makeDBWarehouse()}, nil).Once()
+		mockWarehouseService.On("GetAll").Return(domain.Warehouses{makeDBWarehouse()}, nil).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodGet, "/warehouses", nil)
 		r.ServeHTTP(rr, req)
@@ -229,7 +230,7 @@ func TestGetAllWarehouse(t *testing.T) {
 	})
 
 	t.Run("Should return an error and 500 status if GetAll from Warehouse Service returns an error", func(t *testing.T) {
-		mockWarehouseService.On("GetAll").Return([]warehouses.Warehouse{}, errors.New("any_message")).Once()
+		mockWarehouseService.On("GetAll").Return(domain.Warehouses{}, errors.New("any_message")).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodGet, "/warehouses", nil)
 		r.ServeHTTP(rr, req)
@@ -239,7 +240,7 @@ func TestGetAllWarehouse(t *testing.T) {
 	})
 
 	t.Run("Should 200 status and data on success", func(t *testing.T) {
-		mockWarehouseService.On("GetAll").Return([]warehouses.Warehouse{makeDBWarehouse()}, nil).Once()
+		mockWarehouseService.On("GetAll").Return(domain.Warehouses{makeDBWarehouse()}, nil).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodGet, "/warehouses", nil)
 		r.ServeHTTP(rr, req)
@@ -253,7 +254,7 @@ func TestGetByIdWarehouse(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	mockWarehouseService := mocks.NewService(t)
-	sut := controllers.CreateWarehouseController(mockWarehouseService)
+	sut := adapters.CreateWarehouseController(mockWarehouseService)
 
 	r := gin.Default()
 	r.GET("/warehouses/:id", sut.GetByIdWarehouse)
@@ -277,7 +278,7 @@ func TestGetByIdWarehouse(t *testing.T) {
 	})
 
 	t.Run("Should return an error and 404 status if GetById from Warehouse Service returns not find the correspondent element", func(t *testing.T) {
-		mockWarehouseService.On("GetById", mock.AnythingOfType("int")).Return(warehouses.Warehouse{}, &warehouses.NoElementInFileError{Err: errors.New("any_message")}).Once()
+		mockWarehouseService.On("GetById", mock.AnythingOfType("int")).Return(domain.Warehouse{}, &usecases.NoElementFoundError{Err: errors.New("any_message")}).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodGet, "/warehouses/404", nil)
 		r.ServeHTTP(rr, req)
@@ -287,7 +288,7 @@ func TestGetByIdWarehouse(t *testing.T) {
 	})
 
 	t.Run("Should return an error and 500 status if GetById from Warehouse Service returns an error", func(t *testing.T) {
-		mockWarehouseService.On("GetById", mock.AnythingOfType("int")).Return(warehouses.Warehouse{}, errors.New("any_message")).Once()
+		mockWarehouseService.On("GetById", mock.AnythingOfType("int")).Return(domain.Warehouse{}, errors.New("any_message")).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodGet, "/warehouses/1", nil)
 		r.ServeHTTP(rr, req)
@@ -311,7 +312,7 @@ func TestUpdateWarehouse(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	mockWarehouseService := mocks.NewService(t)
-	sut := controllers.CreateWarehouseController(mockWarehouseService)
+	sut := adapters.CreateWarehouseController(mockWarehouseService)
 
 	r := gin.Default()
 	r.PATCH("/warehouses/:id", sut.UpdateByIdWarehouse)
@@ -355,7 +356,7 @@ func TestUpdateWarehouse(t *testing.T) {
 	})
 
 	t.Run("Should return an error and 404 status if UpdateById from Warehouse Service returns an Business Rule error", func(t *testing.T) {
-		mockWarehouseService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(warehouses.Warehouse{}, &warehouses.BusinessRuleError{Err: errors.New("any_message")}).Once()
+		mockWarehouseService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(domain.Warehouse{}, &usecases.BusinessRuleError{Err: errors.New("any_message")}).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodPatch, "/warehouses/1", makeValidUpdateBody())
 		r.ServeHTTP(rr, req)
@@ -365,7 +366,7 @@ func TestUpdateWarehouse(t *testing.T) {
 	})
 
 	t.Run("Should return an error and 500 status if UpdateById from Warehouse Service did not returns an custom error", func(t *testing.T) {
-		mockWarehouseService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(warehouses.Warehouse{}, errors.New("any_message")).Once()
+		mockWarehouseService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(domain.Warehouse{}, errors.New("any_message")).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodPatch, "/warehouses/1", makeValidUpdateBody())
 		r.ServeHTTP(rr, req)
@@ -389,7 +390,7 @@ func TestDeleteByIdWarehouse(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	mockWarehouseService := mocks.NewService(t)
-	sut := controllers.CreateWarehouseController(mockWarehouseService)
+	sut := adapters.CreateWarehouseController(mockWarehouseService)
 
 	r := gin.Default()
 	r.DELETE("/warehouses/:id", sut.DeleteByIdWarehouse)
@@ -413,7 +414,7 @@ func TestDeleteByIdWarehouse(t *testing.T) {
 	})
 
 	t.Run("Should return an error and 404 status if DeleteById from Warehouse Service returns not find the correspondent element", func(t *testing.T) {
-		mockWarehouseService.On("DeleteById", mock.AnythingOfType("int")).Return(&warehouses.NoElementInFileError{Err: errors.New("any_message")}).Once()
+		mockWarehouseService.On("DeleteById", mock.AnythingOfType("int")).Return(&usecases.NoElementFoundError{Err: errors.New("any_message")}).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodDelete, "/warehouses/404", nil)
 		r.ServeHTTP(rr, req)

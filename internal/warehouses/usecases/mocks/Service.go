@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	warehouses "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
+	domain "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/domain"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -13,14 +13,14 @@ type Service struct {
 }
 
 // Create provides a mock function with given fields: warehouseCode, address, telephone, minimumCapacity, minimumTemperature
-func (_m *Service) Create(warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (warehouses.Warehouse, error) {
+func (_m *Service) Create(warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (domain.Warehouse, error) {
 	ret := _m.Called(warehouseCode, address, telephone, minimumCapacity, minimumTemperature)
 
-	var r0 warehouses.Warehouse
-	if rf, ok := ret.Get(0).(func(string, string, string, int, float64) warehouses.Warehouse); ok {
+	var r0 domain.Warehouse
+	if rf, ok := ret.Get(0).(func(string, string, string, int, float64) domain.Warehouse); ok {
 		r0 = rf(warehouseCode, address, telephone, minimumCapacity, minimumTemperature)
 	} else {
-		r0 = ret.Get(0).(warehouses.Warehouse)
+		r0 = ret.Get(0).(domain.Warehouse)
 	}
 
 	var r1 error
@@ -48,15 +48,15 @@ func (_m *Service) DeleteById(id int) error {
 }
 
 // GetAll provides a mock function with given fields:
-func (_m *Service) GetAll() ([]warehouses.Warehouse, error) {
+func (_m *Service) GetAll() (domain.Warehouses, error) {
 	ret := _m.Called()
 
-	var r0 []warehouses.Warehouse
-	if rf, ok := ret.Get(0).(func() []warehouses.Warehouse); ok {
+	var r0 domain.Warehouses
+	if rf, ok := ret.Get(0).(func() domain.Warehouses); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]warehouses.Warehouse)
+			r0 = ret.Get(0).(domain.Warehouses)
 		}
 	}
 
@@ -71,14 +71,14 @@ func (_m *Service) GetAll() ([]warehouses.Warehouse, error) {
 }
 
 // GetById provides a mock function with given fields: id
-func (_m *Service) GetById(id int) (warehouses.Warehouse, error) {
+func (_m *Service) GetById(id int) (domain.Warehouse, error) {
 	ret := _m.Called(id)
 
-	var r0 warehouses.Warehouse
-	if rf, ok := ret.Get(0).(func(int) warehouses.Warehouse); ok {
+	var r0 domain.Warehouse
+	if rf, ok := ret.Get(0).(func(int) domain.Warehouse); ok {
 		r0 = rf(id)
 	} else {
-		r0 = ret.Get(0).(warehouses.Warehouse)
+		r0 = ret.Get(0).(domain.Warehouse)
 	}
 
 	var r1 error
@@ -92,14 +92,14 @@ func (_m *Service) GetById(id int) (warehouses.Warehouse, error) {
 }
 
 // UpdateById provides a mock function with given fields: id, warehouseCode, address, telephone, minimumCapacity, minimumTemperature
-func (_m *Service) UpdateById(id int, warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (warehouses.Warehouse, error) {
+func (_m *Service) UpdateById(id int, warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (domain.Warehouse, error) {
 	ret := _m.Called(id, warehouseCode, address, telephone, minimumCapacity, minimumTemperature)
 
-	var r0 warehouses.Warehouse
-	if rf, ok := ret.Get(0).(func(int, string, string, string, int, float64) warehouses.Warehouse); ok {
+	var r0 domain.Warehouse
+	if rf, ok := ret.Get(0).(func(int, string, string, string, int, float64) domain.Warehouse); ok {
 		r0 = rf(id, warehouseCode, address, telephone, minimumCapacity, minimumTemperature)
 	} else {
-		r0 = ret.Get(0).(warehouses.Warehouse)
+		r0 = ret.Get(0).(domain.Warehouse)
 	}
 
 	var r1 error

@@ -1,4 +1,4 @@
-package controllers
+package adapters
 
 import (
 	"errors"
@@ -8,14 +8,14 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/usecases"
 )
 
 type WarehouseController struct {
-	service warehouses.Service
+	service usecases.Service
 }
 
-func CreateWarehouseController(ws warehouses.Service) *WarehouseController {
+func CreateWarehouseController(ws usecases.Service) *WarehouseController {
 	return &WarehouseController{
 		service: ws,
 	}
@@ -206,8 +206,8 @@ func (wr *warehouseRequest) Validate() error {
 }
 
 func isCustomError(e error) bool {
-	var be *warehouses.BusinessRuleError
-	var fe *warehouses.NoElementInFileError
+	var be *usecases.BusinessRuleError
+	var fe *usecases.NoElementFoundError
 
 	if errors.As(e, &be) {
 		return true

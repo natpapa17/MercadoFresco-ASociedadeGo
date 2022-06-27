@@ -7,12 +7,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/section"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/employee"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/products"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/adapters"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/factories"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
 
@@ -35,14 +36,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	bs := buyers.CreateBuyerService(br)
 	bc := controllers.CreateBuyerController(bs)
 
-	warehouseFilePath, err := filepath.Abs("" + filepath.Join("data", "warehouses.json"))
-	if err != nil {
-		log.Fatal("can't load warehouse data file")
-	}
-	warehouseFile := store.New(store.FileType, warehouseFilePath)
-	wr := warehouses.CreateRepository(warehouseFile)
-	ws := warehouses.CreateService(wr)
-	wc := controllers.CreateWarehouseController(ws)
+	wc := factories.MakeWarehouseController()
 
 	sellersDb := store.New(store.FileType, "data/sellers.json")
 	sellerRepo := sellers.NewRepository(sellersDb)
@@ -61,6 +55,12 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	}
 	employeeFile := store.New(store.FileType, employeeFilePath)
 	er := employee.CreateRepository(employeeFile)
+	warehouseFilePath, err := filepath.Abs("" + filepath.Join("data", "warehouses.json"))
+	if err != nil {
+		log.Fatal("can't load warehouse data file")
+	}
+	warehouseFile := store.New(store.FileType, warehouseFilePath)
+	wr := adapters.CreateFileRepository(warehouseFile)
 	es := employee.CreateService(er, wr)
 	ec := controllers.CreateEmployeeController(es)
 
