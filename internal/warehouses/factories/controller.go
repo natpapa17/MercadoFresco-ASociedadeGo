@@ -1,21 +1,21 @@
 package factories
 
 import (
+	"database/sql"
 	"log"
-	"path/filepath"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/adapters"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/usecases"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
 
 func MakeWarehouseController() *adapters.WarehouseController {
-	warehouseFilePath, err := filepath.Abs("" + filepath.Join("data", "warehouses.json"))
+	dataSource := "root:123@tcp(db)/fresh_market?parseTime=true"
+	conn, err := sql.Open("mysql", dataSource)
 	if err != nil {
-		log.Fatal("can't load warehouse data file")
+		log.Fatal("failed to connect to mysql")
 	}
-	warehouseFile := store.New(store.FileType, warehouseFilePath)
-	wr := adapters.CreateFileRepository(warehouseFile)
+	wr := adapters.CreateMySQLRepository(conn)
 	ws := usecases.CreateService(wr)
 	wc := adapters.CreateWarehouseController(ws)
 
