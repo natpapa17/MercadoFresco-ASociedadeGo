@@ -3,6 +3,7 @@ package controllers_test
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -95,13 +96,23 @@ func TestGetById( t *testing.T){
 	})
 
 	
-	t.Run("should return an error if the id doesn't exists", func(t *testing.T) {
+	t.Run(" return an error if the id doesn't exists", func(t *testing.T) {
 		response := httptest.NewRecorder()
 		request, _ := http.NewRequest(http.MethodGet, "/sellers/invalid_id", nil)
 		r.ServeHTTP(response, request)
 
 		assert.Equal(t, http.StatusBadRequest, response.Code)
 		assert.Equal(t, "{\"error\":\"invalid id\"}", response.Body.String())
+	})
+
+	t.Run("return an erro if the id is not found", func (t *testing.T){
+		service.On("GetById", int(999)).Return(sellers.Seller{}, fmt.Errorf("seller not found")).Once()
+		response := httptest.NewRecorder()
+		request, _ := http.NewRequest(http.MethodGet, "/sellers/999", nil)
+		r.ServeHTTP(response, request)
+
+		assert.Equal(t, http.StatusNotFound, response.Code)
+		assert.Equal(t, "{\"error\":\"can't find element with this id\"}", response.Body.String())
 	})
 
 }
@@ -142,8 +153,10 @@ func TestGetAllController(t *testing.T){
 		r.ServeHTTP(response, request)
 
 		assert.Equal(t, http.StatusInternalServerError, response.Code)
-		//assert.Equal(t, "{\"error\":\"any_message\"}", rr.Body.String())
+		assert.Equal(t, "{\"error\":\"internal server error\"}", response.Body.String())
 	})
+
+
 
 
 
@@ -174,6 +187,14 @@ func TestDelete(t*testing.T){
 		request, _ := http.NewRequest(http.MethodDelete, "/sellers/id", nil)
 		r.ServeHTTP(response, request)
 		assert.Equal(t, http.StatusBadRequest, response.Code)
+	})
+
+	t.Run("return an error if the specified id not exists", func(t *testing.T){
+		mockService.On("Delete", int(999)).Return( fmt.Errorf("seller not found")).Once()
+		response := httptest.NewRecorder()
+		request, _ := http.NewRequest(http.MethodDelete, "/sellers/999", nil)
+		r.ServeHTTP(response, request)
+		assert.Equal(t, http.StatusNotFound, response.Code)
 	})
 }
 
