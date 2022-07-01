@@ -103,7 +103,7 @@ func makeInvalidCreateAndUpdateBodiesTestCases() []TestCase {
 
 func makeDBBuyer() buyers.Buyer {
 	return buyers.Buyer{
-		Id:             1,
+		ID:             1,
 		FirstName:      "first name",
 		Address:        "address",
 		LastName:       "last name",
@@ -113,7 +113,7 @@ func makeDBBuyer() buyers.Buyer {
 
 func makeUpdatedDBBuyer() buyers.Buyer {
 	return buyers.Buyer{
-		Id:             1,
+		ID:             1,
 		FirstName:      "first name",
 		Address:        "address",
 		LastName:       "last name",
