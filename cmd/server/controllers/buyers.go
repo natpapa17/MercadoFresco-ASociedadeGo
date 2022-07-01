@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"errors"
-	"fmt"
+	_"fmt"
 	"net/http"
 	_ "regexp"
 	"strconv"
@@ -70,7 +70,7 @@ func (bc *BuyerController) GetAllBuyers(ctx *gin.Context) {
 	})
 }
 
-func (bc *BuyerController) GetBuyer(ctx *gin.Context) {
+func (bc *BuyerController) GetBuyerById(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 
 	if err != nil {
@@ -80,7 +80,7 @@ func (bc *BuyerController) GetBuyer(ctx *gin.Context) {
 		return
 	}
 
-	b, err := bc.service.GetById(id)
+	b, err := bc.service.GetBuyerById(id)
 	if err != nil {
 		if CustomError(err) {
 			ctx.JSON(http.StatusNotFound, gin.H{
@@ -99,7 +99,7 @@ func (bc *BuyerController) GetBuyer(ctx *gin.Context) {
 	})
 }
 
-func (bc *BuyerController) UpdateBuyer(ctx *gin.Context) {
+func (bc *BuyerController) UpdateBuyerById(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 
 	if err != nil {
@@ -124,7 +124,7 @@ func (bc *BuyerController) UpdateBuyer(ctx *gin.Context) {
 		return
 	}
 
-	b, err := bc.service.UpdateById(id, req.FirstName, req.LastName, req.Address, req.DocumentNumber)
+	b, err := bc.service.UpdateBuyerById(id, req.FirstName, req.LastName, req.Address, req.DocumentNumber)
 	if err != nil {
 		if CustomError(err) {
 			ctx.JSON(http.StatusNotFound, gin.H{
@@ -142,7 +142,7 @@ func (bc *BuyerController) UpdateBuyer(ctx *gin.Context) {
 	})
 }
 
-func (bc *BuyerController) DeleteBuyer(ctx *gin.Context) {
+func (bc *BuyerController) DeleteBuyerById(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 
 	if err != nil {
@@ -152,7 +152,7 @@ func (bc *BuyerController) DeleteBuyer(ctx *gin.Context) {
 		return
 	}
 
-	err = bc.service.DeleteById(id)
+	err = bc.service.DeleteBuyerById(id)
 	if err != nil {
 		if CustomError(err) {
 			ctx.JSON(http.StatusNotFound, gin.H{

@@ -229,14 +229,14 @@ func TestGetAllBuyer(t *testing.T) {
 	})
 }
 
-func TestGetByIdBuyers(t *testing.T) {
+func TestGetBuyerById(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	mockBuyerService := mocks.NewService(t)
-	sut := controllers.CreateBuyersController(mockBuyerService)
+	sut := controllers.CreateBuyerController(mockBuyerService)
 
 	r := gin.Default()
-	r.GET("/buyers/:id", sut.GetByIdBuyers)
+	r.GET("/buyers/:id", sut.GetBuyerById)
 
 	t.Run("Should return an error and 400 status if a invalid id is provided", func(t *testing.T) {
 		rr := httptest.NewRecorder()
@@ -247,17 +247,17 @@ func TestGetByIdBuyers(t *testing.T) {
 		assert.Equal(t, "{\"error\":\"invalid id\"}", rr.Body.String())
 	})
 
-	t.Run("Should call GetById from Buyer Service with correct id", func(t *testing.T) {
-		mockBuyerService.On("GetById", mock.AnythingOfType("int")).Return(makeDBBuyer(), nil).Once()
+	t.Run("Should call GetBuyerById from Buyer Service with correct id", func(t *testing.T) {
+		mockBuyerService.On("GetBuyerById", mock.AnythingOfType("int")).Return(makeDBBuyer(), nil).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodGet, "/buyers/1", nil)
 		r.ServeHTTP(rr, req)
 
-		mockBuyerService.AssertCalled(t, "GetById", 1)
+		mockBuyerService.AssertCalled(t, "GetBuyerById", 1)
 	})
 
-	t.Run("Should return an error and 404 status if GetById from Warehouse Service returns not find the correspondent element", func(t *testing.T) {
-		mockBuyerService.On("GetById", mock.AnythingOfType("int")).Return(buyers.Buyer{}, &buyers.NoElementInFileError{Err: errors.New("any_message")}).Once()
+	t.Run("Should return an error and 404 status if GetBuyerById from Warehouse Service returns not find the correspondent element", func(t *testing.T) {
+		mockBuyerService.On("GetBuyerById", mock.AnythingOfType("int")).Return(buyers.Buyer{}, &buyers.NoElementInFileError{Err: errors.New("any_message")}).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodGet, "/buyers/404", nil)
 		r.ServeHTTP(rr, req)
@@ -266,8 +266,8 @@ func TestGetByIdBuyers(t *testing.T) {
 		assert.Equal(t, "{\"error\":\"any_message\"}", rr.Body.String())
 	})
 
-	t.Run("Should return an error and 500 status if GetById from Buyer Service returns an error", func(t *testing.T) {
-		mockBuyerService.On("GetById", mock.AnythingOfType("int")).Return(buyers.Buyer{}, errors.New("any_message")).Once()
+	t.Run("Should return an error and 500 status if GetBuyerById from Buyer Service returns an error", func(t *testing.T) {
+		mockBuyerService.On("GetBuyerById", mock.AnythingOfType("int")).Return(buyers.Buyer{}, errors.New("any_message")).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodGet, "/buyers/1", nil)
 		r.ServeHTTP(rr, req)
@@ -277,7 +277,7 @@ func TestGetByIdBuyers(t *testing.T) {
 	})
 
 	t.Run("Should 200 status and data on success", func(t *testing.T) {
-		mockBuyerService.On("GetById", mock.AnythingOfType("int")).Return(makeDBBuyer(), nil).Once()
+		mockBuyerService.On("GetBuyerById", mock.AnythingOfType("int")).Return(makeDBBuyer(), nil).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodGet, "/buyers/1", nil)
 		r.ServeHTTP(rr, req)
@@ -294,7 +294,7 @@ func TestUpdateBuyer(t *testing.T) {
 	sut := controllers.CreateBuyerController(mockBuyerService)
 
 	r := gin.Default()
-	r.PATCH("/buyers/:id", sut.UpdateByIdBuyer)
+	r.PATCH("/buyers/:id", sut.UpdateBuyerById)
 
 	t.Run("Should return an error and 400 status if a invalid id is provided", func(t *testing.T) {
 		rr := httptest.NewRecorder()
@@ -325,17 +325,17 @@ func TestUpdateBuyer(t *testing.T) {
 		}
 	})
 
-	t.Run("Should call UpdateById from Buyer Service with correct values", func(t *testing.T) {
-		mockBuyerService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(makeUpdatedDBBuyer(), nil).Once()
+	t.Run("Should call UpdateBuyerById from Buyer Service with correct values", func(t *testing.T) {
+		mockBuyerService.On("UpdateBuyerById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(makeUpdatedDBBuyer(), nil).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodPatch, "/buyers/1", makeValidUpdateBody())
 		r.ServeHTTP(rr, req)
 
-		mockBuyerService.AssertCalled(t, "UpdateById", 1, "first name", "last name", "address", "2342430043")
+		mockBuyerService.AssertCalled(t, "UpdateBuyerById", 1, "first name", "last name", "address", "2342430043")
 	})
 
-	t.Run("Should return an error and 404 status if UpdateById from Buyer Service returns an Business Rule error", func(t *testing.T) {
-		mockBuyerService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(buyers.Buyer{}, &buyers.BusinessRuleError{Err: errors.New("any_message")}).Once()
+	t.Run("Should return an error and 404 status if UpdateBuyerById from Buyer Service returns an Business Rule error", func(t *testing.T) {
+		mockBuyerService.On("UpdateBuyerById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(buyers.Buyer{}, &buyers.BusinessRuleError{Err: errors.New("any_message")}).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodPatch, "/buyers/1", makeValidUpdateBody())
 		r.ServeHTTP(rr, req)
@@ -344,8 +344,8 @@ func TestUpdateBuyer(t *testing.T) {
 		assert.Equal(t, "{\"error\":\"any_message\"}", rr.Body.String())
 	})
 
-	t.Run("Should return an error and 500 status if UpdateById from Buyer Service did not returns an custom error", func(t *testing.T) {
-		mockBuyerService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(buyers.Buyer{}, errors.New("any_message")).Once()
+	t.Run("Should return an error and 500 status if UpdateBuyerById from Buyer Service did not returns an custom error", func(t *testing.T) {
+		mockBuyerService.On("UpdateBuyerById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(buyers.Buyer{}, errors.New("any_message")).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodPatch, "/buyers/1", makeValidUpdateBody())
 		r.ServeHTTP(rr, req)
@@ -355,7 +355,7 @@ func TestUpdateBuyer(t *testing.T) {
 	})
 
 	t.Run("Should 200 status and data on success", func(t *testing.T) {
-		mockBuyerService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(makeUpdatedDBBuyer(), nil).Once()
+		mockBuyerService.On("UpdateBuyerById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(makeUpdatedDBBuyer(), nil).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodPatch, "/buyers/1", makeValidCreateBody())
 		r.ServeHTTP(rr, req)
@@ -365,14 +365,14 @@ func TestUpdateBuyer(t *testing.T) {
 	})
 }
 
-func TestDeleteByIdBuyer(t *testing.T) {
+func TestDeleteBuyerByIdBuyer(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	mockBuyerService := mocks.NewService(t)
 	sut := controllers.CreateBuyerController(mockBuyerService)
 
 	r := gin.Default()
-	r.DELETE("/buyers/:id", sut.DeleteByIdBuyer)
+	r.DELETE("/buyers/:id", sut.DeleteBuyerById)
 
 	t.Run("Should return an error and 400 status if a invalid id is provided", func(t *testing.T) {
 		rr := httptest.NewRecorder()
@@ -383,17 +383,17 @@ func TestDeleteByIdBuyer(t *testing.T) {
 		assert.Equal(t, "{\"error\":\"invalid id\"}", rr.Body.String())
 	})
 
-	t.Run("Should call DeleteById from Buyer Service with correct id", func(t *testing.T) {
-		mockBuyerService.On("DeleteById", mock.AnythingOfType("int")).Return(nil).Once()
+	t.Run("Should call DeleteBuyerById from Buyer Service with correct id", func(t *testing.T) {
+		mockBuyerService.On("DeleteBuyerById", mock.AnythingOfType("int")).Return(nil).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodDelete, "/buyers/1", nil)
 		r.ServeHTTP(rr, req)
 
-		mockBuyerService.AssertCalled(t, "DeleteById", 1)
+		mockBuyerService.AssertCalled(t, "DeleteBuyerById", 1)
 	})
 
-	t.Run("Should return an error and 404 status if DeleteById from Buyer Service returns not find the correspondent element", func(t *testing.T) {
-		mockBuyerService.On("DeleteById", mock.AnythingOfType("int")).Return(&buyers.NoElementInFileError{Err: errors.New("any_message")}).Once()
+	t.Run("Should return an error and 404 status if DeleteBuyerById from Buyer Service returns not find the correspondent element", func(t *testing.T) {
+		mockBuyerService.On("DeleteBuyerById", mock.AnythingOfType("int")).Return(&buyers.NoElementInFileError{Err: errors.New("any_message")}).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodDelete, "/buyers/404", nil)
 		r.ServeHTTP(rr, req)
@@ -402,8 +402,8 @@ func TestDeleteByIdBuyer(t *testing.T) {
 		assert.Equal(t, "{\"error\":\"any_message\"}", rr.Body.String())
 	})
 
-	t.Run("Should return an error and 500 status if DeleteById from Buyer Service returns an error", func(t *testing.T) {
-		mockBuyerService.On("DeleteById", mock.AnythingOfType("int")).Return(errors.New("any_message")).Once()
+	t.Run("Should return an error and 500 status if DeleteBuyerById from Buyer Service returns an error", func(t *testing.T) {
+		mockBuyerService.On("DeleteBuyerById", mock.AnythingOfType("int")).Return(errors.New("any_message")).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodDelete, "/buyers/1", nil)
 		r.ServeHTTP(rr, req)
@@ -413,7 +413,7 @@ func TestDeleteByIdBuyer(t *testing.T) {
 	})
 
 	t.Run("Should 200 status and data on success", func(t *testing.T) {
-		mockBuyerService.On("DeleteById", mock.AnythingOfType("int")).Return(nil).Once()
+		mockBuyerService.On("DeleteBuyerById", mock.AnythingOfType("int")).Return(nil).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodDelete, "/buyers/1", nil)
 		r.ServeHTTP(rr, req)
