@@ -26,7 +26,7 @@ func (c *ProductController) GetAll() gin.HandlerFunc {
 			ctx.JSON(http.StatusNotFound, nil)
 			return
 		}
-		ctx.JSON(http.StatusOK, NewResponse(http.StatusOK, p))
+		ctx.JSON(http.StatusOK, p)
 	}
 }
 
@@ -48,7 +48,7 @@ func (c *ProductController) GetById() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, NewResponse(http.StatusOK, p))
+		ctx.JSON(http.StatusOK, p)
 	}
 }
 
@@ -103,10 +103,7 @@ func (c *ProductController) Create() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(
-			http.StatusOK,
-			NewResponse(http.StatusOK, p),
-		)
+		ctx.JSON(http.StatusOK, p)
 	}
 }
 
