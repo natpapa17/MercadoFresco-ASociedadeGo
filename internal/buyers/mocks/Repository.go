@@ -29,7 +29,7 @@ func (_m *Repository) Create(firstName string, lastName string, address string, 
 	return r0, r1
 }
 
-func (_m *Repository) DeleteById(id int) error {
+func (_m *Repository) DeleteBuyerById(id int) error {
 	ret := _m.Called(id)
 
 	var r0 error
@@ -64,7 +64,7 @@ func (_m *Repository) GetAll() ([]buyers.Buyer, error) {
 	return r0, r1
 }
 
-func (_m *Repository) GetById(id int) (buyers.Buyer, error) {
+func (_m *Repository) GetBuyerById(id int) (buyers.Buyer, error) {
 	ret := _m.Called(id)
 
 	var r0 buyers.Buyer
@@ -104,7 +104,7 @@ func (_m *Repository) GetByBuyer(code string) (buyers.Buyer, error) {
 	return r0, r1
 }
 
-func (_m *Repository) UpdateById(id int, firstName string, lastName string, address string, documentNumber string) (buyers.Buyer, error) {
+func (_m *Repository) UpdateBuyerById(id int, firstName string, lastName string, address string, documentNumber string) (buyers.Buyer, error) {
 	ret := _m.Called(id, firstName, lastName, address, documentNumber)
 
 	var r0 buyers.Buyer

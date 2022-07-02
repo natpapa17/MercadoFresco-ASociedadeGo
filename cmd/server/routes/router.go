@@ -78,9 +78,9 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 		buyer := mux.Group("buyers")
 		{
 			buyer.GET("/", bc.GetAllBuyers)
-			buyer.GET("/:id", bc.GetBuyer)
-			buyer.PATCH("/:id", bc.UpdateBuyer)
-			buyer.DELETE("/:id", bc.DeleteBuyer)
+			buyer.GET("/:id", bc.GetBuyerById)
+			buyer.PATCH("/:id", bc.UpdateBuyerById)
+			buyer.DELETE("/:id", bc.DeleteBuyerById)
 			buyer.POST("/", bc.CreateBuyer)
 		}
 

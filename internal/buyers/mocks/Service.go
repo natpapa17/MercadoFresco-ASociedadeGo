@@ -1,7 +1,7 @@
 package mocks
 
 import (
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
+	// "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 	buyers "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 	mock "github.com/stretchr/testify/mock"
 )
@@ -30,7 +30,7 @@ func (_m *Service) Create(firstName string, lastName string, address string, doc
 	return r0, r1
 }
 
-func (_m *Service) DeleteById(id int) error {
+func (_m *Service) DeleteBuyerById(id int) error {
 	ret := _m.Called(id)
 
 	var r0 error
@@ -66,7 +66,7 @@ func (_m *Service) GetAll() ([]buyers.Buyer, error) {
 }
 
 // GetById provides a mock function with given fields: id
-func (_m *Service) GetById(id int) (buyers.Buyer, error) {
+func (_m *Service) GetBuyerById(id int) (buyers.Buyer, error) {
 	ret := _m.Called(id)
 
 	var r0 buyers.Buyer
@@ -86,7 +86,7 @@ func (_m *Service) GetById(id int) (buyers.Buyer, error) {
 	return r0, r1
 }
 
-func (_m *Service) UpdateById(id int, firstName string, lastName string, address string, documentNumber string) (buyers.Buyer, error) {
+func (_m *Service) UpdateBuyerById(id int, firstName string, lastName string, address string, documentNumber string) (buyers.Buyer, error) {
 	ret := _m.Called(id, firstName, lastName, address, documentNumber)
 
 	var r0 buyers.Buyer
