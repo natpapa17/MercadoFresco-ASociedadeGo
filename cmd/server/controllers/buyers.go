@@ -3,9 +3,10 @@ package controllers
 import (
 	"errors"
 	"net/http"
-	_"regexp"
+	_ "regexp"
 	"strconv"
 	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 )
@@ -173,12 +174,11 @@ func (bc *BuyerController) DeleteBuyer(ctx *gin.Context) {
 }
 
 type buyerRequest struct {
-	ID int `json:"id" binding:"required"`
-	FirstName string `json:"first_name" binding:"required"`
-	LastName string `json:"last_name" binding:"required"`
-	Address string `json:"address" binding:"required"`
+	ID             int    `json:"id" binding:"required"`
+	FirstName      string `json:"first_name" binding:"required"`
+	LastName       string `json:"last_name" binding:"required"`
+	Address        string `json:"address" binding:"required"`
 	DocumentNumber string `json:"document" binding:"required"`
-
 }
 
 func (br *buyerRequest) Validate() error {
