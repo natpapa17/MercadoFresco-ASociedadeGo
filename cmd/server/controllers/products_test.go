@@ -28,14 +28,14 @@ func makeUnprocessableCreateAndUpdateBody() *bytes.Buffer {
 func makeValidCreateBody() *bytes.Buffer {
 	return bytes.NewBuffer([]byte(`
         {
-            "product_code": "COD01",
-            "description": "Água",
-            "width": 1.5,
-            "height": 1.5,
-            "lenght": 1.5,
-            "net_weight": 1.5,
+            "product_code": "valid_code",
+            "description": "valid_description",
+            "width": 1.0,
+            "height": 1.0,
+            "length": 1.0,
+            "net_weight": 1.0,
             "expiration_rate": 1,
-            "recommended_freezing_temperature": 1.5,
+            "recommended_freezing_temperature": 1.0,
             "freezing_rate": 1,
             "product_type_id": 1,
             "seller_id": 1
@@ -46,14 +46,14 @@ func makeValidCreateBody() *bytes.Buffer {
 func makeValidUpdateBody() *bytes.Buffer {
 	return bytes.NewBuffer([]byte(`
         {
-            "product_code": "COD02",
-            "description": "Água com gás",
-            "width": 2.5,
-            "height": 2.5,
-            "lenght": 2.5,
-            "net_weight": 2.5,
+            "product_code": "update_code",
+            "description": "update_description",
+            "width": 2.0,
+            "height": 2.0,
+            "length": 2.0,
+            "net_weight": 2.0,
             "expiration_rate": 2,
-            "recommended_freezing_temperature": 2.5,
+            "recommended_freezing_temperature": 2.0,
             "freezing_rate": 2,
             "product_type_id": 2,
             "seller_id": 2
@@ -340,21 +340,29 @@ func TestCreateProduct(t *testing.T) {
 	r.POST("/products", controller.Create())
 
 	t.Run("create_ok_201", func(t *testing.T) {
-		mockProductService.
-			On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
-			Return(makeProduct(), nil).Once()
-
+		mockProductService.On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
+			Return(makeProduct(), nil)
 		res := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodPost, "/products", makeValidCreateBody())
 		r.ServeHTTP(res, req)
 
-		assert.Equal(t, http.StatusCreated, res.Code)
+		assert.Equal(t, http.StatusOK, res.Code)
 		assert.Equal(t, "{\"id\":1,\"product_code\":\"valid_code\",\"description\":\"valid_description\",\"width\":1,\"height\":1,\"length\":1,\"net_weight\":1,\"expiration_rate\":1,\"recommended_freezing_temperature\":1,\"freezing_rate\":1,\"product_type_id\":1,\"seller_id\":1}", res.Body.String())
 	})
 
-	t.Run("creat_conflict_409", func(t *testing.T) {})
+	t.Run("creat_conflict_409", func(t *testing.T) {
 
-	t.Run("create_fail_422", func(t *testing.T) {})
+	})
+
+	t.Run("create_fail_422", func(t *testing.T) {
+		res := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodPost, "/products", makeUnprocessableCreateAndUpdateBody())
+		r.ServeHTTP(res, req)
+
+		assert.Equal(t, http.StatusUnprocessableEntity, res.Code)
+		assert.Contains(t, res.Body.String(), "{\"error\":")
+	})
+
 }
 
 func TestUpdateProduct(t *testing.T) {
@@ -367,10 +375,31 @@ func TestUpdateProduct(t *testing.T) {
 	r.PATCH("/products/:id", controller.Update())
 
 	t.Run("update_ok_200", func(t *testing.T) {
+		mockProductService.
+			On("Update", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
+			Return(makeUpdateProduct(), nil).
+			Once()
+
+		res := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodPatch, "/products/1", makeValidUpdateBody())
+		r.ServeHTTP(res, req)
+
+		assert.Equal(t, http.StatusOK, res.Code)
+		assert.Equal(t, "{\"id\":2,\"product_code\":\"update_code\",\"description\":\"update_description\",\"width\":2,\"height\":2,\"length\":2,\"net_weight\":2,\"expiration_rate\":2,\"recommended_freezing_temperature\":2,\"freezing_rate\":2,\"product_type_id\":2,\"seller_id\":2}", res.Body.String())
 
 	})
 
 	t.Run("update_non_existent_404", func(t *testing.T) {
+		mockProductService.
+			On("Update", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
+			Return(makeUpdateProduct(), errors.New("Error")).
+			Once()
+		res := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodPatch, "/products/1", makeValidUpdateBody())
+		r.ServeHTTP(res, req)
+
+		assert.Equal(t, http.StatusNotFound, res.Code)
+		assert.Equal(t, "{\"error\":\"Error\"}", res.Body.String())
 
 	})
 }

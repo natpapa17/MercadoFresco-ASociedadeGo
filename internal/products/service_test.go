@@ -111,6 +111,7 @@ func TestCreate(t *testing.T) {
 			On("GetByCode", mock.AnythingOfType("string")).
 			Return(products.Product{}, errors.New("product code: valid_code is already in use")).
 			Once()
+
 		mockProductRepository.
 			On("Create", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
 			Return(makeProduct(), nil).
