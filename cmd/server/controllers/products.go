@@ -153,7 +153,7 @@ type Request struct {
 	Width                          float64 `json:"width" binding:"required"`
 	Height                         float64 `json:"height" binding:"required"`
 	Length                         float64 `json:"length" binding:"required"`
-	NetWeight                      float64 `json:"netweight" binding:"required"`
+	NetWeight                      float64 `json:"net_weight" binding:"required"`
 	ExpirationRate                 int     `json:"expiration_rate" binding:"required"`
 	RecommendedFreezingTemperature float64 `json:"recommended_freezing_temperature" binding:"required"`
 	FreezingRate                   int     `json:"freezing_rate" binding:"required"`
