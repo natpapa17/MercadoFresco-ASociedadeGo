@@ -1,4 +1,4 @@
-package controllers
+package buyer
 
 import (
 	"errors"
@@ -40,7 +40,7 @@ func (bc *BuyerController) CreateBuyer(ctx *gin.Context) {
 
 	b, err := bc.service.Create(req.FirstName, req.LastName, req.Address, req.DocumentNumber)
 	if err != nil {
-		if isCustomError(err) {
+		if CustomError(err) {
 			ctx.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
