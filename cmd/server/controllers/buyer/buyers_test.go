@@ -125,7 +125,7 @@ func TestCreateBuyer(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	mockBuyerService := mocks.NewService(t)
-	sut := controllers.CreateBuyerController(mockBuyerService)
+	sut := buyer.CreateBuyerController(mockBuyerService)
 
 	r := gin.Default()
 	r.POST("/buyers", sut.CreateBuyer)
@@ -184,7 +184,7 @@ func TestGetAllBuyer(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	mockBuyerService := mocks.NewService(t)
-	sut := controllers.CreateBuyerController(mockBuyerService)
+	sut := buyer.CreateBuyerController(mockBuyerService)
 
 	r := gin.Default()
 	r.GET("/buyers", sut.GetAllBuyers)
@@ -223,7 +223,7 @@ func TestGetBuyerById(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	mockBuyerService := mocks.NewService(t)
-	sut := controllers.CreateBuyerController(mockBuyerService)
+	sut := buyer.CreateBuyerController(mockBuyerService)
 
 	r := gin.Default()
 	r.GET("/buyers/:id", sut.GetBuyerById)
@@ -277,11 +277,11 @@ func TestGetBuyerById(t *testing.T) {
 	})
 }
 
-func TestUpdateBuyer(t *testing.T) {
+func TestUpdateBuyerById(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	mockBuyerService := mocks.NewService(t)
-	sut := controllers.CreateBuyerController(mockBuyerService)
+	sut := buyer.CreateBuyerController(mockBuyerService)
 
 	r := gin.Default()
 	r.PATCH("/buyers/:id", sut.UpdateBuyerById)
@@ -359,7 +359,7 @@ func TestDeleteBuyerByIdBuyer(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	mockBuyerService := mocks.NewService(t)
-	sut := controllers.CreateBuyerController(mockBuyerService)
+	sut := buyer.CreateBuyerController(mockBuyerService)
 
 	r := gin.Default()
 	r.DELETE("/buyers/:id", sut.DeleteBuyerById)

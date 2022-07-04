@@ -1,7 +1,5 @@
 package buyers
 
-// import "fmt"
-
 type Service interface {
 	Create(firstName string, lastName string, address string, document string) (Buyer, error)
 	GetAll() ([]Buyer, error)

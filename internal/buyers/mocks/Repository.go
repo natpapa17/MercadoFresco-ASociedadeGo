@@ -90,7 +90,7 @@ func (_m *Repository) GetBuyerById(id int) (buyers.Buyer, error) {
 }
 
 // UpdateById provides a mock function with given fields: id, firstName, lastName, address, document
-func (_m *Repository) UpdateById(id int, firstName string, lastName string, address string, document string) (buyers.Buyer, error) {
+func (_m *Repository) UpdateBuyerById(id int, firstName string, lastName string, address string, document string) (buyers.Buyer, error) {
 	ret := _m.Called(id, firstName, lastName, address, document)
 
 	var r0 buyers.Buyer
