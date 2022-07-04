@@ -98,12 +98,13 @@ func (c *ProductController) Create() gin.HandlerFunc {
 		}
 
 		p, err := c.service.Create(req.ProductCode, req.Description, req.Width, req.Height, req.Length, req.NetWeight, req.ExpirationRate, req.RecommendedFreezingTemperature, req.FreezingRate, req.ProductTypeId, req.SellerId)
+
 		if err != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
 		}
 
-		ctx.JSON(http.StatusOK, p)
+		ctx.JSON(http.StatusCreated, p)
 	}
 }
 

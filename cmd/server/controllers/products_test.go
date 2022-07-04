@@ -61,188 +61,6 @@ func makeValidUpdateBody() *bytes.Buffer {
     `))
 }
 
-type TestCase struct {
-	RequestBody      string
-	ExpectedResponse string
-}
-
-func makeInvalidBodiesTestCases() []TestCase {
-	return []TestCase{
-		{
-			RequestBody: `
-            {
-                "product_code": " ",
-                "description": "Água com gás",
-                "width": 2.5,
-                "height": 2.5,
-                "lenght": 2.5,
-                "net_weight": 2.5,
-                "expiration_rate": 2,
-                "recommended_freezing_temperature": 2.5,
-                "freezing_rate": 2,
-                "product_type_id": 2,
-                "seller_id": 2
-            }
-            `,
-			ExpectedResponse: "{\"error\":\"product_code can't be empty\"}",
-		},
-		{
-			RequestBody: `
-            {
-                "product_code": "COD02",
-                "description": " ",
-                "width": 2.5,
-                "height": 2.5,
-                "lenght": 2.5,
-                "net_weight": 2.5,
-                "expiration_rate": 2,
-                "recommended_freezing_temperature": 2.5,
-                "freezing_rate": 2,
-                "product_type_id": 2,
-                "seller_id": 2
-            }
-            `,
-			ExpectedResponse: "{\"error\":\"description can't be empty\"}",
-		}, {
-			RequestBody: `
-            {
-                "product_code": "COD02",
-                "description": "Água com gás",
-                "width": " ",
-                "height": 2.5,
-                "lenght": 2.5,
-                "net_weight": 2.5,
-                "expiration_rate": 2,
-                "recommended_freezing_temperature": 2.5,
-                "freezing_rate": 2,
-                "product_type_id": 2,
-                "seller_id": 2
-            }
-            `,
-			ExpectedResponse: "{\"error\":\"width can't be empty\"}",
-		}, {
-			RequestBody: `
-            {
-                "product_code": "COD02",
-                "description": "Água com gás",
-                "width": 2.5,
-                "height": " ",
-                "lenght": 2.5,
-                "net_weight": 2.5,
-                "expiration_rate": 2,
-                "recommended_freezing_temperature": 2.5,
-                "freezing_rate": 2,
-                "product_type_id": 2,
-                "seller_id": 2
-            }
-            `,
-			ExpectedResponse: "{\"error\":\"height can't be empty\"}",
-		}, {
-			RequestBody: `
-            {
-                "product_code": "COD02",
-                "description": "Água com gás",
-                "width": 2.5,
-                "height": 2.5,
-                "lenght": " ",
-                "net_weight": 2.5,
-                "expiration_rate": 2,
-                "recommended_freezing_temperature": 2.5,
-                "freezing_rate": 2,
-                "product_type_id": 2,
-                "seller_id": 2
-            }
-            `,
-			ExpectedResponse: "{\"error\":\"lenght can't be empty\"}",
-		}, {
-			RequestBody: `
-            {
-                "product_code": "COD02",
-                "description": "Água com gás",
-                "width": 2.5,
-                "height": 2.5,
-                "lenght": 2.5,
-                "net_weight": " ",
-                "expiration_rate": 2,
-                "recommended_freezing_temperature": 2.5,
-                "freezing_rate": 2,
-                "product_type_id": 2,
-                "seller_id": 2
-            }
-            `,
-			ExpectedResponse: "{\"error\":\"net_weight can't be empty\"}",
-		}, {
-			RequestBody: `
-            {
-                "product_code": "COD02",
-                "description": "Água com gás",
-                "width": 2.5,
-                "height": 2.5,
-                "lenght": 2.5,
-                "net_weight": 2.5,
-                "expiration_rate": " ",
-                "recommended_freezing_temperature": 2.5,
-                "freezing_rate": 2,
-                "product_type_id": 2,
-                "seller_id": 2
-            }
-            `,
-			ExpectedResponse: "{\"error\":\"expiration_rate can't be empty\"}",
-		}, {
-			RequestBody: `
-            {
-                "product_code": "COD02",
-                "description": "Água com gás",
-                "width": 2.5,
-                "height": 2.5,
-                "lenght": 2.5,
-                "net_weight": 2.5,
-                "expiration_rate": 2,
-                "recommended_freezing_temperature": " ",
-                "freezing_rate": 2,
-                "product_type_id": 2,
-                "seller_id": 2
-            }
-            `,
-			ExpectedResponse: "{\"error\":\"recommended_freezing_temperature can't be empty\"}",
-		}, {
-			RequestBody: `
-            {
-                "product_code": "COD02",
-                "description": "Água com gás",
-                "width": 2.5,
-                "height": 2.5,
-                "lenght": 2.5,
-                "net_weight": 2.5,
-                "expiration_rate": 2,
-                "recommended_freezing_temperature": 2.5,
-                "freezing_rate": " ",
-                "product_type_id": 2,
-                "seller_id": 2
-            }
-            `,
-			ExpectedResponse: "{\"error\":\"freezing_rate can't be empty\"}",
-		}, {
-			RequestBody: `
-            {
-                "product_code": "COD02",
-                "description": "Água com gás",
-                "width": 2.5,
-                "height": 2.5,
-                "lenght": 2.5,
-                "net_weight": 2.5,
-                "expiration_rate": 2,
-                "recommended_freezing_temperature": 2.5,
-                "freezing_rate": 2,
-                "product_type_id": " ",
-                "seller_id": 2
-            }
-            `,
-			ExpectedResponse: "{\"error\":\"product_type_id can't be empty\"}",
-		},
-	}
-}
-
 func makeProduct() products.Product {
 	return products.Product{
 		Id:                               1,
@@ -340,19 +158,30 @@ func TestCreateProduct(t *testing.T) {
 	r.POST("/products", controller.Create())
 
 	t.Run("create_ok_201", func(t *testing.T) {
-		mockProductService.On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
-			Return(makeProduct(), nil)
+		mockProductService.
+			On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
+			Return(makeProduct(), nil).
+			Once()
 		res := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodPost, "/products", makeValidCreateBody())
 		r.ServeHTTP(res, req)
 
-		assert.Equal(t, http.StatusOK, res.Code)
+		assert.Equal(t, http.StatusCreated, res.Code)
 		assert.Equal(t, "{\"id\":1,\"product_code\":\"valid_code\",\"description\":\"valid_description\",\"width\":1,\"height\":1,\"length\":1,\"net_weight\":1,\"expiration_rate\":1,\"recommended_freezing_temperature\":1,\"freezing_rate\":1,\"product_type_id\":1,\"seller_id\":1}", res.Body.String())
 	})
 
-	t.Run("creat_conflict_409", func(t *testing.T) {
+	// t.Run("creat_conflict_409", func(t *testing.T) {
+	// 	mockProductService.
+	// 		On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
+	// 		Return(products.Product{}, errors.New("product code: valid_code is already in use")).
+	// 		Once()
 
-	})
+	// 	rr := httptest.NewRecorder()
+	// 	req, _ := http.NewRequest(http.MethodPost, "/products", makeValidCreateBody())
+	// 	r.ServeHTTP(rr, req)
+
+	// 	assert.Equal(t, http.StatusConflict, rr.Code)
+	// })
 
 	t.Run("create_fail_422", func(t *testing.T) {
 		res := httptest.NewRecorder()
@@ -381,7 +210,7 @@ func TestUpdateProduct(t *testing.T) {
 			Once()
 
 		res := httptest.NewRecorder()
-		req, _ := http.NewRequest(http.MethodPatch, "/products/1", makeValidUpdateBody())
+		req, _ := http.NewRequest(http.MethodPatch, "/products/2", makeValidUpdateBody())
 		r.ServeHTTP(res, req)
 
 		assert.Equal(t, http.StatusOK, res.Code)
@@ -395,7 +224,7 @@ func TestUpdateProduct(t *testing.T) {
 			Return(makeUpdateProduct(), errors.New("Error")).
 			Once()
 		res := httptest.NewRecorder()
-		req, _ := http.NewRequest(http.MethodPatch, "/products/1", makeValidUpdateBody())
+		req, _ := http.NewRequest(http.MethodPatch, "/products/2", makeValidUpdateBody())
 		r.ServeHTTP(res, req)
 
 		assert.Equal(t, http.StatusNotFound, res.Code)
