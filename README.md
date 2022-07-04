@@ -444,3 +444,187 @@
 ## Sections
 
 ## Products
+
+### Cadastrar Produtos
+- uri:  `localhost:8080/api/v1/products`
+- método: `POST`
+- body: 
+  ```
+  {
+    "product_code": string, unique
+    "description": string
+    "width": number, float
+    "height": number, float
+    "length": number, float
+    "net_weight": number, float
+    "expiration_rate": number, integer
+    "recommended_freezing_temperature": number, float
+    "freezing_rate": number, integer
+    "product_type_id": number, integer
+    "seller_id": number, integer
+  }
+  ```
+
+- responses em caso de sucesso: 
+    - status: 201
+      - body:
+        ```
+        "data": {
+        "id": number, integer, unique
+        "product_code": string, unique
+        "description": string
+        "width": number, float
+        "height": number, float
+        "length": number, float
+        "net_weight": number, float
+        "expiration_rate": number, integer
+        "recommended_freezing_temperature": number, float
+        "freezing_rate": number, integer
+        "product_type_id": number, integer
+        "seller_id": number, integer
+        }
+        ```
+- responses em caso de falha: 
+    - status: 400
+    - status: 422
+    - status: 500
+      - body: comum para todas as requisições com falha
+        ```
+        {
+          "error": string
+        }
+        ```
+
+### Listar Todos os Produtos
+- uri:  `localhost:8080/api/v1/products`
+- método: `GET`
+
+- responses em caso de sucesso: 
+    - status: 200
+      - body:
+        ```
+        "data": [
+          {
+            "id": number, integer, unique
+            "product_code": string, unique
+            "description": string
+            "width": number, float
+            "height": number, float
+            "length": number, float
+            "net_weight": number, float
+            "expiration_rate": number, integer
+            "recommended_freezing_temperature": number, float
+            "freezing_rate": number, integer
+            "product_type_id": number, integer
+            "seller_id": number, integer
+          },
+          ...
+        ]
+        ```
+- responses em caso de falha: 
+    - status: 500
+      - body:
+        ```
+        {
+          "error": string
+        }
+        ```
+
+### Listar Produtos por Id
+- uri:  `localhost:8080/api/v1/products/:id`
+- método: `GET`
+- responses em caso de sucesso: 
+    - status: 200
+      - body:
+        ```
+        "data": {
+          "id": number, integer, unique
+          "product_code": string, unique
+          "description": string
+          "width": number, float
+          "height": number, float
+          "length": number, float
+          "net_weight": number, float
+          "expiration_rate": number, integer
+          "recommended_freezing_temperature": number, float
+          "freezing_rate": number, integer
+          "product_type_id": number, integer
+          "seller_id": number, integer
+        }
+        ```
+- responses em caso de falha: 
+    - status: 400
+    - status: 404
+    - status: 500
+      - body: comum para todas as requisições com falha
+        ```
+        {
+          "error": string
+        }
+        ```
+
+### Atualizar Produtos
+- uri:  `localhost:8080/api/v1/products/:id`
+- método: `PATCH`
+- body: 
+  ```
+  {
+    "product_code": string, unique
+    "description": string
+    "width": number, float
+    "height": number, float
+    "length": number, float
+    "net_weight": number, float
+    "expiration_rate": number, integer
+    "recommended_freezing_temperature": number, float
+    "freezing_rate": number, integer
+    "product_type_id": number, integer
+    "seller_id": number, integer
+  }
+  ```
+- responses em caso de sucesso: 
+    - status: 200
+      - body:
+        ```
+        "data": {
+          "id": number, integer, unique
+          "product_code": string, unique
+          "description": string
+          "width": number, float
+          "height": number, float
+          "length": number, float
+          "net_weight": number, float
+          "expiration_rate": number, integer
+          "recommended_freezing_temperature": number, float
+          "freezing_rate": number, integer
+          "product_type_id": number, integer
+          "seller_id": number, integer
+        }
+        ```
+- responses em caso de falha: 
+    - status: 400
+    - status: 404
+    - status: 422
+    - status: 500
+      - body: comum para todas as requisições com falha
+        ```
+        {
+          "error": string
+        }
+        ```
+
+### Deletar Produtos
+- uri:  `localhost:8080/api/v1/products/:id`
+- método: `DELETE`
+- responses em caso de sucesso: 
+    - status: 204
+- responses em caso de falha: 
+    - status: 400
+    - status: 404
+    - status: 500
+      - body: comum para todas as requisições com falha
+        ```
+        {
+          "error": string
+        }
+        ```
