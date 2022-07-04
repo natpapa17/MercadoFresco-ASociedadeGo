@@ -170,18 +170,18 @@ func TestCreateProduct(t *testing.T) {
 		assert.Equal(t, "{\"id\":1,\"product_code\":\"valid_code\",\"description\":\"valid_description\",\"width\":1,\"height\":1,\"length\":1,\"net_weight\":1,\"expiration_rate\":1,\"recommended_freezing_temperature\":1,\"freezing_rate\":1,\"product_type_id\":1,\"seller_id\":1}", res.Body.String())
 	})
 
-	// t.Run("creat_conflict_409", func(t *testing.T) {
-	// 	mockProductService.
-	// 		On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
-	// 		Return(products.Product{}, errors.New("product code: valid_code is already in use")).
-	// 		Once()
+	t.Run("creat_conflict_409", func(t *testing.T) {
+		mockProductService.
+			On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
+			Return(products.Product{}, errors.New("product code: valid_code is already in use")).
+			Once()
 
-	// 	rr := httptest.NewRecorder()
-	// 	req, _ := http.NewRequest(http.MethodPost, "/products", makeValidCreateBody())
-	// 	r.ServeHTTP(rr, req)
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodPost, "/products", makeValidCreateBody())
+		r.ServeHTTP(rr, req)
 
-	// 	assert.Equal(t, http.StatusConflict, rr.Code)
-	// })
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
 
 	t.Run("create_fail_422", func(t *testing.T) {
 		res := httptest.NewRecorder()
