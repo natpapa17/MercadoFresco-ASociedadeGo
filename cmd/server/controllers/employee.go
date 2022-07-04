@@ -205,3 +205,18 @@ func (ec *EmployeeController) DeleteByIdEmployee(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusNoContent, gin.H{})
 }
+
+func CustomError(e error) bool {
+	var be *employee.BusinessRuleError
+	var fe *employee.NoElementInFileError
+
+	if errors.As(e, &be) {
+		return true
+	}
+
+	if errors.As(e, &fe) {
+		return true
+	}
+
+	return false
+}
