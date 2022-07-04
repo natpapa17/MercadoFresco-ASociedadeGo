@@ -1,18 +1,20 @@
 package buyers
 
+// import "fmt"
+
 type Service interface {
 	Create(firstName string, lastName string, address string, document string) (Buyer, error)
 	GetAll() ([]Buyer, error)
-	GetById(id int) (Buyer, error)
-	UpdateById(id int, firstName string, lastName string, address string, document string) (Buyer, error)
-	DeleteById(id int) error
+	GetBuyerById(id int) (Buyer, error)
+	UpdateBuyerById(id int, firstName string, lastName string, address string, document string) (Buyer, error)
+	DeleteBuyerById(id int) error
 }
 
 type service struct {
 	repository Repository
 }
 
-func CreateService(r Repository) Service {
+func CreateBuyerService(r Repository) Service {
 	return &service{
 		repository: r,
 	}
@@ -38,8 +40,8 @@ func (s *service) GetAll() ([]Buyer, error) {
 	return ws, nil
 }
 
-func (s *service) GetById(id int) (Buyer, error) {
-	w, err := s.repository.GetById(id)
+func (s *service) GetBuyerById(id int) (Buyer, error) {
+	w, err := s.repository.GetBuyerById(id)
 
 	if err != nil {
 		return Buyer{}, err
@@ -48,8 +50,8 @@ func (s *service) GetById(id int) (Buyer, error) {
 	return w, nil
 }
 
-func (s *service) UpdateById(id int, firstName string, lastName string, address string, document string) (Buyer, error) {
-	w, err := s.repository.UpdateById(id, firstName, lastName, address, document)
+func (s *service) UpdateBuyerById(id int, firstName string, lastName string, address string, document string) (Buyer, error) {
+	w, err := s.repository.UpdateBuyerById(id, firstName, lastName, address, document)
 
 	if err != nil {
 		return Buyer{}, err
@@ -58,8 +60,8 @@ func (s *service) UpdateById(id int, firstName string, lastName string, address 
 	return w, nil
 }
 
-func (s *service) DeleteById(id int) error {
-	err := s.repository.DeleteById(id)
+func (s *service) DeleteBuyerById(id int) error {
+	err := s.repository.DeleteBuyerById(id)
 
 	if err != nil {
 		return err

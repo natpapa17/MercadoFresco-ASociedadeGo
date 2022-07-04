@@ -33,8 +33,7 @@ func (_m *Repository) Create(firstName string, lastName string, address string, 
 	return r0, r1
 }
 
-// DeleteById provides a mock function with given fields: id
-func (_m *Repository) DeleteById(id int) error {
+func (_m *Repository) DeleteBuyerById(id int) error {
 	ret := _m.Called(id)
 
 	var r0 error
@@ -70,8 +69,7 @@ func (_m *Repository) GetAll() ([]buyers.Buyer, error) {
 	return r0, r1
 }
 
-// GetById provides a mock function with given fields: id
-func (_m *Repository) GetById(id int) (buyers.Buyer, error) {
+func (_m *Repository) GetBuyerById(id int) (buyers.Buyer, error) {
 	ret := _m.Called(id)
 
 	var r0 buyers.Buyer
@@ -121,7 +119,7 @@ type mockConstructorTestingTNewRepository interface {
 func NewRepository(t mockConstructorTestingTNewRepository) *Repository {
 	mock := &Repository{}
 	mock.Mock.Test(t)
-=
+
 	t.Cleanup(func() { mock.AssertExpectations(t) })
 
 	return mock
