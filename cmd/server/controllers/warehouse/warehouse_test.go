@@ -1,4 +1,4 @@
-package controllers_test
+package warehouse_test
 
 import (
 	"bytes"
@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/warehouse"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/mocks"
 	"github.com/stretchr/testify/assert"
@@ -145,7 +145,7 @@ func TestCreateWarehouse(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	mockWarehouseService := mocks.NewService(t)
-	sut := controllers.CreateWarehouseController(mockWarehouseService)
+	sut := warehouse.CreateWarehouseController(mockWarehouseService)
 
 	r := gin.Default()
 	r.POST("/warehouses", sut.CreateWarehouse)
@@ -214,7 +214,7 @@ func TestGetAllWarehouse(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	mockWarehouseService := mocks.NewService(t)
-	sut := controllers.CreateWarehouseController(mockWarehouseService)
+	sut := warehouse.CreateWarehouseController(mockWarehouseService)
 
 	r := gin.Default()
 	r.GET("/warehouses", sut.GetAllWarehouses)
@@ -253,7 +253,7 @@ func TestGetByIdWarehouse(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	mockWarehouseService := mocks.NewService(t)
-	sut := controllers.CreateWarehouseController(mockWarehouseService)
+	sut := warehouse.CreateWarehouseController(mockWarehouseService)
 
 	r := gin.Default()
 	r.GET("/warehouses/:id", sut.GetByIdWarehouse)
@@ -311,7 +311,7 @@ func TestUpdateWarehouse(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	mockWarehouseService := mocks.NewService(t)
-	sut := controllers.CreateWarehouseController(mockWarehouseService)
+	sut := warehouse.CreateWarehouseController(mockWarehouseService)
 
 	r := gin.Default()
 	r.PATCH("/warehouses/:id", sut.UpdateByIdWarehouse)
@@ -389,7 +389,7 @@ func TestDeleteByIdWarehouse(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	mockWarehouseService := mocks.NewService(t)
-	sut := controllers.CreateWarehouseController(mockWarehouseService)
+	sut := warehouse.CreateWarehouseController(mockWarehouseService)
 
 	r := gin.Default()
 	r.DELETE("/warehouses/:id", sut.DeleteByIdWarehouse)
