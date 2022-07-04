@@ -27,8 +27,8 @@ func (c *SellerController) GetAll() gin.HandlerFunc {
 
 		s, err := c.service.GetAll()
 		if err != nil {
-			ctx.JSON(404, gin.H{
-				"error": err.Error(),
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"error": "internal server error",
 			})
 			return
 		}
@@ -113,7 +113,7 @@ func (c *SellerController) Update() gin.HandlerFunc {
 			return
 		}
 		if req.Cid== 0 {
-			ctx.JSON(400, gin.H{"error": "A cidade  é obrigatória"})
+			ctx.JSON(400, gin.H{"error": "O CID é obrigatório"})
 			return
 		}
 
