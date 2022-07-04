@@ -55,12 +55,12 @@ func TestGetAll(t *testing.T) {
 	})
 }
 
-func TestGetById(t *testing.T) {
+func TestGetBuyerById(t *testing.T) {
 	mockBuyerRepository := mocks.NewRepository(t)
 	service := buyers.CreateBuyerService(mockBuyerRepository)
 
 	t.Run("find_by_id_non_existent", func(t *testing.T) {
-		mockBuyerRepository.On("GetById", mock.AnythingOfType("int")).
+		mockBuyerRepository.On("GetBuyerById", mock.AnythingOfType("int")).
 			Return(makeBuyer(), errors.New("Error")).Once()
 
 		_, err := service.GetBuyerById(1)
@@ -69,7 +69,7 @@ func TestGetById(t *testing.T) {
 	})
 
 	t.Run("find_by_id_existent", func(t *testing.T) {
-		mockBuyerRepository.On("GetById", mock.AnythingOfType("int")).Return(makeBuyer(), nil).Once()
+		mockBuyerRepository.On("GetBuyerById", mock.AnythingOfType("int")).Return(makeBuyer(), nil).Once()
 
 		p, err := service.GetBuyerById(1)
 

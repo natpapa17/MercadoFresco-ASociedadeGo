@@ -169,7 +169,7 @@ func (bc *BuyerController) DeleteBuyerById(ctx *gin.Context) {
 }
 
 type buyerRequest struct {
-	ID             int    `json:"id" binding:"required"`
+	ID             int    `json:"id"`
 	FirstName      string `json:"first_name" binding:"required"`
 	LastName       string `json:"last_name" binding:"required"`
 	Address        string `json:"address" binding:"required"`
