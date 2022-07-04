@@ -1,4 +1,4 @@
-package controllers_test
+package product_test
 
 import (
 	"bytes"
@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
+	controllers "github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/product"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/products"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/products/mocks"
 	"github.com/stretchr/testify/assert"

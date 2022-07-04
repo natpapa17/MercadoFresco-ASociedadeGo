@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/product"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/section"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/warehouse"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
@@ -25,7 +26,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	productsFile := store.New(store.FileType, productsFilePath)
 	pr := products.NewRepository(productsFile)
 	ps := products.NewProductService(pr)
-	pc := controllers.NewProductController(ps)
+	pc := product.NewProductController(ps)
 
 	BuyersFilePath, err := filepath.Abs("" + filepath.Join("data", "buyers.json"))
 	if err != nil {
