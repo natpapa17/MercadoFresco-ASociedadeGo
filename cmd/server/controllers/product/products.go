@@ -1,4 +1,4 @@
-package controllers
+package product
 
 import (
 	"fmt"
@@ -26,7 +26,7 @@ func (c *ProductController) GetAll() gin.HandlerFunc {
 			ctx.JSON(http.StatusNotFound, nil)
 			return
 		}
-		ctx.JSON(http.StatusOK, NewResponse(http.StatusOK, p))
+		ctx.JSON(http.StatusOK, p)
 	}
 }
 
@@ -48,7 +48,7 @@ func (c *ProductController) GetById() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, NewResponse(http.StatusOK, p))
+		ctx.JSON(http.StatusOK, p)
 	}
 }
 
@@ -98,15 +98,13 @@ func (c *ProductController) Create() gin.HandlerFunc {
 		}
 
 		p, err := c.service.Create(req.ProductCode, req.Description, req.Width, req.Height, req.Length, req.NetWeight, req.ExpirationRate, req.RecommendedFreezingTemperature, req.FreezingRate, req.ProductTypeId, req.SellerId)
+
 		if err != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
 		}
 
-		ctx.JSON(
-			http.StatusOK,
-			NewResponse(http.StatusOK, p),
-		)
+		ctx.JSON(http.StatusCreated, p)
 	}
 }
 
@@ -156,7 +154,7 @@ type Request struct {
 	Width                          float64 `json:"width" binding:"required"`
 	Height                         float64 `json:"height" binding:"required"`
 	Length                         float64 `json:"length" binding:"required"`
-	NetWeight                      float64 `json:"netweight" binding:"required"`
+	NetWeight                      float64 `json:"net_weight" binding:"required"`
 	ExpirationRate                 int     `json:"expiration_rate" binding:"required"`
 	RecommendedFreezingTemperature float64 `json:"recommended_freezing_temperature" binding:"required"`
 	FreezingRate                   int     `json:"freezing_rate" binding:"required"`
