@@ -5,13 +5,13 @@ import (
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/buyer"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/section"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/employee"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/products"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
@@ -26,8 +26,6 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	ps := products.NewProductService(pr)
 	pc := controllers.NewProductController(ps)
 
-<<<<<<< HEAD
-=======
 	BuyersFilePath, err := filepath.Abs("" + filepath.Join("data", "buyers.json"))
 	if err != nil {
 		log.Fatal("can't load buyers data file")
@@ -37,7 +35,6 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	bs := buyers.CreateBuyerService(br)
 	bc := controllers.CreateBuyerController(bs)
 
->>>>>>> 39b04a6fa426656c47062fe6352c6640787b3a96
 	warehouseFilePath, err := filepath.Abs("" + filepath.Join("data", "warehouses.json"))
 	if err != nil {
 		log.Fatal("can't load warehouse data file")
