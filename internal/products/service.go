@@ -7,8 +7,8 @@ import (
 type Service interface {
 	GetAll() ([]Product, error)
 	GetById(id int) (Product, error)
-	Create(productCode string, description string, width float64, height float64, length float64, netWeight float64, expirationRate int, recommendedFreezingTemperature float64, freezingRate int, productTypeId int, sellerId int) (Product, error)
-	Update(id int, productCode string, description string, width float64, height float64, length float64, netWeight float64, expirationRate int, recommendedFreezingTemperature float64, freezingRate int, productTypeId int, sellerId int) (Product, error)
+	Create(product_code string, description string, width float64, height float64, length float64, net_weight float64, expiration_rate int, recommended_freezing_temperature float64, freezing_rate int, product_type_id int, seller_id int) (Product, error)
+	Update(id int, product_code string, description string, width float64, height float64, length float64, net_weight float64, expiration_rate int, recommended_freezing_temperature float64, freezing_rate int, product_type_id int, seller_id int) (Product, error)
 	Delete(id int) error
 }
 
@@ -16,25 +16,33 @@ type service struct {
 	repository Repository
 }
 
-func (s service) GetAll() ([]Product, error) {
-	ps, err := s.repository.GetAll()
-	if err != nil {
-		fmt.Println(ps)
-		return nil, err
+func NewProductService(r Repository) Service {
+	return &service{
+		repository: r,
 	}
-	fmt.Println(ps)
+}
+
+func (s *service) GetAll() ([]Product, error) {
+	ps, err := s.repository.GetAll()
+
+	if err != nil {
+		return []Product{}, err
+	}
+
 	return ps, nil
 }
 
-func (s service) GetById(id int) (Product, error) {
+func (s *service) GetById(id int) (Product, error) {
 	ps, err := s.repository.GetById(id)
+
 	if err != nil {
 		return Product{}, err
 	}
+
 	return ps, nil
 }
 
-func (s service) Create(productCode string, description string, width float64, height float64, length float64, netWeight float64, expirationRate int, recommendedFreezingTemperature float64, freezingRate int, productTypeId int, sellerId int) (Product, error) {
+func (s *service) Create(product_code string, description string, width float64, height float64, length float64, net_weight float64, expiration_rate int, recommended_freezing_temperature float64, freezing_rate int, product_type_id int, seller_id int) (Product, error) {
 	lastID, err := s.repository.LastID()
 
 	if err != nil {
@@ -43,13 +51,13 @@ func (s service) Create(productCode string, description string, width float64, h
 
 	lastID++
 
-	ps, err := s.repository.GetByCode(productCode)
+	ps, _ := s.repository.GetByCode(product_code)
 
-	if ps.ProductCode != "" {
-		return Product{}, err
+	if ps.Product_Code != "" {
+		return Product{}, fmt.Errorf("product code: %s is already in use", ps.Product_Code)
 	}
 
-	product, err := s.repository.Create(lastID, productCode, description, width, height, length, netWeight, expirationRate, recommendedFreezingTemperature, freezingRate, productTypeId, sellerId)
+	product, err := s.repository.Create(lastID, product_code, description, width, height, length, net_weight, expiration_rate, recommended_freezing_temperature, freezing_rate, product_type_id, seller_id)
 
 	if err != nil {
 		return Product{}, err
@@ -59,28 +67,23 @@ func (s service) Create(productCode string, description string, width float64, h
 
 }
 
-func (s service) Update(id int, productCode string, description string, width float64, height float64, length float64, netWeight float64, expirationRate int, recommendedFreezingTemperature float64, freezingRate int, productTypeId int, sellerId int) (Product, error) {
-	codeProductInUse, err := s.repository.GetByCode(productCode)
+func (s *service) Update(id int, product_code string, description string, width float64, height float64, length float64, net_weight float64, expiration_rate int, recommended_freezing_temperature float64, freezing_rate int, product_type_id int, seller_id int) (Product, error) {
+	codeProductInUse, _ := s.repository.GetByCode(product_code)
 
-	if codeProductInUse.ProductCode != "" && codeProductInUse.ProductCode != productCode {
-		return Product{}, err
+	if codeProductInUse.Product_Code != "" && codeProductInUse.Id != id {
+		return Product{}, fmt.Errorf("product code: %s is already in use", codeProductInUse.Product_Code)
 	}
 
-	ps, err := s.repository.GetByCode(productCode)
-
-	if ps.Id != id {
-		return Product{}, err
-	}
-
-	product, err := s.repository.Update(id, productCode, description, width, height, length, netWeight, expirationRate, recommendedFreezingTemperature, freezingRate, productTypeId, sellerId)
+	product, err := s.repository.Update(id, product_code, description, width, height, length, net_weight, expiration_rate, recommended_freezing_temperature, freezing_rate, product_type_id, seller_id)
 
 	if err != nil {
 		return Product{}, err
 	}
+
 	return product, err
 }
 
-func (s service) Delete(id int) error {
+func (s *service) Delete(id int) error {
 	err := s.repository.Delete(id)
 
 	if err != nil {
@@ -88,11 +91,4 @@ func (s service) Delete(id int) error {
 	}
 
 	return err
-}
-
-func NewProductService(r Repository) Service {
-
-	return service{
-		repository: r,
-	}
 }

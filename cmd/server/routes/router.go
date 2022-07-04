@@ -7,11 +7,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/section"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/employee"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/products"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
