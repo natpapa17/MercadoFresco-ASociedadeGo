@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/buyer"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/product"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/section"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
@@ -33,7 +34,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	buyersFile := store.New(store.FileType, BuyersFilePath)
 	br := buyers.CreateBuyerRepository(buyersFile)
 	bs := buyers.CreateBuyerService(br)
-	bc := controllers.CreateBuyerController(bs)
+	bc := buyer.CreateBuyerController(bs)
 
 	warehouseFilePath, err := filepath.Abs("" + filepath.Join("data", "warehouses.json"))
 	if err != nil {
@@ -91,6 +92,15 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			sec.GET("/:id", sc.GetById())
 			sec.PATCH("/:id", sc.UpdateById())
 			sec.DELETE("/:id", sc.Delete())
+		}
+
+		products := mux.Group("products")
+		{
+			products.GET("/", pc.GetAll())
+			products.GET("/:id", pc.GetById())
+			products.POST("/", pc.Create())
+			products.PATCH("/:id", pc.Update())
+			products.DELETE("/:id", pc.Delete())
 		}
 	}
 
