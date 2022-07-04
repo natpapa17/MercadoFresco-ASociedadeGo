@@ -8,6 +8,7 @@ import (
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/product"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/section"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/warehouse"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/employee"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/products"
@@ -43,7 +44,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	warehouseFile := store.New(store.FileType, warehouseFilePath)
 	wr := warehouses.CreateRepository(warehouseFile)
 	ws := warehouses.CreateService(wr)
-	wc := controllers.CreateWarehouseController(ws)
+	wc := warehouse.CreateWarehouseController(ws)
 
 	sellersDb := store.New(store.FileType, "data/sellers.json")
 	sellerRepo := sellers.NewRepository(sellersDb)
