@@ -12,20 +12,20 @@ type Repository struct {
 	mock.Mock
 }
 
-// Create provides a mock function with given fields: id, product_code, description, width, height, length, net_weight, expiration_rate, recommended_freezing_temperature, freezing_rate, product_type_id, seller_id
-func (_m *Repository) Create(id int, product_code string, description string, width float64, height float64, length float64, net_weight float64, expiration_rate int, recommended_freezing_temperature float64, freezing_rate int, product_type_id int, seller_id int) (products.Product, error) {
-	ret := _m.Called(id, product_code, description, width, height, length, net_weight, expiration_rate, recommended_freezing_temperature, freezing_rate, product_type_id, seller_id)
+// Create provides a mock function with given fields: product_code, description, width, height, length, net_weight, expiration_rate, recommended_freezing_temperature, freezing_rate, product_type_id, seller_id
+func (_m *Repository) Create(product_code string, description string, width float64, height float64, length float64, net_weight float64, expiration_rate int, recommended_freezing_temperature float64, freezing_rate int, product_type_id int, seller_id int) (products.Product, error) {
+	ret := _m.Called(product_code, description, width, height, length, net_weight, expiration_rate, recommended_freezing_temperature, freezing_rate, product_type_id, seller_id)
 
 	var r0 products.Product
-	if rf, ok := ret.Get(0).(func(int, string, string, float64, float64, float64, float64, int, float64, int, int, int) products.Product); ok {
-		r0 = rf(id, product_code, description, width, height, length, net_weight, expiration_rate, recommended_freezing_temperature, freezing_rate, product_type_id, seller_id)
+	if rf, ok := ret.Get(0).(func(string, string, float64, float64, float64, float64, int, float64, int, int, int) products.Product); ok {
+		r0 = rf(product_code, description, width, height, length, net_weight, expiration_rate, recommended_freezing_temperature, freezing_rate, product_type_id, seller_id)
 	} else {
 		r0 = ret.Get(0).(products.Product)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(int, string, string, float64, float64, float64, float64, int, float64, int, int, int) error); ok {
-		r1 = rf(id, product_code, description, width, height, length, net_weight, expiration_rate, recommended_freezing_temperature, freezing_rate, product_type_id, seller_id)
+	if rf, ok := ret.Get(1).(func(string, string, float64, float64, float64, float64, int, float64, int, int, int) error); ok {
+		r1 = rf(product_code, description, width, height, length, net_weight, expiration_rate, recommended_freezing_temperature, freezing_rate, product_type_id, seller_id)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -105,27 +105,6 @@ func (_m *Repository) GetById(id int) (products.Product, error) {
 	var r1 error
 	if rf, ok := ret.Get(1).(func(int) error); ok {
 		r1 = rf(id)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// LastID provides a mock function with given fields:
-func (_m *Repository) LastID() (int, error) {
-	ret := _m.Called()
-
-	var r0 int
-	if rf, ok := ret.Get(0).(func() int); ok {
-		r0 = rf()
-	} else {
-		r0 = ret.Get(0).(int)
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
 	} else {
 		r1 = ret.Error(1)
 	}
