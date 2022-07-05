@@ -92,7 +92,7 @@ func (r *mySQLRepositoryAdapter) GetById(id int) (domain.Warehouse, error) {
 	}
 
 	if w.Id == 0 {
-		return domain.Warehouse{}, &usecases.NoElementFoundError{Err: errors.New("can't find element with this code")}
+		return domain.Warehouse{}, &usecases.NoElementFoundError{Err: errors.New("can't find element with this id")}
 	}
 
 	return w, nil
