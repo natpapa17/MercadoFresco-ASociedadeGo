@@ -69,7 +69,15 @@ func (r *repository) lastID() (int, error) {
 	return ps[len(ps)-1].Id, nil
 }
 
-func (r *repository) Create(id int, product_code string, description string, width float64, height float64, length float64, net_weight float64, expiration_rate int, recommended_freezing_temperature float64, freezing_rate int, product_type_id int, seller_id int) (Product, error) {
+func (r *repository) Create(product_code string, description string, width float64, height float64, length float64, net_weight float64, expiration_rate int, recommended_freezing_temperature float64, freezing_rate int, product_type_id int, seller_id int) (Product, error) {
+	id, err := r.lastID()
+
+	if err != nil {
+		return Product{}, err
+	}
+
+	id++
+
 	var ps []Product
 
 	if err := r.db.Read(&ps); err != nil {
