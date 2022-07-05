@@ -97,7 +97,6 @@ func TestCreate(t *testing.T) {
 	service := products.NewProductService(mockProductRepository)
 
 	t.Run("creat_conflict", func(t *testing.T) {
-		mockProductRepository.On("LastID").Return(1, nil).Once()
 		mockProductRepository.On("GetByCode", mock.AnythingOfType("string")).Return(makeProduct(), nil).Once()
 
 		_, err := service.Create(makeCreateParams())
@@ -106,14 +105,13 @@ func TestCreate(t *testing.T) {
 	})
 
 	t.Run("create_ok", func(t *testing.T) {
-		mockProductRepository.On("LastID").Return(1, nil).Once()
 		mockProductRepository.
 			On("GetByCode", mock.AnythingOfType("string")).
 			Return(products.Product{}, errors.New("product code: valid_code is already in use")).
 			Once()
 
 		mockProductRepository.
-			On("Create", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
+			On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
 			Return(makeProduct(), nil).
 			Once()
 
