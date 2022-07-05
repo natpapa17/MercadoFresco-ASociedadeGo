@@ -1,7 +1,7 @@
 package sections
 
 import (
-	"log"
+	"errors"
 
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
@@ -11,7 +11,7 @@ type Repository interface {
 	GetById(id int) (Section, error)
 	LastID() (int, error)
 	HasSectionNumber(number int) (bool, error)
-	Add(section Section) (Section, error)
+	Add(id int, sectionNumber int, currentTemperature float32, minimumTemprarature float32, currentCapacity int, minimumCapacity int, maximumCapacity int, warehouseID int, productTypeID int) (Section, error)
 	UpdateById(id int, section Section) (Section, error)
 	Delete(id int) error
 }
@@ -37,7 +37,7 @@ func (r *repository) GetAll() ([]Section, error) {
 func (r *repository) GetById(id int) (Section, error) {
 	var ss []Section
 	if err := r.db.Read(&ss); err != nil {
-		return Section{}, nil
+		return Section{}, errors.New("Unable to read database.")
 	}
 
 	for _, s := range ss {
@@ -46,7 +46,7 @@ func (r *repository) GetById(id int) (Section, error) {
 		}
 	}
 
-	return Section{}, nil
+	return Section{}, errors.New("Id not found.")
 }
 
 func (r *repository) LastID() (int, error) {
@@ -81,10 +81,22 @@ func (r *repository) HasSectionNumber(number int) (bool, error) {
 	return false, nil
 }
 
-func (r *repository) Add(section Section) (Section, error) {
+func (r *repository) Add(id int, sectionNumber int, currentTemperature float32, minimumTemperature float32, currentCapacity int, minimumCapacity int, maximumCapacity int, warehouseID int, productTypeID int) (Section, error) {
 	var ss []Section
 	if err := r.db.Read(&ss); err != nil {
 		return Section{}, err
+	}
+
+	section := Section{
+		ID:                 id,
+		SectionNumber:      sectionNumber,
+		CurrentTemperature: currentTemperature,
+		MinimumTemperature: minimumTemperature,
+		CurrentCapacity:    currentCapacity,
+		MinimumCapacity:    minimumCapacity,
+		MaximumCapacity:    maximumCapacity,
+		WarehouseID:        warehouseID,
+		ProductTypeID:      productTypeID,
 	}
 
 	ss = append(ss, section)
@@ -109,8 +121,8 @@ func (r *repository) UpdateById(id int, section Section) (Section, error) {
 				if section.CurrentTemperature != 0.0 {
 					s.CurrentTemperature = section.CurrentTemperature
 				}
-				if section.MinimumTemprarature != 0.0 {
-					s.MinimumTemprarature = section.MinimumTemprarature
+				if section.MinimumTemperature != 0.0 {
+					s.MinimumTemperature = section.MinimumTemperature
 				}
 				if section.CurrentCapacity != 0 {
 					s.CurrentCapacity = section.CurrentCapacity
@@ -135,13 +147,11 @@ func (r *repository) UpdateById(id int, section Section) (Section, error) {
 	}(&ss, section)
 
 	if err := r.db.Write(nss); err != nil {
-		log.Println("Write Error")
 		return Section{}, err
 	}
 
 	ns, err := r.GetById(id)
 	if err != nil {
-		log.Println("GetById Error")
 		return Section{}, err
 	}
 
@@ -154,18 +164,25 @@ func (r *repository) Delete(id int) error {
 		return err
 	}
 
-	nss := func(old *[]Section) *[]Section {
+	found := false
+	nss := func(old *[]Section, found *bool) *[]Section {
+
 		for i, s := range ss {
 			if s.ID == id {
 				ss = append(ss[:i], ss[i+1:]...)
+				*found = true
 			}
 		}
+
 		return &ss
 
-	}(&ss)
+	}(&ss, &found)
+
+	if !found {
+		return errors.New("Id not found")
+	}
 
 	if err := r.db.Write(nss); err != nil {
-		log.Println("Write Error")
 		return err
 	}
 
