@@ -25,7 +25,7 @@ func (r *mySQLRepositoryAdapter) Create(warehouseCode string, address string, te
 		return domain.Warehouse{}, err
 	}
 
-	const query = `INSERT INTO warehouses (warehouse_code, address, telephone, minimum_capacity, minimum_temperature) VALUES (?, ?, ?, ?, ?)`
+	const query = `INSERT INTO warehouse (warehouse_code, address, telephone, minimum_capacity, minimum_temperature) VALUES (?, ?, ?, ?, ?)`
 
 	res, err := tx.Exec(query, warehouseCode, address, telephone, minimumCapacity, minimumTemperature)
 
@@ -54,7 +54,7 @@ func (r *mySQLRepositoryAdapter) Create(warehouseCode string, address string, te
 }
 
 func (r *mySQLRepositoryAdapter) GetAll() (domain.Warehouses, error) {
-	const query = `SELECT * FROM warehouses`
+	const query = `SELECT * FROM warehouse`
 
 	rows, err := r.db.Query(query)
 
@@ -80,7 +80,7 @@ func (r *mySQLRepositoryAdapter) GetAll() (domain.Warehouses, error) {
 }
 
 func (r *mySQLRepositoryAdapter) GetById(id int) (domain.Warehouse, error) {
-	const query = `SELECT * FROM warehouses WHERE id=?`
+	const query = `SELECT * FROM warehouse WHERE id=?`
 
 	row := r.db.QueryRow(query, id)
 
@@ -99,7 +99,7 @@ func (r *mySQLRepositoryAdapter) GetById(id int) (domain.Warehouse, error) {
 }
 
 func (r *mySQLRepositoryAdapter) GetByWarehouseCode(code string) (domain.Warehouse, error) {
-	const query = `SELECT * FROM warehouses WHERE warehouse_code=?`
+	const query = `SELECT * FROM warehouse WHERE warehouse_code=?`
 
 	row := r.db.QueryRow(query, code)
 
@@ -149,7 +149,7 @@ func (r *mySQLRepositoryAdapter) UpdateById(id int, warehouseCode string, addres
 }
 
 func (r *mySQLRepositoryAdapter) DeleteById(id int) error {
-	const query = `DELETE FROM warehouses WHERE id=?`
+	const query = `DELETE FROM warehouse WHERE id=?`
 
 	res, err := r.db.Exec(query, id)
 
