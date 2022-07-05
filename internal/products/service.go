@@ -44,10 +44,10 @@ func (s *service) GetById(id int) (Product, error) {
 
 func (s *service) Create(product_code string, description string, width float64, height float64, length float64, net_weight float64, expiration_rate int, recommended_freezing_temperature float64, freezing_rate int, product_type_id int, seller_id int) (Product, error) {
 
-	ps, _ := s.repository.GetByCode(product_code)
+	codeProductInUse, _ := s.repository.GetByCode(product_code)
 
-	if ps.Product_Code != "" {
-		return Product{}, fmt.Errorf("product code: %s is already in use", ps.Product_Code)
+	if codeProductInUse.Product_Code != "" {
+		return Product{}, fmt.Errorf("product code: %s is already in use", codeProductInUse.Product_Code)
 	}
 
 	product, err := s.repository.Create(product_code, description, width, height, length, net_weight, expiration_rate, recommended_freezing_temperature, freezing_rate, product_type_id, seller_id)
