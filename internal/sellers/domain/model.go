@@ -1,4 +1,4 @@
-package sellers
+package domain
 
 type Seller struct{
 	Id	int `json:"Id"`
@@ -7,3 +7,5 @@ type Seller struct{
 	Address string `json:"Address"`
 	Telephone string `json:"Telephone"`
 }
+
+type Sellers []Seller

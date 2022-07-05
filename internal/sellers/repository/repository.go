@@ -1,21 +1,21 @@
-package sellers
+package repository
 
 import (
 	"errors"
 	"fmt"
-
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/domain"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
 
 
-var sl []Seller = []Seller{}
+var sl []domain.Seller = []domain.Seller{}
 
 type Repository interface{
-	GetAll() ([]Seller, error)
-	GetById(id int) (Seller, error)
-	Store(id int, cid int, companyName string, address string , telephone string ) (Seller , error)
+	GetAll() ([]domain.Seller, error)
+	GetById(id int) (domain.Seller, error)
+	Store(id int, cid int, companyName string, address string , telephone string ) (domain.Seller , error)
 	LastID() (int, error)
-	Update(id , cid int, companyName, address, telephone string) (Seller, error)
+	Update(id , cid int, companyName, address, telephone string) (domain.Seller, error)
 	Delete(id int) error
 	
 
@@ -27,7 +27,7 @@ type repository struct{
 }
 
 func (r *repository) LastID() (int, error) {
-	var sl[]Seller
+	var sl[]domain.Seller
 	if err := r.db.Read(&sl); err != nil {
 		return 0, err
 	}
@@ -39,18 +39,18 @@ func (r *repository) LastID() (int, error) {
 	return sl[len(sl)-1].Id, nil
 }
 
-func (r *repository) GetAll() ([]Seller, error) {
-	var sl []Seller 
+func (r *repository) GetAll() ([]domain.Seller, error) {
+	var sl []domain.Seller 
 	if err := r.db.Read(&sl); err != nil {
-		return []Seller{}, nil
+		return []domain.Seller{}, nil
 	}
 	return sl, nil
 }
 
-func (r *repository) GetById(id int) (Seller, error){
-	var sl []Seller 
+func (r *repository) GetById(id int) (domain.Seller, error){
+	var sl []domain.Seller 
 	if err := r.db.Read(&sl); err != nil {
-		return Seller{}, nil
+		return domain.Seller{}, nil
 	}
 	
 
@@ -61,27 +61,27 @@ func (r *repository) GetById(id int) (Seller, error){
 	}
 
 	
-	return Seller{},  errors.New("Nao encontrado")
+	return domain.Seller{},  errors.New("nao encontrado")
 }
 
-func (r *repository) Store(id int, cid int, companyName string, address string , telephone string) (Seller, error) {
-	var sl []Seller 
+func (r *repository) Store(id int, cid int, companyName string, address string , telephone string) (domain.Seller, error) {
+	var sl []domain.Seller 
 	if err := r.db.Read(&sl); err != nil {
-		return Seller{}, err
+		return domain.Seller{}, err
 	}
-	s := Seller{id, cid, companyName, address, telephone}
+	s := domain.Seller{id, cid, companyName, address, telephone}
 	sl = append(sl, s)
 	if err := r.db.Write(sl); err != nil {
-		return Seller{}, err
+		return domain.Seller{}, err
 	}
 	return s, nil
 }
 
-func (r repository) Update(id , cid int, companyName, address, telephone string) (Seller, error) {
+func (r repository) Update(id , cid int, companyName, address, telephone string) (domain.Seller, error) {
 	if err := r.db.Read(&sl); err != nil {
-		return Seller{}, nil
+		return domain.Seller{}, nil
 	}
-	s := Seller{Id: id, Cid: cid, CompanyName: companyName, Address: address, Telephone: telephone}
+	s := domain.Seller{Id: id, Cid: cid, CompanyName: companyName, Address: address, Telephone: telephone}
 	updated := false
 	for i := range sl {
 		if sl[i].Id == id {
@@ -94,18 +94,18 @@ func (r repository) Update(id , cid int, companyName, address, telephone string)
 
 	if err := r.db.Write(&sl); err != nil {
 		fmt.Println("Write Error")
-		return Seller{}, err
+		return domain.Seller{}, err
 	}
 
 
 	if !updated {
-		return Seller{}, fmt.Errorf("vendedor %d não encontrado", id)
+		return domain.Seller{}, fmt.Errorf("vendedor %d não encontrado", id)
 	}
 	return s, nil
 }
 
 func (r repository) Delete(id int) error {
-	var sl []Seller 
+	var sl []domain.Seller 
 	if err := r.db.Read(&sl); err != nil {
 		return  nil
 	}

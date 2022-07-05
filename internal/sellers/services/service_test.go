@@ -1,4 +1,4 @@
-package sellers_test
+package services_test
 
 import (
 	"errors"
@@ -6,8 +6,10 @@ import (
 
 	"testing"
 
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/mocks"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/domain"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/domain/mocks"
+	sellers "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/services"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -16,7 +18,7 @@ import (
 func TestGetAll(t *testing.T) {
 	mockRepo := mocks.NewRepository(t)
 
-	s := sellers.Seller{
+	s := domain.Seller{
 		Id:    1,
 		Cid:  1,
 		CompanyName:  "None",
@@ -24,7 +26,7 @@ func TestGetAll(t *testing.T) {
 		Telephone: "00000",
 	}
 
-	sList := make([]sellers.Seller, 0)
+	sList := make([]domain.Seller, 0)
 	sList = append(sList, s)
 
 	t.Run("success", func(t *testing.T) {
@@ -95,7 +97,7 @@ func TestDelete(t *testing.T) {
 
 func TestStore(t *testing.T){
 	mockRepo := mocks.NewRepository(t)
-	expectSeller := sellers.Seller{
+	expectSeller := domain.Seller{
 		Id:    1,
 		Cid:  1,
 		CompanyName:  "None",
@@ -118,7 +120,7 @@ func TestStore(t *testing.T){
 
 func TestUpdate(t *testing.T){
 	mockRepo := mocks.NewRepository(t)
-	expectSeller := sellers.Seller{
+	expectSeller := domain.Seller{
 		Id:    1,
 		Cid:  1,
 		CompanyName:  "None",
@@ -136,12 +138,12 @@ func TestUpdate(t *testing.T){
 	})
 
 	t.Run(" If the element with the specified id not exists, return nil", func(t *testing.T) {
-		mockRepo.On("Update", int(3), int(219),"None", "None", "None").Return(sellers.Seller{}, fmt.Errorf("Seller not found"))
+		mockRepo.On("Update", int(3), int(219),"None", "None", "None").Return(domain.Seller{}, fmt.Errorf("Seller not found"))
 		service := sellers.NewService(mockRepo)
 
 		result, err := service.Update(int(3), int(219),"None", "None", "None")
 
-		assert.Equal(t, sellers.Seller{}, result)
+		assert.Equal(t, domain.Seller{}, result)
 		assert.NotNil(t, err)
 
 	})
@@ -152,7 +154,7 @@ func TestUpdate(t *testing.T){
 func TestGetById(t *testing.T){
 	mockRepo := mocks.NewRepository(t)
 
-	expectedSellersList := []sellers.Seller{
+	expectedSellersList := []domain.Seller{
 		{
 			Id:          1,
 			Cid:         219,
@@ -182,13 +184,13 @@ func TestGetById(t *testing.T){
 	})
 
 	t.Run("fif the element with the specified Id not exists,, return nil", func(t *testing.T) {
-		mockRepo.On("GetById", int(1)).Return(sellers.Seller{}, fmt.Errorf("Seller not found."))
+		mockRepo.On("GetById", int(1)).Return(domain.Seller{}, fmt.Errorf("Seller not found."))
 		service := sellers.NewService(mockRepo)
 
 		result, err := service.GetById(int(1))
 
 		assert.Error(t, err)
-		assert.Equal(t, sellers.Seller{}, result)
+		assert.Equal(t, domain.Seller{}, result)
 	})
 	
 

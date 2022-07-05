@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	sellers "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
+	sellers "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/domain"
 	mock "github.com/stretchr/testify/mock"
 )
 

@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
+
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/buyer"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/product"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/section"
@@ -13,7 +13,9 @@ import (
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/products"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/repository"
+
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/service"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
@@ -46,10 +48,14 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	ws := warehouses.CreateService(wr)
 	wc := warehouse.CreateWarehouseController(ws)
 
-	sellersDb := store.New(store.FileType, "data/sellers.json")
-	sellerRepo := sellers.NewRepository(sellersDb)
-	sellerService := sellers.NewService(sellerRepo)
-	sellerControllers := controllers.NewSeller(sellerService)
+	sellerFilePath, err := filepath.Abs("" + filepath.Join("data", "seller.json"))
+	if err != nil {
+		log.Fatal("can't load seller data file")
+	}
+	sellersFile := store.New(store.FileType, sellerFilePath)
+	sellerRepo := repository.NewRepository(sellersFile)
+	sellerService := service.NewService(sellerRepo)
+	sellerControllers := sellerService.NewService(sellerService)
 
 	sdb := store.New(store.FileType, "data/sections.json")
 	sr := sections.NewRepository(sdb)

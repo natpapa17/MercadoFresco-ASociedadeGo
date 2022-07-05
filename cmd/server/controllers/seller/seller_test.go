@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/seller"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/mocks"
 	"github.com/stretchr/testify/assert"
