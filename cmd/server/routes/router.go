@@ -7,11 +7,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/section"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/employee"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/products"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
+	sf "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections/repository/file"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
@@ -50,7 +51,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	sellerControllers := controllers.NewSeller(sellerService)
 
 	sdb := store.New(store.FileType, "data/sections.json")
-	sr := sections.NewRepository(sdb)
+	sr := sf.NewRepository(sdb)
 	ss := sections.NewService(sr)
 	sc := section.NewSection(ss)
 
