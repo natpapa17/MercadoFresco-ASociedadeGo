@@ -19,3 +19,5 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSI
 EXPOSE 8080
 
 COPY --from=builder /usr/src/app/bin .
+
+COPY ./.env .
