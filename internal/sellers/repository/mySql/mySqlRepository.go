@@ -73,9 +73,7 @@ func (r *mySqlRepository) GetById(id int) (domain.Seller, error) {
 		return domain.Seller{}, err
 	}
 
-	//if s.Id == 0 {
-		//return domain.Seller{}, errors.New("can't find element with this code")}
-	//}
+
 
 	return s, nil
 }

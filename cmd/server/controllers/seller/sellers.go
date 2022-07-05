@@ -3,19 +3,19 @@ package controllers
 import (
 	"fmt"
 	"net/http"
-	
+
 	"strconv"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/services"
 
 	"github.com/gin-gonic/gin"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/web"
 )
 
 type SellerController struct {
-	service sellers.Service
+	service services.Service
 }
 
-func NewSeller(s sellers.Service) *SellerController {
+func NewSeller(s services.Service) *SellerController {
 	return &SellerController{
 		service: s,
 	}

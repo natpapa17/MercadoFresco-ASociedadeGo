@@ -10,8 +10,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/seller"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/mocks"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/domain"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/domain/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -54,8 +54,8 @@ func InvalidSeller() *bytes.Buffer{
 	`)))
 }
 
-func dbSeller()sellers.Seller{
-	return sellers.Seller{
+func dbSeller()domain.Seller{
+	return domain.Seller{
 		Id:    1,
 			Cid:  1,
 			CompanyName:  "None",
@@ -64,8 +64,8 @@ func dbSeller()sellers.Seller{
 	}
 }
 
-func ValidSellerWithParams(Id, Cid int, CompanyName, Address, Telephone string) sellers.Seller{
-	return sellers.Seller{
+func ValidSellerWithParams(Id, Cid int, CompanyName, Address, Telephone string) domain.Seller{
+	return domain.Seller{
 		Id : Id,
 		Cid : Cid,
 		CompanyName: CompanyName,
@@ -106,7 +106,7 @@ func TestGetById( t *testing.T){
 	})
 
 	t.Run("return an erro if the id is not found", func (t *testing.T){
-		service.On("GetById", int(999)).Return(sellers.Seller{}, fmt.Errorf("seller not found")).Once()
+		service.On("GetById", int(999)).Return(domain.Seller{}, fmt.Errorf("seller not found")).Once()
 		response := httptest.NewRecorder()
 		request, _ := http.NewRequest(http.MethodGet, "/sellers/999", nil)
 		r.ServeHTTP(response, request)
@@ -126,7 +126,7 @@ func TestGetAllController(t *testing.T){
 	r.GET("/sellers", sellerController.GetAll() )
 
 	t.Run("return all sellers", func(t *testing.T){
-		s := sellers.Seller{
+		s := domain.Seller{
 			Id:    1,
 			Cid:  1,
 			CompanyName:  "None",
@@ -134,7 +134,7 @@ func TestGetAllController(t *testing.T){
 			Telephone: "00000",
 		}
 
-		sList := make([]sellers.Seller, 0)
+		sList := make([]domain.Seller, 0)
 		sList = append(sList, s)
 		
 		service.On("GetAll").Return(sList, nil ).Once()
@@ -147,7 +147,7 @@ func TestGetAllController(t *testing.T){
 		
 	})
 	t.Run("return an error if GetAll returns an error", func(t *testing.T) {
-		service.On("GetAll").Return([]sellers.Seller{}, errors.New("any_message")).Once()
+		service.On("GetAll").Return([]domain.Seller{}, errors.New("any_message")).Once()
 		response := httptest.NewRecorder()
 		request, _ := http.NewRequest(http.MethodGet, "/sellers", nil)
 		r.ServeHTTP(response, request)
@@ -206,7 +206,7 @@ func TestStoreController( t *testing.T){
 
 	r := gin.Default()
 	r.POST("/sellers", sellerController.Store())
-	expectSeller := sellers.Seller{
+	expectSeller := domain.Seller{
 		Id:    1,
 		Cid:  1,
 		CompanyName:  "None",
@@ -240,7 +240,7 @@ func TestUpdate(t *testing.T){
 	mockService := mocks.NewService(t)
 	service := controllers.NewSeller(mockService)
 	r := gin.Default()
-	expectSeller := sellers.Seller{
+	expectSeller := domain.Seller{
 		Id:    1,
 		Cid:  1,
 		CompanyName:  "None",
