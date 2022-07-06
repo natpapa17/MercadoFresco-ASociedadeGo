@@ -49,7 +49,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	ws := warehouses.CreateService(wr)
 	wc := warehouse.CreateWarehouseController(ws)
 
-	sellerFilePath, err := filepath.Abs("" + filepath.Join("data", "seller.json"))
+	sellerFilePath, err := filepath.Abs("" + filepath.Join("data", "sellers.json"))
 	if err != nil {
 		log.Fatal("can't load seller data file")
 	}
