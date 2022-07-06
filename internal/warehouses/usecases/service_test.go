@@ -48,7 +48,7 @@ func TestCreate(t *testing.T) {
 	t.Run("Should call GetByWarehouseCode from Warehouse Repository with correct code", func(t *testing.T) {
 		mockWarehouseRepository.
 			On("GetByWarehouseCode", mock.AnythingOfType("string")).
-			Return(domain.Warehouse{}, &usecases.NoElementFoundError{errors.New("can't find element with this id")}).
+			Return(domain.Warehouse{}, usecases.ErrNoElementFound).
 			Once()
 		mockWarehouseRepository.
 			On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).
@@ -79,7 +79,7 @@ func TestCreate(t *testing.T) {
 	t.Run("Should call Create from Warehouse Repository with correct values", func(t *testing.T) {
 		mockWarehouseRepository.
 			On("GetByWarehouseCode", mock.AnythingOfType("string")).
-			Return(domain.Warehouse{}, &usecases.NoElementFoundError{errors.New("can't find element with this id")}).
+			Return(domain.Warehouse{}, usecases.ErrNoElementFound).
 			Once()
 		mockWarehouseRepository.
 			On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).
@@ -93,7 +93,7 @@ func TestCreate(t *testing.T) {
 	t.Run("Should return error if Create from Warehouse Repository returns an error", func(t *testing.T) {
 		mockWarehouseRepository.
 			On("GetByWarehouseCode", mock.AnythingOfType("string")).
-			Return(domain.Warehouse{}, &usecases.NoElementFoundError{errors.New("can't find element with this id")}).
+			Return(domain.Warehouse{}, usecases.ErrNoElementFound).
 			Once()
 		mockWarehouseRepository.
 			On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).
@@ -106,7 +106,7 @@ func TestCreate(t *testing.T) {
 	t.Run("Should return an Warehouse on success", func(t *testing.T) {
 		mockWarehouseRepository.
 			On("GetByWarehouseCode", mock.AnythingOfType("string")).
-			Return(domain.Warehouse{}, &usecases.NoElementFoundError{errors.New("can't find element with this id")}).
+			Return(domain.Warehouse{}, usecases.ErrNoElementFound).
 			Once()
 		mockWarehouseRepository.
 			On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).
@@ -205,7 +205,7 @@ func TestUpdateById(t *testing.T) {
 	t.Run("Should call GetByWarehouseCode from Warehouse Repository with correct code", func(t *testing.T) {
 		mockWarehouseRepository.
 			On("GetByWarehouseCode", mock.AnythingOfType("string")).
-			Return(domain.Warehouse{}, &usecases.NoElementFoundError{errors.New("can't find element with this id")}).
+			Return(domain.Warehouse{}, usecases.ErrNoElementFound).
 			Once()
 		mockWarehouseRepository.
 			On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).
@@ -238,7 +238,7 @@ func TestUpdateById(t *testing.T) {
 	t.Run("Should call UpdateById from Warehouse Repository with correct values", func(t *testing.T) {
 		mockWarehouseRepository.
 			On("GetByWarehouseCode", mock.AnythingOfType("string")).
-			Return(domain.Warehouse{}, &usecases.NoElementFoundError{errors.New("can't find element with this id")}).
+			Return(domain.Warehouse{}, usecases.ErrNoElementFound).
 			Once()
 		mockWarehouseRepository.
 			On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).
@@ -252,7 +252,7 @@ func TestUpdateById(t *testing.T) {
 	t.Run("Should return error if UpdateById from Warehouse Repository returns an error", func(t *testing.T) {
 		mockWarehouseRepository.
 			On("GetByWarehouseCode", mock.AnythingOfType("string")).
-			Return(domain.Warehouse{}, &usecases.NoElementFoundError{errors.New("can't find element with this id")}).
+			Return(domain.Warehouse{}, usecases.ErrNoElementFound).
 			Once()
 		mockWarehouseRepository.
 			On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).
@@ -265,7 +265,7 @@ func TestUpdateById(t *testing.T) {
 	t.Run("Should return an Updated Warehouse on success", func(t *testing.T) {
 		mockWarehouseRepository.
 			On("GetByWarehouseCode", mock.AnythingOfType("string")).
-			Return(domain.Warehouse{}, &usecases.NoElementFoundError{errors.New("can't find element with this id")}).
+			Return(domain.Warehouse{}, usecases.ErrNoElementFound).
 			Once()
 		mockWarehouseRepository.
 			On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).

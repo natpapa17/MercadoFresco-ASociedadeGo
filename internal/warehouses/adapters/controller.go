@@ -24,49 +24,52 @@ func CreateWarehouseController(ws usecases.Service) *WarehouseController {
 func (wc *WarehouseController) CreateWarehouse(ctx *gin.Context) {
 	var req warehouseRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{
+		ctx.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
 	if err := req.Validate(); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
 	w, err := wc.service.Create(req.WarehouseCode, req.Address, req.Telephone, req.MinimumCapacity, req.MinimumTemperature)
-	if err != nil {
-		if isCustomError(err) {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "internal server error",
+
+	if err == nil {
+		ctx.JSON(http.StatusCreated, gin.H{
+			"data": w,
 		})
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{
-		"data": w,
+	if errors.Is(err, usecases.ErrWarehouseCodeInUse) {
+		ctx.JSON(http.StatusConflict, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusInternalServerError, gin.H{
+		"error": "internal server error",
 	})
 }
 
 func (wc *WarehouseController) GetAllWarehouses(ctx *gin.Context) {
 	w, err := wc.service.GetAll()
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "internal server error",
+
+	if err == nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"data": w,
 		})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"data": w,
+	ctx.JSON(http.StatusInternalServerError, gin.H{
+		"error": "internal server error",
 	})
 }
 
@@ -81,21 +84,23 @@ func (wc *WarehouseController) GetByIdWarehouse(ctx *gin.Context) {
 	}
 
 	w, err := wc.service.GetById(id)
-	if err != nil {
-		if isCustomError(err) {
-			ctx.JSON(http.StatusNotFound, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "internal server error",
+
+	if err == nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"data": w,
 		})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"data": w,
+	if errors.Is(err, usecases.ErrNoElementFound) {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusInternalServerError, gin.H{
+		"error": "internal server error",
 	})
 }
 
@@ -111,35 +116,44 @@ func (wc *WarehouseController) UpdateByIdWarehouse(ctx *gin.Context) {
 
 	var req warehouseRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{
+		ctx.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
 	if err := req.Validate(); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
 	w, err := wc.service.UpdateById(id, req.WarehouseCode, req.Address, req.Telephone, req.MinimumCapacity, req.MinimumTemperature)
-	if err != nil {
-		if isCustomError(err) {
-			ctx.JSON(http.StatusNotFound, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "internal server error",
+
+	if err == nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"data": w,
 		})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"data": w,
+	if errors.Is(err, usecases.ErrWarehouseCodeInUse) {
+		ctx.JSON(http.StatusConflict, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if errors.Is(err, usecases.ErrNoElementFound) {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusInternalServerError, gin.H{
+		"error": "internal server error",
 	})
 }
 
@@ -154,20 +168,22 @@ func (wc *WarehouseController) DeleteByIdWarehouse(ctx *gin.Context) {
 	}
 
 	err = wc.service.DeleteById(id)
-	if err != nil {
-		if isCustomError(err) {
-			ctx.JSON(http.StatusNotFound, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "internal server error",
+
+	if err == nil {
+		ctx.JSON(http.StatusNoContent, gin.H{})
+		return
+	}
+
+	if errors.Is(err, usecases.ErrNoElementFound) {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
 
-	ctx.JSON(http.StatusNoContent, gin.H{})
+	ctx.JSON(http.StatusInternalServerError, gin.H{
+		"error": "internal server error",
+	})
 }
 
 type warehouseRequest struct {
@@ -203,19 +219,4 @@ func (wr *warehouseRequest) Validate() error {
 	}
 
 	return nil
-}
-
-func isCustomError(e error) bool {
-	var be *usecases.BusinessRuleError
-	var fe *usecases.NoElementFoundError
-
-	if errors.As(e, &be) {
-		return true
-	}
-
-	if errors.As(e, &fe) {
-		return true
-	}
-
-	return false
 }

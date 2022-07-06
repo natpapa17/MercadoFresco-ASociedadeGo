@@ -1,17 +1,7 @@
 package usecases
 
-type BusinessRuleError struct {
-	Err error
-}
+import "errors"
 
-func (b *BusinessRuleError) Error() string {
-	return b.Err.Error()
-}
+var ErrWarehouseCodeInUse = errors.New("this warehouse_code is already in use")
 
-type NoElementFoundError struct {
-	Err error
-}
-
-func (b *NoElementFoundError) Error() string {
-	return b.Err.Error()
-}
+var ErrNoElementFound = errors.New("can't find element")

@@ -28,11 +28,10 @@ func (s *service) Create(warehouseCode string, address string, telephone string,
 	w, err := s.repository.GetByWarehouseCode(warehouseCode)
 
 	if w.Id != 0 {
-		return domain.Warehouse{}, &BusinessRuleError{errors.New("this warehouse_code is already in use")}
+		return domain.Warehouse{}, ErrWarehouseCodeInUse
 	}
 
-	var noContentError *NoElementFoundError
-	if err != nil && !errors.As(err, &noContentError) {
+	if !errors.Is(err, ErrNoElementFound) {
 		return domain.Warehouse{}, err
 	}
 
@@ -69,11 +68,10 @@ func (s *service) UpdateById(id int, warehouseCode string, address string, telep
 	isWareHouseCodeInUse, err := s.repository.GetByWarehouseCode(warehouseCode)
 
 	if isWareHouseCodeInUse.Id != 0 && isWareHouseCodeInUse.Id != id {
-		return domain.Warehouse{}, &BusinessRuleError{errors.New("this warehouse_code is already in use")}
+		return domain.Warehouse{}, ErrWarehouseCodeInUse
 	}
 
-	var noContentError *NoElementFoundError
-	if err != nil && !errors.As(err, &noContentError) {
+	if !errors.Is(err, ErrNoElementFound) {
 		return domain.Warehouse{}, err
 	}
 

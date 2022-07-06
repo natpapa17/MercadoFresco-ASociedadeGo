@@ -1,8 +1,6 @@
 package adapters
 
 import (
-	"errors"
-
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/domain"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/usecases"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
@@ -67,7 +65,7 @@ func (r *fileRepositoryAdapter) GetById(id int) (domain.Warehouse, error) {
 		}
 	}
 
-	return domain.Warehouse{}, &usecases.NoElementFoundError{Err: errors.New("can't find element with this id")}
+	return domain.Warehouse{}, usecases.ErrNoElementFound
 }
 
 func (r *fileRepositoryAdapter) GetByWarehouseCode(code string) (domain.Warehouse, error) {
@@ -82,7 +80,7 @@ func (r *fileRepositoryAdapter) GetByWarehouseCode(code string) (domain.Warehous
 		}
 	}
 
-	return domain.Warehouse{}, &usecases.NoElementFoundError{Err: errors.New("can't find element with this warehouse_code")}
+	return domain.Warehouse{}, usecases.ErrNoElementFound
 }
 
 func (r *fileRepositoryAdapter) UpdateById(id int, warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (domain.Warehouse, error) {
@@ -108,7 +106,7 @@ func (r *fileRepositoryAdapter) UpdateById(id int, warehouseCode string, address
 	}
 
 	if !updated {
-		return domain.Warehouse{}, &usecases.NoElementFoundError{Err: errors.New("can't find element with this id")}
+		return domain.Warehouse{}, usecases.ErrNoElementFound
 	}
 
 	if err := r.file.Write(ws); err != nil {
@@ -137,7 +135,7 @@ func (r *fileRepositoryAdapter) DeleteById(id int) error {
 	}
 
 	if !deleted {
-		return &usecases.NoElementFoundError{Err: errors.New("can't find element with this id")}
+		return usecases.ErrNoElementFound
 	}
 
 	if err := r.file.Write(ws); err != nil {

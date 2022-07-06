@@ -180,14 +180,14 @@ func TestCreateWarehouse(t *testing.T) {
 		mockWarehouseService.AssertCalled(t, "Create", "valid_code", "valid_address", "(44) 99909-9999", 10, 8.7)
 	})
 
-	t.Run("Should return an error and 400 status if Create from Warehouse Service returns an Business Rule error", func(t *testing.T) {
-		mockWarehouseService.On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(domain.Warehouse{}, &usecases.BusinessRuleError{Err: errors.New("any_message")}).Once()
+	t.Run("Should return an error and 409 status if Warehouse code is in use", func(t *testing.T) {
+		mockWarehouseService.On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(domain.Warehouse{}, usecases.ErrWarehouseCodeInUse).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodPost, "/warehouses", makeValidCreateBody())
 		r.ServeHTTP(rr, req)
 
-		assert.Equal(t, http.StatusBadRequest, rr.Code)
-		assert.Equal(t, "{\"error\":\"any_message\"}", rr.Body.String())
+		assert.Equal(t, http.StatusConflict, rr.Code)
+		assert.Equal(t, "{\"error\":\"this warehouse_code is already in use\"}", rr.Body.String())
 	})
 
 	t.Run("Should return an error and 500 status if Create from Warehouse Service did not returns an custom error", func(t *testing.T) {
@@ -278,13 +278,13 @@ func TestGetByIdWarehouse(t *testing.T) {
 	})
 
 	t.Run("Should return an error and 404 status if GetById from Warehouse Service returns not find the correspondent element", func(t *testing.T) {
-		mockWarehouseService.On("GetById", mock.AnythingOfType("int")).Return(domain.Warehouse{}, &usecases.NoElementFoundError{Err: errors.New("any_message")}).Once()
+		mockWarehouseService.On("GetById", mock.AnythingOfType("int")).Return(domain.Warehouse{}, usecases.ErrNoElementFound).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodGet, "/warehouses/404", nil)
 		r.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusNotFound, rr.Code)
-		assert.Equal(t, "{\"error\":\"any_message\"}", rr.Body.String())
+		assert.Equal(t, "{\"error\":\"can't find element\"}", rr.Body.String())
 	})
 
 	t.Run("Should return an error and 500 status if GetById from Warehouse Service returns an error", func(t *testing.T) {
@@ -355,14 +355,24 @@ func TestUpdateWarehouse(t *testing.T) {
 		mockWarehouseService.AssertCalled(t, "UpdateById", 1, "valid_code", "updated_address", "(44) 99909-9999", 10, 8.7)
 	})
 
-	t.Run("Should return an error and 404 status if UpdateById from Warehouse Service returns an Business Rule error", func(t *testing.T) {
-		mockWarehouseService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(domain.Warehouse{}, &usecases.BusinessRuleError{Err: errors.New("any_message")}).Once()
+	t.Run("Should return an error and 409 if warehouse_code is in use", func(t *testing.T) {
+		mockWarehouseService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(domain.Warehouse{}, usecases.ErrWarehouseCodeInUse).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodPatch, "/warehouses/1", makeValidUpdateBody())
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusConflict, rr.Code)
+		assert.Equal(t, "{\"error\":\"this warehouse_code is already in use\"}", rr.Body.String())
+	})
+
+	t.Run("Should return an error and 404 if can't find warehouse", func(t *testing.T) {
+		mockWarehouseService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(domain.Warehouse{}, usecases.ErrNoElementFound).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodPatch, "/warehouses/1", makeValidUpdateBody())
 		r.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusNotFound, rr.Code)
-		assert.Equal(t, "{\"error\":\"any_message\"}", rr.Body.String())
+		assert.Equal(t, "{\"error\":\"can't find element\"}", rr.Body.String())
 	})
 
 	t.Run("Should return an error and 500 status if UpdateById from Warehouse Service did not returns an custom error", func(t *testing.T) {
@@ -414,13 +424,13 @@ func TestDeleteByIdWarehouse(t *testing.T) {
 	})
 
 	t.Run("Should return an error and 404 status if DeleteById from Warehouse Service returns not find the correspondent element", func(t *testing.T) {
-		mockWarehouseService.On("DeleteById", mock.AnythingOfType("int")).Return(&usecases.NoElementFoundError{Err: errors.New("any_message")}).Once()
+		mockWarehouseService.On("DeleteById", mock.AnythingOfType("int")).Return(usecases.ErrNoElementFound).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodDelete, "/warehouses/404", nil)
 		r.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusNotFound, rr.Code)
-		assert.Equal(t, "{\"error\":\"any_message\"}", rr.Body.String())
+		assert.Equal(t, "{\"error\":\"can't find element\"}", rr.Body.String())
 	})
 
 	t.Run("Should return an error and 500 status if DeleteById from Warehouse Service returns an error", func(t *testing.T) {

@@ -54,7 +54,7 @@ func (r *mySQLRepositoryAdapter) Create(warehouseCode string, address string, te
 }
 
 func (r *mySQLRepositoryAdapter) GetAll() (domain.Warehouses, error) {
-	const query = `SELECT * FROM warehouse`
+	const query = `SELECT id, warehouse_code, address, telephone, minimum_capacity,	minimum_temperature FROM warehouse`
 
 	rows, err := r.db.Query(query)
 
@@ -80,45 +80,41 @@ func (r *mySQLRepositoryAdapter) GetAll() (domain.Warehouses, error) {
 }
 
 func (r *mySQLRepositoryAdapter) GetById(id int) (domain.Warehouse, error) {
-	const query = `SELECT * FROM warehouse WHERE id=?`
-
-	row := r.db.QueryRow(query, id)
+	const query = `SELECT id, warehouse_code, address, telephone, minimum_capacity,	minimum_temperature FROM warehouse WHERE id=?`
 
 	w := domain.Warehouse{}
-	row.Scan(&w.Id, &w.WarehouseCode, &w.Address, &w.Telephone, &w.MinimumCapacity, &w.MinimumTemperature)
+	err := r.db.QueryRow(query, id).Scan(&w.Id, &w.WarehouseCode, &w.Address, &w.Telephone, &w.MinimumCapacity, &w.MinimumTemperature)
 
-	if err := row.Err(); err != nil {
-		return domain.Warehouse{}, err
+	if errors.Is(err, sql.ErrNoRows) {
+		return domain.Warehouse{}, usecases.ErrNoElementFound
 	}
 
-	if w.Id == 0 {
-		return domain.Warehouse{}, &usecases.NoElementFoundError{Err: errors.New("can't find element with this id")}
+	if err != nil {
+		return domain.Warehouse{}, err
 	}
 
 	return w, nil
 }
 
 func (r *mySQLRepositoryAdapter) GetByWarehouseCode(code string) (domain.Warehouse, error) {
-	const query = `SELECT * FROM warehouse WHERE warehouse_code=?`
-
-	row := r.db.QueryRow(query, code)
+	const query = `SELECT id, warehouse_code, address, telephone, minimum_capacity,	minimum_temperature FROM warehouse WHERE warehouse_code=?`
 
 	w := domain.Warehouse{}
-	row.Scan(&w.Id, &w.WarehouseCode, &w.Address, &w.Telephone, &w.MinimumCapacity, &w.MinimumTemperature)
+	err := r.db.QueryRow(query, code).Scan(&w.Id, &w.WarehouseCode, &w.Address, &w.Telephone, &w.MinimumCapacity, &w.MinimumTemperature)
 
-	if err := row.Err(); err != nil {
-		return domain.Warehouse{}, err
+	if errors.Is(err, sql.ErrNoRows) {
+		return domain.Warehouse{}, usecases.ErrNoElementFound
 	}
 
-	if w.Id == 0 {
-		return domain.Warehouse{}, &usecases.NoElementFoundError{Err: errors.New("can't find element with this code")}
+	if err != nil {
+		return domain.Warehouse{}, err
 	}
 
 	return w, nil
 }
 
 func (r *mySQLRepositoryAdapter) UpdateById(id int, warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (domain.Warehouse, error) {
-	const query = `UPDATE warehouses SET warehouse_code=?, address=?, telephone=?, minimum_capacity=?, minimum_temperature=? WHERE id=?`
+	const query = `UPDATE warehouse SET warehouse_code=?, address=?, telephone=?, minimum_capacity=?, minimum_temperature=? WHERE id=?`
 
 	res, err := r.db.Exec(query, warehouseCode, address, telephone, minimumCapacity, minimumTemperature, id)
 
@@ -134,7 +130,7 @@ func (r *mySQLRepositoryAdapter) UpdateById(id int, warehouseCode string, addres
 
 	if rows == 0 {
 		if w, _ := r.GetById(id); w.Id == 0 {
-			return domain.Warehouse{}, &usecases.NoElementFoundError{Err: errors.New("can't find element with this id")}
+			return domain.Warehouse{}, usecases.ErrNoElementFound
 		}
 	}
 
@@ -164,7 +160,7 @@ func (r *mySQLRepositoryAdapter) DeleteById(id int) error {
 	}
 
 	if rows == 0 {
-		return &usecases.NoElementFoundError{Err: errors.New("can't find element with this id")}
+		return usecases.ErrNoElementFound
 	}
 
 	return nil
