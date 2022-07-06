@@ -430,3 +430,14 @@ ENGINE = InnoDB;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+INSERT INTO `fresh_market`.`country` (`id`,`name`) VALUES (1, "brasil");
+
+INSERT INTO `fresh_market`.`province` (`id`, `name`, `country_id`) VALUES (1, "parana", 1);
+INSERT INTO `fresh_market`.`province` (`id`, `name`, `country_id`) VALUES (2, "sao paulo", 1);
+INSERT INTO `fresh_market`.`province` (`id`, `name`, `country_id`) VALUES (3, "rio de janeiro", 1);
+
+INSERT INTO `fresh_market`.`locality` (`id`, `name`, `province_id`) VALUES (1, "campo mourao", 1);
+INSERT INTO `fresh_market`.`locality` (`id`, `name`, `province_id`) VALUES (2, "sao paulo", 2);
+INSERT INTO `fresh_market`.`locality` (`id`, `name`, `province_id`) VALUES (3, "rio de janeiro", 3);
+INSERT INTO `fresh_market`.`locality` (`id`, `name`, `province_id`) VALUES (4, "maringa", 1);

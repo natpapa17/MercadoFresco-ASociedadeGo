@@ -10,6 +10,7 @@ import (
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/product"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/section"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
+	carrier_factories "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/carriers/factories"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/employee"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/products"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
@@ -38,7 +39,8 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	bs := buyers.CreateBuyerService(br)
 	bc := buyer.CreateBuyerController(bs)
 
-	wc := factories.MakeWarehouseController()
+	warehouseController := factories.MakeWarehouseController()
+	carrierController := carrier_factories.MakeCarrierController()
 
 	sellersDb := store.New(store.FileType, "data/sellers.json")
 	sellerRepo := sellers.NewRepository(sellersDb)
@@ -70,11 +72,11 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	{
 		warehouse := mux.Group("warehouses")
 		{
-			warehouse.GET("/", wc.GetAllWarehouses)
-			warehouse.GET("/:id", wc.GetByIdWarehouse)
-			warehouse.PATCH("/:id", wc.UpdateByIdWarehouse)
-			warehouse.DELETE("/:id", wc.DeleteByIdWarehouse)
-			warehouse.POST("/", wc.CreateWarehouse)
+			warehouse.GET("/", warehouseController.GetAllWarehouses)
+			warehouse.GET("/:id", warehouseController.GetByIdWarehouse)
+			warehouse.PATCH("/:id", warehouseController.UpdateByIdWarehouse)
+			warehouse.DELETE("/:id", warehouseController.DeleteByIdWarehouse)
+			warehouse.POST("/", warehouseController.CreateWarehouse)
 		}
 
 		buyer := mux.Group("buyers")
@@ -121,6 +123,12 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			employee.PATCH("/:id", ec.UpdateByIdEmployee)
 			employee.DELETE("/:id", ec.DeleteByIdEmployee)
 			employee.POST("/", ec.CreateEmployee)
+		}
+
+		carriers := mux.Group("carriers")
+		{
+			carriers.POST("/", carrierController.CreateCarrier)
+			carriers.GET("/:id", carrierController.GetNumberOfCarriersPerLocality)
 		}
 	}
 
