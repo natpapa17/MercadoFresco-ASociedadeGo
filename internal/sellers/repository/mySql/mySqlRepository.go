@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	
 	"fmt"
 
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/domain"
@@ -82,14 +83,47 @@ func (*mySqlRepository) LastID() (int, error) {
 	panic("unimplemented")
 }
 
-func (*mySqlRepository) Store(id int, cid int, companyName string, address string, telephone string) (domain.Seller, error) {
-	panic("unimplemented")
+func (r *mySqlRepository) Store( id, cid int, companyName string, address string, telephone string) (domain.Seller, error) {
+	tx, err := r.db.Begin()
+
+	if err != nil {
+		return domain.Seller{}, err
+	}
+
+	const query = `INSERT INTO seller (cid, companyName, address, telephone) VALUES (?, ?, ?, ?, ?)`
+
+	res, err := tx.Exec(query, cid, companyName, address, telephone)
+
+	if err != nil {
+		_ = tx.Rollback()
+		return domain.Seller{}, err
+	}
+
+	if err = tx.Commit(); err != nil {
+		return domain.Seller{}, err
+	}
+
+	a, err := res.LastInsertId()
+		if err != nil {
+			return domain.Seller{}, err
+		}
+
+	return domain.Seller{
+		Id:                 int(a),
+		Cid:      cid,
+		CompanyName:            companyName,
+		Address:          address,
+		Telephone:    telephone,
+		
+	}, nil
 }
 
 
-func (*mySqlRepository) Update(id int, cid int, companyName string, address string, telephone string) (domain.Seller, error) {
+func (r *mySqlRepository) Update(id int, cid int, companyName string, address string, telephone string) (domain.Seller, error) {
+	
 	panic("unimplemented")
 }
+
 
 func CreateMySQLRepository(db *sql.DB) repository.Repository {
 	return &mySqlRepository{
