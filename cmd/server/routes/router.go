@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/seller"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/newController"
 
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/buyer"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/product"
@@ -58,6 +59,8 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	sellerService := services.NewService(sellerRepo)
 	sellerControllers := controllers.NewSeller(sellerService)
 
+	sellerCont := newController.NewSellerController()
+
 	sdb := store.New(store.FileType, "data/sections.json")
 	sr := sections.NewRepository(sdb)
 	ss := sections.NewService(sr)
@@ -85,6 +88,12 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 
 		seller := mux.Group("seller")
 		{
+			seller.GET("/", sellerCont.GetAll())
+			seller.GET("/:id", sellerCont.GetByIdSeller())
+			seller.POST("/", sellerCont.Store())
+			seller.DELETE("/:id", sellerCont.Delete())
+			seller.PATCH("/:id", sellerCont.Update())
+
 			seller.GET("/", sellerControllers.GetAll())
 			seller.GET("/:id", sellerControllers.GetByIdSeller())
 			seller.POST("/", sellerControllers.Store())
