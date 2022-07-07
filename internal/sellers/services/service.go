@@ -8,8 +8,8 @@ import(
 type Service interface {
 	GetAll() ([]domain.Seller, error)
 	GetById(id int) (domain.Seller, error)
-	Store( cid int, companyName string, address string , telephone string ) (domain.Seller, error)
-	Update(id , cid int, companyName, address, telephone string) (domain.Seller, error)
+	Store( cid int, companyName string, address string , telephone string, localityId int ) (domain.Seller, error)
+	Update(id , cid int, companyName, address, telephone string, localityId int) (domain.Seller, error)
 	Delete(id int) error
 }
 
@@ -42,7 +42,7 @@ func (s service) GetById (id int) (domain.Seller, error){
 }
 
 
-func (s service) Store(cid int, companyName string, address string , telephone string) (domain.Seller, error) {
+func (s service) Store(cid int, companyName string, address string , telephone string, localityId int) (domain.Seller, error) {
 	lastID, err := s.repository.LastID()
 
 	if err != nil {
@@ -51,7 +51,7 @@ func (s service) Store(cid int, companyName string, address string , telephone s
 
 	lastID++
 
-	seller, err := s.repository.Store(lastID, cid, companyName, address, telephone)
+	seller, err := s.repository.Store(lastID, cid, companyName, address, telephone, localityId)
 
 	if err != nil {
 		return domain.Seller{}, err
@@ -63,8 +63,8 @@ func (s service) Store(cid int, companyName string, address string , telephone s
 
 }
 
-func (s service) Update(id , cid int, companyName, address, telephone string) (domain.Seller, error) {
-	seller, err := s.repository.Update(id, cid, companyName, address, telephone)
+func (s service) Update(id , cid int, companyName, address, telephone string, localityId int) (domain.Seller, error) {
+	seller, err := s.repository.Update(id, cid, companyName, address, telephone, localityId)
 	if err != nil {
 		return domain.Seller{}, err
 	}

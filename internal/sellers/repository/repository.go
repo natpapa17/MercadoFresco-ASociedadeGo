@@ -13,9 +13,9 @@ var sl []domain.Seller = []domain.Seller{}
 type Repository interface{
 	GetAll() ([]domain.Seller, error)
 	GetById(id int) (domain.Seller, error)
-	Store(id int, cid int, companyName string, address string , telephone string ) (domain.Seller , error)
+	Store(id int, cid int, companyName string, address string , telephone string , localityId int) (domain.Seller , error)
 	LastID() (int, error)
-	Update(id , cid int, companyName, address, telephone string) (domain.Seller, error)
+	Update(id , cid int, companyName, address, telephone string, localityId int) (domain.Seller, error)
 	Delete(id int) error
 	
 
@@ -64,12 +64,12 @@ func (r *repository) GetById(id int) (domain.Seller, error){
 	return domain.Seller{},  errors.New("nao encontrado")
 }
 
-func (r *repository) Store(id int, cid int, companyName string, address string , telephone string) (domain.Seller, error) {
+func (r *repository) Store(id int, cid int, companyName string, address string , telephone string, localityId int) (domain.Seller, error) {
 	var sl []domain.Seller 
 	if err := r.db.Read(&sl); err != nil {
 		return domain.Seller{}, err
 	}
-	s := domain.Seller{id, cid, companyName, address, telephone}
+	s := domain.Seller{id, cid, companyName, address, telephone, localityId}
 	sl = append(sl, s)
 	if err := r.db.Write(sl); err != nil {
 		return domain.Seller{}, err
@@ -77,11 +77,11 @@ func (r *repository) Store(id int, cid int, companyName string, address string ,
 	return s, nil
 }
 
-func (r repository) Update(id , cid int, companyName, address, telephone string) (domain.Seller, error) {
+func (r repository) Update(id , cid int, companyName, address, telephone string, localityId int) (domain.Seller, error) {
 	if err := r.db.Read(&sl); err != nil {
 		return domain.Seller{}, nil
 	}
-	s := domain.Seller{Id: id, Cid: cid, CompanyName: companyName, Address: address, Telephone: telephone}
+	s := domain.Seller{Id: id, Cid: cid, CompanyName: companyName, Address: address, Telephone: telephone, LocalityId : localityId}
 	updated := false
 	for i := range sl {
 		if sl[i].Id == id {

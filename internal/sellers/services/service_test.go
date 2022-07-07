@@ -24,6 +24,7 @@ func TestGetAll(t *testing.T) {
 		CompanyName:  "None",
 		Address: "none",
 		Telephone: "00000",
+		LocalityId: 1,
 	}
 
 	sList := make([]domain.Seller, 0)
@@ -103,15 +104,16 @@ func TestStore(t *testing.T){
 		CompanyName:  "None",
 		Address: "none",
 		Telephone: "00000",
+		LocalityId: 1,
 	}
 
 	t.Run("if the fields are correct, the new seller will be stored", func(t *testing.T) {
 		mockRepo.On("LastID").Return(1, nil).Once()
-		mockRepo.On("Store",  mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(expectSeller, nil).Once()
+		mockRepo.On("Store",  mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int")).Return(expectSeller, nil).Once()
 
 		service := sellers.NewService(mockRepo)
 
-		result, _ := service.Store(219, "Name", "Addres", "telephone")
+		result, _ := service.Store(219, "Name", "Addres", "telephone", 1)
 		
 		assert.Equal(t, expectSeller, result)
 	})
@@ -126,22 +128,23 @@ func TestUpdate(t *testing.T){
 		CompanyName:  "None",
 		Address: "none",
 		Telephone: "00000",
+		LocalityId: 1,
 	}
 	t.Run("return the updated information", func(t*testing.T){
 	
-		mockRepo.On("Update", mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(expectSeller, nil).Once()
+		mockRepo.On("Update", mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int")).Return(expectSeller, nil).Once()
 		service := sellers.NewService(mockRepo)
-		result, _ := service.Update( int(1),int(219), "Name", "Addres", "telephone")
+		result, _ := service.Update( int(1),int(219), "Name", "Addres", "telephone", 1)
 		
 		assert.Equal(t, expectSeller, result)
 
 	})
 
 	t.Run(" If the element with the specified id not exists, return nil", func(t *testing.T) {
-		mockRepo.On("Update", int(3), int(219),"None", "None", "None").Return(domain.Seller{}, fmt.Errorf("Seller not found"))
+		mockRepo.On("Update", int(3), int(219),"None", "None", "None", 1).Return(domain.Seller{}, fmt.Errorf("Seller not found"))
 		service := sellers.NewService(mockRepo)
 
-		result, err := service.Update(int(3), int(219),"None", "None", "None")
+		result, err := service.Update(int(3), int(219),"None", "None", "None", 1)
 
 		assert.Equal(t, domain.Seller{}, result)
 		assert.NotNil(t, err)

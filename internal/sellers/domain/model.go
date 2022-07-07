@@ -6,6 +6,7 @@ type Seller struct{
 	CompanyName string `json:"CompanyName"`
 	Address string `json:"Address"`
 	Telephone string `json:"Telephone"`
+	LocalityId  int    `json:"LocalityId"`
 }
 
 type Sellers []Seller

@@ -50,7 +50,7 @@ func (r *mySqlRepository) GetAll() ([]domain.Seller, error) {
 
 	for rows.Next() {
 		s := domain.Seller{}
-		rows.Scan(&s.Id, &s.Cid, &s.CompanyName, &s.Address, &s.Telephone)
+		rows.Scan(&s.Id, &s.Cid, &s.CompanyName, &s.Address, &s.Telephone, &s.LocalityId)
 		sl = append(sl, s)
 	}
 
@@ -83,16 +83,16 @@ func (*mySqlRepository) LastID() (int, error) {
 	panic("unimplemented")
 }
 
-func (r *mySqlRepository) Store( id, cid int, companyName string, address string, telephone string) (domain.Seller, error) {
+func (r *mySqlRepository) Store( id, cid int, companyName string, address string, telephone string, localityId int) (domain.Seller, error) {
 	tx, err := r.db.Begin()
 
 	if err != nil {
 		return domain.Seller{}, err
 	}
 
-	const query = `INSERT INTO seller (cid, companyName, address, telephone) VALUES (?, ?, ?, ?, ?)`
+	const query = `INSERT INTO seller (cid, companyName, address, telephone, localityId) VALUES (?, ?, ?, ?, ?, ?)`
 
-	res, err := tx.Exec(query, cid, companyName, address, telephone)
+	res, err := tx.Exec(query, cid, companyName, address, telephone, localityId)
 
 	if err != nil {
 		_ = tx.Rollback()
@@ -114,12 +114,13 @@ func (r *mySqlRepository) Store( id, cid int, companyName string, address string
 		CompanyName:            companyName,
 		Address:          address,
 		Telephone:    telephone,
+		LocalityId: localityId,
 		
 	}, nil
 }
 
 
-func (r *mySqlRepository) Update(id int, cid int, companyName string, address string, telephone string) (domain.Seller, error) {
+func (r *mySqlRepository) Update(id int, cid int, companyName string, address string, telephone string, localityId int) (domain.Seller, error) {
 	
 	panic("unimplemented")
 }
