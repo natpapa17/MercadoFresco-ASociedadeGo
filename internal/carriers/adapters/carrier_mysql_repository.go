@@ -67,7 +67,7 @@ func (r *carrierMySQLRepositoryAdapter) GetNumberOfCarriersPerLocality(localityI
 }
 
 func (r *carrierMySQLRepositoryAdapter) GetByCid(cid string) (domain.Carrier, error) {
-	const query = `SELECT * FROM carrier WHERE cid=?`
+	const query = `SELECT id, cid, company_name, address, telephone, locality_id FROM carrier WHERE cid=?`
 
 	c := domain.Carrier{}
 	err := r.db.QueryRow(query, cid).Scan(&c.Id, &c.Cid, &c.CompanyName, &c.Address, &c.Telephone, &c.LocalityId)

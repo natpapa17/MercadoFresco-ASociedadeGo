@@ -19,7 +19,7 @@ func CreateLocalityMySQLRepository(db *sql.DB) usecases.LocalityRepository {
 }
 
 func (r *localityMySQLRepositoryAdapter) GetById(id int) (domain.Locality, error) {
-	const query = `SELECT * FROM locality WHERE id=?`
+	const query = `SELECT id, name, province_id FROM locality WHERE id=?`
 
 	locality := domain.Locality{}
 
