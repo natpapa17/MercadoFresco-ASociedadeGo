@@ -47,7 +47,7 @@ func (c *SellerController) Store() gin.HandlerFunc {
 			return
 		}
 
-		s, err := c.service.Store( req.Cid, req.CompanyName, req.Address, req.Telephone)
+		s, err := c.service.Store( req.Cid, req.CompanyName, req.Address, req.Telephone, req.LocalityId)
 		if err != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
@@ -117,7 +117,7 @@ func (c *SellerController) Update() gin.HandlerFunc {
 			return
 		}
 
-		s, err := c.service.Update(int(id), req.Cid, req.CompanyName, req.Address, req.Telephone)
+		s, err := c.service.Update(int(id), req.Cid, req.CompanyName, req.Address, req.Telephone, req.LocalityId)
 		if err != nil {
 			ctx.JSON(404, gin.H{"error": err.Error()})
 			return
@@ -151,5 +151,6 @@ type request struct {
 	CompanyName string `json:"CompanyName" binding:"required"`
 	Address string `json:"Address" binding:"required"`
 	Telephone string `json:"Telephone" binding:"required"`
+	LocalityId int `json:"LocalityId" binding:"required"`
 }
 
