@@ -97,35 +97,34 @@ func (r *buyerRepository) GetBuyerById(id int) (domain.Buyer, error) {
 
 }
 
-func (r *buyerRepository) UpdateBuyerById(id int, firstName string, lastName string, address string, document string) (Buyer, error) {
-	var bs []Buyer
-	if err := r.file.Read(&bs); err != nil {
-		return Buyer{}, nil
+func (r *buyerRepository) UpdateBuyerById(id int, firstName string, lastName string, address string, document string) (domain.Buyer, error) {
+	const query = `UPDATE buyer SET first_name=?, last_name=?, address=?, document_number=? WHERE id=?`
+
+	res, err := tx.Exec(query, firstName, lastName, address, document, id)
+
+	if err != nil {
+		return domain.Buyer{}, nil
 	}
-	result, found := Buyer{}, false
-	for i, b := range bs {
-		if b.ID == id {
-			bs[i], found = Buyer{
-				ID:                 id,
-				FirstName:      firstName,
-				LastName:          lastName,
-				Address:            address,
-				DocumentNumber:    document,
-			}, true
-			result = bs[i]
-			break
+	
+	rows, err := res.RowsAffected()
+
+	if err != nil {
+		return domain.Buyer{}, err
+	}
+
+	if rows == 0 {
+		if b, _ := r.GetBuyerById(id); b.ID == 0 {
+			return domain.Buyer{}, usecases.ErrNoElementFound
 		}
 	}
 
-	if !found {
-		return Buyer{}, &NoElementInFileError{errors.New("can't find element with this id")}
-	}
-	
-	if err := r.file.Write(bs); err != nil {
-		return Buyer{}, err
-	}
-
-	return result, nil
+	return domain.Buyer{
+		ID: int(id),
+		FirstName: firstName,
+		LastName: lastName,
+		Address: address,
+		DocumentNumber: document,
+	}, nil
 }
 
 func (r *buyerRepository) DeleteBuyerById(id int) error {
@@ -149,17 +148,4 @@ func (r *buyerRepository) DeleteBuyerById(id int) error {
 
 	return nil
 
-}
-
-func (r *buyerRepository) lastId() (int, error) {
-	var bs []Buyer
-	if err := r.file.Read(&bs); err != nil {
-		return 0, err
-	}
-
-	if len(bs) == 0 {
-		return 0, nil
-	}
-
-	return bs[len(bs)-1].ID, nil
 }
