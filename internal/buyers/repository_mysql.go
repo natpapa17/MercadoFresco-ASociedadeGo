@@ -77,19 +77,21 @@ func (r *buyerRepository) GetAll() (domain.Buyers, error) {
 	return bs, nil
 }
 
-func (r *buyerRepository) GetBuyerById(id int) (Buyer, error) {
-	var bs []Buyer
-	if err := r.file.Read(&bs); err != nil {
-		return Buyer{}, nil
+func (r *buyerRepository) GetBuyerById(id int) (domain.Buyer, error) {
+	const query = `SELECT id, first_name, last_name, address, document_number FROM buyer WHERE id=?`
+
+	b := domain.Buyer{}
+	err := r.db.QueryRow(query, id).Scan(&b.ID, &b.FirstName, &b.LastName, &b.Address, &b.DocumentNumber)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return domain.Buyer{}, usecases.ErrNoElementFound
 	}
 
-	for _, b := range bs {
-		if b.ID == id {
-			return b, nil
-		}
+	if err != nil {
+		return domain.Buyer{}, err
 	}
 
-	return Buyer{}, &NoElementInFileError{errors.New("can't find element with this id")}
+	return b, nil
 
 }
 
