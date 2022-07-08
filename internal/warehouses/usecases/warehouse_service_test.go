@@ -42,8 +42,8 @@ func makeUpdatedWarehouse() domain.Warehouse {
 }
 
 func TestCreate(t *testing.T) {
-	mockWarehouseRepository := mocks.NewRepository(t)
-	sut := usecases.CreateService(mockWarehouseRepository)
+	mockWarehouseRepository := mocks.NewWarehouseRepository(t)
+	sut := usecases.CreateWarehouseService(mockWarehouseRepository)
 
 	t.Run("Should call GetByWarehouseCode from Warehouse Repository with correct code", func(t *testing.T) {
 		mockWarehouseRepository.
@@ -121,8 +121,8 @@ func TestCreate(t *testing.T) {
 }
 
 func TestGetAll(t *testing.T) {
-	mockWarehouseRepository := mocks.NewRepository(t)
-	sut := usecases.CreateService(mockWarehouseRepository)
+	mockWarehouseRepository := mocks.NewWarehouseRepository(t)
+	sut := usecases.CreateWarehouseService(mockWarehouseRepository)
 
 	t.Run("Should call GetAll from Warehouse Repository", func(t *testing.T) {
 		mockWarehouseRepository.
@@ -160,8 +160,8 @@ func TestGetAll(t *testing.T) {
 }
 
 func TestGetById(t *testing.T) {
-	mockWarehouseRepository := mocks.NewRepository(t)
-	sut := usecases.CreateService(mockWarehouseRepository)
+	mockWarehouseRepository := mocks.NewWarehouseRepository(t)
+	sut := usecases.CreateWarehouseService(mockWarehouseRepository)
 
 	t.Run("Should call GetById from Warehouse Repository with correct id", func(t *testing.T) {
 		mockWarehouseRepository.
@@ -199,8 +199,8 @@ func TestGetById(t *testing.T) {
 }
 
 func TestUpdateById(t *testing.T) {
-	mockWarehouseRepository := mocks.NewRepository(t)
-	sut := usecases.CreateService(mockWarehouseRepository)
+	mockWarehouseRepository := mocks.NewWarehouseRepository(t)
+	sut := usecases.CreateWarehouseService(mockWarehouseRepository)
 
 	t.Run("Should call GetByWarehouseCode from Warehouse Repository with correct code", func(t *testing.T) {
 		mockWarehouseRepository.
@@ -280,8 +280,8 @@ func TestUpdateById(t *testing.T) {
 }
 
 func TestDeleteById(t *testing.T) {
-	mockWarehouseRepository := mocks.NewRepository(t)
-	sut := usecases.CreateService(mockWarehouseRepository)
+	mockWarehouseRepository := mocks.NewWarehouseRepository(t)
+	sut := usecases.CreateWarehouseService(mockWarehouseRepository)
 
 	t.Run("Should call DeleteById from Warehouse Repository with correct id", func(t *testing.T) {
 		mockWarehouseRepository.

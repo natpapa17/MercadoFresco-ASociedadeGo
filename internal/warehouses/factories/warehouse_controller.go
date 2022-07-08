@@ -8,8 +8,8 @@ import (
 )
 
 func MakeWarehouseController() *adapters.WarehouseController {
-	wr := adapters.CreateMySQLRepository(db.GetInstance())
-	ws := usecases.CreateService(wr)
+	wr := adapters.CreateWarehouseMySQLRepository(db.GetInstance())
+	ws := usecases.CreateWarehouseService(wr)
 	wc := adapters.CreateWarehouseController(ws)
 
 	return wc

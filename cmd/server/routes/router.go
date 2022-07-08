@@ -64,7 +64,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 		log.Fatal("can't load warehouse data file")
 	}
 	warehouseFile := store.New(store.FileType, warehouseFilePath)
-	wr := adapters.CreateFileRepository(warehouseFile)
+	wr := adapters.CreateWarehouseFileRepository(warehouseFile)
 	es := employee.CreateService(er, wr)
 	ec := controllers.CreateEmployeeController(es)
 

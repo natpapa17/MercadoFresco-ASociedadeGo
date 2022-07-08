@@ -2,7 +2,7 @@ package usecases
 
 import "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/domain"
 
-type Repository interface {
+type WarehouseRepository interface {
 	Create(warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (domain.Warehouse, error)
 	GetAll() (domain.Warehouses, error)
 	GetById(id int) (domain.Warehouse, error)

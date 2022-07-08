@@ -16,10 +16,10 @@ type EmployeeServiceInterface interface {
 
 type service struct {
 	repository    employeeInterface
-	wareHouseRepo usecases.Repository
+	wareHouseRepo usecases.WarehouseRepository
 }
 
-func CreateService(r employeeInterface, w usecases.Repository) EmployeeServiceInterface {
+func CreateService(r employeeInterface, w usecases.WarehouseRepository) EmployeeServiceInterface {
 	return &service{
 		repository:    r,
 		wareHouseRepo: w,

@@ -12,10 +12,10 @@ import (
 )
 
 type WarehouseController struct {
-	service usecases.Service
+	service usecases.WarehouseService
 }
 
-func CreateWarehouseController(ws usecases.Service) *WarehouseController {
+func CreateWarehouseController(ws usecases.WarehouseService) *WarehouseController {
 	return &WarehouseController{
 		service: ws,
 	}
@@ -37,11 +37,11 @@ func (wc *WarehouseController) CreateWarehouse(ctx *gin.Context) {
 		return
 	}
 
-	w, err := wc.service.Create(req.WarehouseCode, req.Address, req.Telephone, req.MinimumCapacity, req.MinimumTemperature)
+	warehouse, err := wc.service.Create(req.WarehouseCode, req.Address, req.Telephone, req.MinimumCapacity, req.MinimumTemperature)
 
 	if err == nil {
 		ctx.JSON(http.StatusCreated, gin.H{
-			"data": w,
+			"data": warehouse,
 		})
 		return
 	}
@@ -59,11 +59,11 @@ func (wc *WarehouseController) CreateWarehouse(ctx *gin.Context) {
 }
 
 func (wc *WarehouseController) GetAllWarehouses(ctx *gin.Context) {
-	w, err := wc.service.GetAll()
+	warehouses, err := wc.service.GetAll()
 
 	if err == nil {
 		ctx.JSON(http.StatusOK, gin.H{
-			"data": w,
+			"data": warehouses,
 		})
 		return
 	}
@@ -83,11 +83,11 @@ func (wc *WarehouseController) GetByIdWarehouse(ctx *gin.Context) {
 		return
 	}
 
-	w, err := wc.service.GetById(id)
+	warehouse, err := wc.service.GetById(id)
 
 	if err == nil {
 		ctx.JSON(http.StatusOK, gin.H{
-			"data": w,
+			"data": warehouse,
 		})
 		return
 	}
@@ -129,11 +129,11 @@ func (wc *WarehouseController) UpdateByIdWarehouse(ctx *gin.Context) {
 		return
 	}
 
-	w, err := wc.service.UpdateById(id, req.WarehouseCode, req.Address, req.Telephone, req.MinimumCapacity, req.MinimumTemperature)
+	warehouse, err := wc.service.UpdateById(id, req.WarehouseCode, req.Address, req.Telephone, req.MinimumCapacity, req.MinimumTemperature)
 
 	if err == nil {
 		ctx.JSON(http.StatusOK, gin.H{
-			"data": w,
+			"data": warehouse,
 		})
 		return
 	}

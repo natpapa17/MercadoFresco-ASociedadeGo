@@ -6,17 +6,17 @@ import (
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
 
-type fileRepositoryAdapter struct {
+type warehouseFileRepositoryAdapter struct {
 	file store.Store
 }
 
-func CreateFileRepository(file store.Store) usecases.Repository {
-	return &fileRepositoryAdapter{
+func CreateWarehouseFileRepository(file store.Store) usecases.WarehouseRepository {
+	return &warehouseFileRepositoryAdapter{
 		file: file,
 	}
 }
 
-func (r *fileRepositoryAdapter) Create(warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (domain.Warehouse, error) {
+func (r *warehouseFileRepositoryAdapter) Create(warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (domain.Warehouse, error) {
 	var ws domain.Warehouses
 	if err := r.file.Read(&ws); err != nil {
 		return domain.Warehouse{}, err
@@ -44,7 +44,7 @@ func (r *fileRepositoryAdapter) Create(warehouseCode string, address string, tel
 	return w, nil
 }
 
-func (r *fileRepositoryAdapter) GetAll() (domain.Warehouses, error) {
+func (r *warehouseFileRepositoryAdapter) GetAll() (domain.Warehouses, error) {
 	var ws domain.Warehouses
 	if err := r.file.Read(&ws); err != nil {
 		return domain.Warehouses{}, err
@@ -52,7 +52,7 @@ func (r *fileRepositoryAdapter) GetAll() (domain.Warehouses, error) {
 	return ws, nil
 }
 
-func (r *fileRepositoryAdapter) GetById(id int) (domain.Warehouse, error) {
+func (r *warehouseFileRepositoryAdapter) GetById(id int) (domain.Warehouse, error) {
 	var ws domain.Warehouses
 
 	if err := r.file.Read(&ws); err != nil {
@@ -68,7 +68,7 @@ func (r *fileRepositoryAdapter) GetById(id int) (domain.Warehouse, error) {
 	return domain.Warehouse{}, usecases.ErrNoElementFound
 }
 
-func (r *fileRepositoryAdapter) GetByWarehouseCode(code string) (domain.Warehouse, error) {
+func (r *warehouseFileRepositoryAdapter) GetByWarehouseCode(code string) (domain.Warehouse, error) {
 	var ws domain.Warehouses
 	if err := r.file.Read(&ws); err != nil {
 		return domain.Warehouse{}, err
@@ -83,7 +83,7 @@ func (r *fileRepositoryAdapter) GetByWarehouseCode(code string) (domain.Warehous
 	return domain.Warehouse{}, usecases.ErrNoElementFound
 }
 
-func (r *fileRepositoryAdapter) UpdateById(id int, warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (domain.Warehouse, error) {
+func (r *warehouseFileRepositoryAdapter) UpdateById(id int, warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (domain.Warehouse, error) {
 	var ws domain.Warehouses
 	if err := r.file.Read(&ws); err != nil {
 		return domain.Warehouse{}, err
@@ -116,7 +116,7 @@ func (r *fileRepositoryAdapter) UpdateById(id int, warehouseCode string, address
 	return result, nil
 }
 
-func (r *fileRepositoryAdapter) DeleteById(id int) error {
+func (r *warehouseFileRepositoryAdapter) DeleteById(id int) error {
 	var ws domain.Warehouses
 	if err := r.file.Read(&ws); err != nil {
 		return err
@@ -145,7 +145,7 @@ func (r *fileRepositoryAdapter) DeleteById(id int) error {
 	return nil
 }
 
-func (r *fileRepositoryAdapter) lastId() (int, error) {
+func (r *warehouseFileRepositoryAdapter) lastId() (int, error) {
 	var ws domain.Warehouses
 	if err := r.file.Read(&ws); err != nil {
 		return 0, err

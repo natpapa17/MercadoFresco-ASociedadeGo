@@ -30,7 +30,7 @@ func (s *carrierService) Create(cid string, companyName string, address string, 
 		return domain.Carrier{}, ErrCidInUse
 	}
 
-	if !errors.Is(err, ErrNoElementFound) {
+	if err != nil && !errors.Is(err, ErrNoElementFound) {
 		return domain.Carrier{}, err
 	}
 

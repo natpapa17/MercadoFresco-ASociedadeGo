@@ -145,7 +145,7 @@ func makeUpdatedDBWarehouse() domain.Warehouse {
 func TestCreateWarehouse(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
-	mockWarehouseService := mocks.NewService(t)
+	mockWarehouseService := mocks.NewWarehouseService(t)
 	sut := adapters.CreateWarehouseController(mockWarehouseService)
 
 	r := gin.Default()
@@ -214,7 +214,7 @@ func TestCreateWarehouse(t *testing.T) {
 func TestGetAllWarehouse(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
-	mockWarehouseService := mocks.NewService(t)
+	mockWarehouseService := mocks.NewWarehouseService(t)
 	sut := adapters.CreateWarehouseController(mockWarehouseService)
 
 	r := gin.Default()
@@ -253,7 +253,7 @@ func TestGetAllWarehouse(t *testing.T) {
 func TestGetByIdWarehouse(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
-	mockWarehouseService := mocks.NewService(t)
+	mockWarehouseService := mocks.NewWarehouseService(t)
 	sut := adapters.CreateWarehouseController(mockWarehouseService)
 
 	r := gin.Default()
@@ -311,7 +311,7 @@ func TestGetByIdWarehouse(t *testing.T) {
 func TestUpdateWarehouse(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
-	mockWarehouseService := mocks.NewService(t)
+	mockWarehouseService := mocks.NewWarehouseService(t)
 	sut := adapters.CreateWarehouseController(mockWarehouseService)
 
 	r := gin.Default()
@@ -399,7 +399,7 @@ func TestUpdateWarehouse(t *testing.T) {
 func TestDeleteByIdWarehouse(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
-	mockWarehouseService := mocks.NewService(t)
+	mockWarehouseService := mocks.NewWarehouseService(t)
 	sut := adapters.CreateWarehouseController(mockWarehouseService)
 
 	r := gin.Default()

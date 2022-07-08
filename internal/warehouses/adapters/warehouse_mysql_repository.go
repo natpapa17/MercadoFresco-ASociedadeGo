@@ -8,17 +8,17 @@ import (
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/usecases"
 )
 
-type mySQLRepositoryAdapter struct {
+type warehouseMySQLRepositoryAdapter struct {
 	db *sql.DB
 }
 
-func CreateMySQLRepository(db *sql.DB) usecases.Repository {
-	return &mySQLRepositoryAdapter{
+func CreateWarehouseMySQLRepository(db *sql.DB) usecases.WarehouseRepository {
+	return &warehouseMySQLRepositoryAdapter{
 		db: db,
 	}
 }
 
-func (r *mySQLRepositoryAdapter) Create(warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (domain.Warehouse, error) {
+func (r *warehouseMySQLRepositoryAdapter) Create(warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (domain.Warehouse, error) {
 	tx, err := r.db.Begin()
 
 	if err != nil {
@@ -53,7 +53,7 @@ func (r *mySQLRepositoryAdapter) Create(warehouseCode string, address string, te
 	}, nil
 }
 
-func (r *mySQLRepositoryAdapter) GetAll() (domain.Warehouses, error) {
+func (r *warehouseMySQLRepositoryAdapter) GetAll() (domain.Warehouses, error) {
 	const query = `SELECT id, warehouse_code, address, telephone, minimum_capacity,	minimum_temperature FROM warehouse`
 
 	rows, err := r.db.Query(query)
@@ -79,7 +79,7 @@ func (r *mySQLRepositoryAdapter) GetAll() (domain.Warehouses, error) {
 	return ws, nil
 }
 
-func (r *mySQLRepositoryAdapter) GetById(id int) (domain.Warehouse, error) {
+func (r *warehouseMySQLRepositoryAdapter) GetById(id int) (domain.Warehouse, error) {
 	const query = `SELECT id, warehouse_code, address, telephone, minimum_capacity,	minimum_temperature FROM warehouse WHERE id=?`
 
 	w := domain.Warehouse{}
@@ -96,7 +96,7 @@ func (r *mySQLRepositoryAdapter) GetById(id int) (domain.Warehouse, error) {
 	return w, nil
 }
 
-func (r *mySQLRepositoryAdapter) GetByWarehouseCode(code string) (domain.Warehouse, error) {
+func (r *warehouseMySQLRepositoryAdapter) GetByWarehouseCode(code string) (domain.Warehouse, error) {
 	const query = `SELECT id, warehouse_code, address, telephone, minimum_capacity,	minimum_temperature FROM warehouse WHERE warehouse_code=?`
 
 	w := domain.Warehouse{}
@@ -113,7 +113,7 @@ func (r *mySQLRepositoryAdapter) GetByWarehouseCode(code string) (domain.Warehou
 	return w, nil
 }
 
-func (r *mySQLRepositoryAdapter) UpdateById(id int, warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (domain.Warehouse, error) {
+func (r *warehouseMySQLRepositoryAdapter) UpdateById(id int, warehouseCode string, address string, telephone string, minimumCapacity int, minimumTemperature float64) (domain.Warehouse, error) {
 	const query = `UPDATE warehouse SET warehouse_code=?, address=?, telephone=?, minimum_capacity=?, minimum_temperature=? WHERE id=?`
 
 	res, err := r.db.Exec(query, warehouseCode, address, telephone, minimumCapacity, minimumTemperature, id)
@@ -144,7 +144,7 @@ func (r *mySQLRepositoryAdapter) UpdateById(id int, warehouseCode string, addres
 	}, nil
 }
 
-func (r *mySQLRepositoryAdapter) DeleteById(id int) error {
+func (r *warehouseMySQLRepositoryAdapter) DeleteById(id int) error {
 	const query = `DELETE FROM warehouse WHERE id=?`
 
 	res, err := r.db.Exec(query, id)
