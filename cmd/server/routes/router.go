@@ -6,12 +6,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/buyer"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/product"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/section"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/employee"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/warehouse"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/products"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
@@ -24,7 +26,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	productsFile := store.New(store.FileType, productsFilePath)
 	pr := products.NewRepository(productsFile)
 	ps := products.NewProductService(pr)
-	pc := controllers.NewProductController(ps)
+	pc := product.NewProductController(ps)
 
 	BuyersFilePath, err := filepath.Abs("" + filepath.Join("data", "buyers.json"))
 	if err != nil {
@@ -33,7 +35,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	buyersFile := store.New(store.FileType, BuyersFilePath)
 	br := buyers.CreateBuyerRepository(buyersFile)
 	bs := buyers.CreateBuyerService(br)
-	bc := controllers.CreateBuyerController(bs)
+	bc := buyer.CreateBuyerController(bs)
 
 	warehouseFilePath, err := filepath.Abs("" + filepath.Join("data", "warehouses.json"))
 	if err != nil {
@@ -42,7 +44,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	warehouseFile := store.New(store.FileType, warehouseFilePath)
 	wr := warehouses.CreateRepository(warehouseFile)
 	ws := warehouses.CreateService(wr)
-	wc := controllers.CreateWarehouseController(ws)
+	wc := warehouse.CreateWarehouseController(ws)
 
 	sellersDb := store.New(store.FileType, "data/sellers.json")
 	sellerRepo := sellers.NewRepository(sellersDb)
@@ -54,17 +56,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	ss := sections.NewService(sr)
 	sc := section.NewSection(ss)
 
-	//Employee:
-	employeeFilePath, err := filepath.Abs("" + filepath.Join("data", "employee.json"))
-	if err != nil {
-		log.Fatal("can't load employee data file")
-	}
-	employeeFile := store.New(store.FileType, employeeFilePath)
-	er := employee.CreateRepository(employeeFile)
-	es := employee.CreateService(er, wr)
-	ec := controllers.CreateEmployeeController(es)
-
-	mux := r.Group("api/v1")
+	mux := r.Group("api/")
 	{
 		warehouse := mux.Group("warehouses")
 		{
@@ -78,9 +70,9 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 		buyer := mux.Group("buyers")
 		{
 			buyer.GET("/", bc.GetAllBuyers)
-			buyer.GET("/:id", bc.GetBuyer)
-			buyer.PATCH("/:id", bc.UpdateBuyer)
-			buyer.DELETE("/:id", bc.DeleteBuyer)
+			buyer.GET("/:id", bc.GetBuyerById)
+			buyer.PATCH("/:id", bc.UpdateBuyerById)
+			buyer.DELETE("/:id", bc.DeleteBuyerById)
 			buyer.POST("/", bc.CreateBuyer)
 		}
 
@@ -103,15 +95,6 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			sec.DELETE("/:id", sc.Delete())
 		}
 
-		employee := mux.Group("employees")
-		{
-			employee.GET("/", ec.GetAllEmployee)
-			employee.GET("/:id", ec.GetByIdEmployee)
-			employee.PATCH("/:id", ec.UpdateByIdEmployee)
-			employee.DELETE("/:id", ec.DeleteByIdEmployee)
-			employee.POST("/", ec.CreateEmployee)
-		}
-
 		products := mux.Group("products")
 		{
 			products.GET("/", pc.GetAll())
@@ -120,7 +103,6 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			products.PATCH("/:id", pc.Update())
 			products.DELETE("/:id", pc.Delete())
 		}
-
 	}
 
 	return r

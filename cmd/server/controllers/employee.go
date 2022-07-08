@@ -68,7 +68,7 @@ func (ec *EmployeeController) CreateEmployee(ctx *gin.Context) {
 
 	e, err := ec.service.Create(req.Card_number_id, req.First_name, req.Last_name, req.Warehouse_id)
 	if err != nil {
-		if isCustomError(err) {
+		if CustomError(err) {
 			ctx.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
@@ -111,7 +111,7 @@ func (ec *EmployeeController) GetByIdEmployee(ctx *gin.Context) {
 
 	e, err := ec.service.GetById(id)
 	if err != nil {
-		if isCustomError(err) {
+		if CustomError(err) {
 			ctx.JSON(http.StatusNotFound, gin.H{
 				"error": err.Error(),
 			})
@@ -162,7 +162,7 @@ func (ec *EmployeeController) UpdateByIdEmployee(ctx *gin.Context) {
 
 	e, err := ec.service.UpdateById(id, req.Card_number_id, req.First_name, req.Last_name, req.Warehouse_id)
 	if err != nil {
-		if isCustomError(err) {
+		if CustomError(err) {
 			ctx.JSON(http.StatusNotFound, gin.H{
 				"error": err.Error(),
 			})
@@ -191,7 +191,7 @@ func (ec *EmployeeController) DeleteByIdEmployee(ctx *gin.Context) {
 
 	err = ec.service.DeleteById(id)
 	if err != nil {
-		if isCustomError(err) {
+		if CustomError(err) {
 			ctx.JSON(http.StatusNotFound, gin.H{
 				"error": err.Error(),
 			})
@@ -204,4 +204,19 @@ func (ec *EmployeeController) DeleteByIdEmployee(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusNoContent, gin.H{})
+}
+
+func CustomError(e error) bool {
+	var be *employee.BusinessRuleError
+	var fe *employee.NoElementInFileError
+
+	if errors.As(e, &be) {
+		return true
+	}
+
+	if errors.As(e, &fe) {
+		return true
+	}
+
+	return false
 }

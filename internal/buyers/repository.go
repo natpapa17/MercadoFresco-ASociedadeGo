@@ -8,9 +8,9 @@ import (
 type Repository interface {
 	Create(firstName string, lastName string, address string, document string) (Buyer, error)
 	GetAll() ([]Buyer, error)
-	GetById(id int) (Buyer, error)
-	UpdateById(id int, firstName string, lastName string, address string, document string) (Buyer, error)
-	DeleteById(id int) error
+	GetBuyerById(id int) (Buyer, error)
+	UpdateBuyerById(id int, firstName string, lastName string, address string, document string) (Buyer, error)
+	DeleteBuyerById(id int) error
 }
 
 type repository struct{
@@ -58,7 +58,7 @@ func (r *repository) GetAll() ([]Buyer, error) {
 	return bs, nil
 }
 
-func (r *repository) GetById(id int) (Buyer, error) {
+func (r *repository) GetBuyerById(id int) (Buyer, error) {
 	var bs []Buyer
 	if err := r.file.Read(&bs); err != nil {
 		return Buyer{}, nil
@@ -74,7 +74,7 @@ func (r *repository) GetById(id int) (Buyer, error) {
 
 }
 
-func (r *repository) UpdateById(id int, firstName string, lastName string, address string, document string) (Buyer, error) {
+func (r *repository) UpdateBuyerById(id int, firstName string, lastName string, address string, document string) (Buyer, error) {
 	var bs []Buyer
 	if err := r.file.Read(&bs); err != nil {
 		return Buyer{}, nil
@@ -105,7 +105,7 @@ func (r *repository) UpdateById(id int, firstName string, lastName string, addre
 	return result, nil
 }
 
-func (r *repository) DeleteById(id int) error {
+func (r *repository) DeleteBuyerById(id int) error {
 	var bs []Buyer
 	if err := r.file.Read(&bs); err != nil {
 		return nil
