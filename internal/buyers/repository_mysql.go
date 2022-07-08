@@ -5,6 +5,8 @@ import (
 	"errors"
 
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/domain"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/usecases"
+
 )
 
 type buyerRepository struct{
@@ -127,31 +129,26 @@ func (r *buyerRepository) UpdateBuyerById(id int, firstName string, lastName str
 }
 
 func (r *buyerRepository) DeleteBuyerById(id int) error {
-	var bs []Buyer
-	if err := r.file.Read(&bs); err != nil {
-		return nil
-	}
-	found := false
-	for i, b := range bs {
-		if b.ID == id {
-			newBs := []Buyer{}
-			newBs = append(newBs, bs[:i]...)
-			newBs = append(newBs, bs[i+1:]...)
-			bs = newBs
-			found = true
-			break
-		}
-	}
+	const query = `DELETE FROM buyer WHERE id=?`
 
-	if !found {
-		return &NoElementInFileError{errors.New("can't find element with this id")}
-	}
+	res, err := r.db.Exec(query, id)
 
-	if err := r.file.Write(bs); err != nil {
+	if err != nil {
 		return err
 	}
 
+	rows, err := res.RowsAffected()
+
+	if err != nil {
+		return err
+	}
+
+	if rows == 0 {
+		return usecases.ErrNoElementFound
+	}
+
 	return nil
+
 }
 
 func (r *buyerRepository) lastId() (int, error) {
