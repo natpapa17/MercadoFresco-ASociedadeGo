@@ -7,10 +7,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/buyer"
+	employees "github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/employee"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/product"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/section"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/warehouse"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/employee"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/products"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
@@ -55,6 +57,16 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	sr := sections.NewRepository(sdb)
 	ss := sections.NewService(sr)
 	sc := section.NewSection(ss)
+
+	//Employee:
+	employeeFilePath, err := filepath.Abs("" + filepath.Join("data", "employee.json"))
+	if err != nil {
+		log.Fatal("can't load employee data file")
+	}
+	employeeFile := store.New(store.FileType, employeeFilePath)
+	er := employee.CreateRepository(employeeFile)
+	es := employee.CreateService(er, wr)
+	ec := employees.CreateEmployeeController(es)
 
 	mux := r.Group("api/")
 	{
@@ -102,6 +114,15 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			products.POST("/", pc.Create())
 			products.PATCH("/:id", pc.Update())
 			products.DELETE("/:id", pc.Delete())
+		}
+
+		employee := mux.Group("employees")
+		{
+			employee.GET("/", ec.GetAllEmployee)
+			employee.GET("/:id", ec.GetByIdEmployee)
+			employee.PATCH("/:id", ec.UpdateByIdEmployee)
+			employee.DELETE("/:id", ec.DeleteByIdEmployee)
+			employee.POST("/", ec.CreateEmployee)
 		}
 	}
 
