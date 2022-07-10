@@ -1,4 +1,4 @@
-package buyers
+package adapters
 
 import (
 	"errors"
