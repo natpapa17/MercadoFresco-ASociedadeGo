@@ -9,17 +9,17 @@ import (
 
 )
 
-type buyerRepository struct{
+type buyerMySQLRepository struct{
 	db *sql.DB
 }
 
-func CreateBuyerRepository(db *sql.DB) Repository {
+func CreateBuyerMySQLRepository(db *sql.DB) usecases.BuyerRepository {
 	return &buyerRepository{
 		db: db,
 	}
 }
 
-func (r *buyerRepository) Create(firstName string, lastName string, address string, document string) (domain.Buyer, error) {
+func (r *buyerMySQLRepository) Create(firstName string, lastName string, address string, document string) (domain.Buyer, error) {
 	tx, err := r.db.Begin()
 
 	if err != nil {
@@ -54,7 +54,7 @@ func (r *buyerRepository) Create(firstName string, lastName string, address stri
 	}, nil
 }
 
-func (r *buyerRepository) GetAll() (domain.Buyers, error) {
+func (r *buyerMySQLRepository) GetAll() (domain.Buyers, error) {
 	const query = `SELECT first_name, last_name, address, document_number FROM buyer`
 
 	rows, err := r.db.Query(query)
@@ -79,7 +79,7 @@ func (r *buyerRepository) GetAll() (domain.Buyers, error) {
 	return bs, nil
 }
 
-func (r *buyerRepository) GetBuyerById(id int) (domain.Buyer, error) {
+func (r *buyerMySQLRepository) GetBuyerById(id int) (domain.Buyer, error) {
 	const query = `SELECT id, first_name, last_name, address, document_number FROM buyer WHERE id=?`
 
 	b := domain.Buyer{}
@@ -97,7 +97,7 @@ func (r *buyerRepository) GetBuyerById(id int) (domain.Buyer, error) {
 
 }
 
-func (r *buyerRepository) UpdateBuyerById(id int, firstName string, lastName string, address string, document string) (domain.Buyer, error) {
+func (r *buyerMySQLRepository) UpdateBuyerById(id int, firstName string, lastName string, address string, document string) (domain.Buyer, error) {
 	const query = `UPDATE buyer SET first_name=?, last_name=?, address=?, document_number=? WHERE id=?`
 
 	res, err := tx.Exec(query, firstName, lastName, address, document, id)
@@ -127,7 +127,7 @@ func (r *buyerRepository) UpdateBuyerById(id int, firstName string, lastName str
 	}, nil
 }
 
-func (r *buyerRepository) DeleteBuyerById(id int) error {
+func (r *buyerMySQLRepository) DeleteBuyerById(id int) error {
 	const query = `DELETE FROM buyer WHERE id=?`
 
 	res, err := r.db.Exec(query, id)

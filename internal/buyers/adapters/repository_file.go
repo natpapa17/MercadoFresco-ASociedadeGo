@@ -3,27 +3,21 @@ package adapters
 import (
 	"errors"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/domain"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/usecases"
 )
 
-type Repository interface {
-	Create(firstName string, lastName string, address string, document string) (Buyer, error)
-	GetAll() ([]Buyer, error)
-	GetBuyerById(id int) (Buyer, error)
-	UpdateBuyerById(id int, firstName string, lastName string, address string, document string) (Buyer, error)
-	DeleteBuyerById(id int) error
-}
-
-type repository struct{
+type BuyerFileRepository struct{
 	file store.Store
 }
 
-func CreateBuyerRepository(file store.Store) Repository {
-	return &repository{
+func CreateBuyerRepository(file store.Store) usecases.BuyerRepository {
+	return &BuyerFileRepository{
 		file: file,
 	}
 }
 
-func (r *repository) Create(firstName string, lastName string, address string, document string) (Buyer, error) {
+func (r *BuyerFileRepository) Create(firstName string, lastName string, address string, document string) (Buyer, error) {
 	var bs []Buyer
 	if err := r.file.Read(&bs); err != nil {
 		return Buyer{}, err
