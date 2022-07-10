@@ -59,7 +59,7 @@ func (poc *PurchaseOrderController) CreatePurchaseOrder(ctx *gin.Context) {
 	})
 }
 
-func (bc *BuyerController) GetBuyerById(ctx *gin.Context) {
+func (bc *PurchaseOrderController) GetPurchaseOrderById(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 
 	if err != nil {
@@ -69,7 +69,7 @@ func (bc *BuyerController) GetBuyerById(ctx *gin.Context) {
 		return
 	}
 
-	b, err := bc.service.GetBuyerById(id)
+	b, err := bc.service.GetPurchaseOrderById(id)
 	if err != nil {
 		if CustomError(err) {
 			ctx.JSON(http.StatusNotFound, gin.H{
