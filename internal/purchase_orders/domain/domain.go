@@ -5,9 +5,9 @@ type Purchase_Order struct {
 	OrderNumber string `json:"order_number"`
 	OrderDate string `json:"order_date"`
 	TrackingCode string `json:"tracking_code"`
-	BuyerId string `json:"buyer_id"`
-	ProductRecordId string `json:"product_record_id"`
-	OrderStatusId string `json:"order_status_id"`
+	BuyerId int `json:"buyer_id"`
+	ProductRecordId int `json:"product_record_id"`
+	OrderStatusId int `json:"order_status_id"`
 }
 
 type Purchase_Orders []Purchase_Order
