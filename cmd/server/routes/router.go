@@ -23,6 +23,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 		log.Fatal("can't load products data file")
 	}
 	productsFile := store.New(store.FileType, productsFilePath)
+	// pr := products.NewMysqlRepository(db.GetInstance())
 	pr := products.NewRepository(productsFile)
 	ps := products.NewProductService(pr)
 	pc := product.NewProductController(ps)
