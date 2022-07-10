@@ -1,4 +1,4 @@
-package buyers
+package usecases
 
 type BusinessRuleError struct {
 	Err error

@@ -1,4 +1,4 @@
-package buyers
+package usecases
 
 type Buyer struct {
 	ID int `json:"id"`

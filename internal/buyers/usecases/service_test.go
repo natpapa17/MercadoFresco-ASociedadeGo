@@ -1,11 +1,11 @@
-package buyers_test
+package usecases_test
 
 import (
 	"errors"
 	"testing"
 
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/mocks"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/usecases/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
