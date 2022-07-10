@@ -103,6 +103,12 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			products.PATCH("/:id", pc.Update())
 			products.DELETE("/:id", pc.Delete())
 		}
+
+		po := mux.Group("purchaseOrders")
+		{
+			po.GET("/:id", po.GetPurchaseOrderById())
+			po.POST("/", po.Create())
+		}
 	}
 
 	return r
