@@ -1,4 +1,4 @@
-package buyer
+package adapters
 
 import (
 	"errors"
@@ -10,10 +10,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/usecases"
+
 )
 
 type BuyerController struct {
-	service buyers.Service
+	service usecases.Service
 }
 
 func CreateBuyerController(bs buyers.Service) *BuyerController {

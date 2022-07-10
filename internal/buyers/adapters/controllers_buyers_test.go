@@ -1,4 +1,4 @@
-package buyer_test
+package adapters_test
 
 import (
 	"bytes"
@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/buyer"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/adapters"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/mocks"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/usecases/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
