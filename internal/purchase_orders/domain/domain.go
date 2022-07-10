@@ -2,10 +2,12 @@ package domain
 
 type Purchase_Order struct {
 	ID int `json:"id"`
-	FirstName string `json:"first_name"`
-	LastName string `json:"last_name"`
-	Address string `json:"address"`
-	DocumentNumber string `json:"document_number"`
+	OrderNumber string `json:"order_number"`
+	OrderDate string `json:"order_date"`
+	TrackingCode string `json:"tracking_code"`
+	BuyerId string `json:"buyer_id"`
+	ProductRecordId string `json:"product_record_id"`
+	OrderStatusId string `json:"order_status_id"`
 }
 
 type Purchase_Orders []Purchase_Order
