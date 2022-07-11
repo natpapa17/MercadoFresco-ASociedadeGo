@@ -21,11 +21,12 @@ import (
 func UpdateBody() *bytes.Buffer{
 	return bytes.NewBuffer(([]byte(`
 	{
-		"Id": 1,
-		"Cid": 1,
-		"CompanyName": "None",
-		"Address": "rua sem nome",
-		"Telephone": "000000"
+		
+		"cid": 1,
+		"company_name": "None",
+		"address": "rua sem nome",
+		"telephone": "000000",
+		"locality_id": 1
 	}
 	`)))
 }
@@ -33,11 +34,12 @@ func UpdateBody() *bytes.Buffer{
 func validSeller() *bytes.Buffer{
 	return bytes.NewBuffer(([]byte(`
 	{
-		"Id": 1,
-		"Cid": 1,
-		"CompanyName": "None",
-		"Address": "rua sem nome",
-		"Telephone": "000000"
+		
+		"cid": 1,
+		"company_name": "None",
+		"address": "rua sem nome",
+		"telephone": "000000",
+		"locality_id": 1
 	}
 	`)))
 }
@@ -45,7 +47,7 @@ func validSeller() *bytes.Buffer{
 func InvalidSeller() *bytes.Buffer{
 	return bytes.NewBuffer(([]byte(`
 	{
-		"Id": 1,
+		
 		"Cid":  ,
 		"CompanyName": "None",
 		"Address": "rua sem nome",
@@ -214,7 +216,7 @@ func TestStoreController( t *testing.T){
 		Telephone: "00000",
 	}
 	t.Run("Create a new seller", func(t*testing.T){
-		mockService.On("Store", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(expectSeller, nil).Once()
+		mockService.On("Store", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int")).Return(expectSeller, nil).Once()
 		request := httptest.NewRecorder()
 		response, _ := http.NewRequest(http.MethodPost, "/sellers",validSeller())
 		r.ServeHTTP(request, response)
@@ -249,7 +251,7 @@ func TestUpdate(t *testing.T){
 	}
 	r.PATCH("/sellers/:id", service.Update())
 	t.Run("return the seller with the updated data", func(t *testing.T){
-		mockService.On("Update", mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(expectSeller, nil).Once()
+		mockService.On("Update", mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int")).Return(expectSeller, nil).Once()
 		response := httptest.NewRecorder()
 		request, _ := http.NewRequest(http.MethodPatch, "/sellers/1", UpdateBody())
 		r.ServeHTTP(response, request)

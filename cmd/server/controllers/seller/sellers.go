@@ -147,10 +147,10 @@ func (c *SellerController) Delete() gin.HandlerFunc {
 }
 
 type request struct {
-	Cid int `json:"Cid" binding:"required"`
+	Cid int `json:"cid" binding:"required"`
 	CompanyName string `json:"company_name" binding:"required"`
-	Address string `json:"Address" binding:"required"`
-	Telephone string `json:"Telephone" binding:"required"`
+	Address string `json:"address" binding:"required"`
+	Telephone string `json:"telephone" binding:"required"`
 	LocalityId int `json:"locality_id" binding:"required"`
 }
 
