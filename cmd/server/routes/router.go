@@ -5,8 +5,10 @@ import (
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/seller"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/newController"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/localities/newLController"
+
+	
 
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/buyer"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/product"
@@ -15,8 +17,7 @@ import (
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/products"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/repository"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/services"
+
 
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
@@ -50,14 +51,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	ws := warehouses.CreateService(wr)
 	wc := warehouse.CreateWarehouseController(ws)
 
-	sellerFilePath, err := filepath.Abs("" + filepath.Join("data", "sellers.json"))
-	if err != nil {
-		log.Fatal("can't load seller data file")
-	}
-	sellersFile := store.New(store.FileType, sellerFilePath)
-	sellerRepo := repository.NewRepository(sellersFile)
-	sellerService := services.NewService(sellerRepo)
-	sellerControllers := controllers.NewSeller(sellerService)
+
 
 	sellerCont := newController.NewSellerController()
 
@@ -66,6 +60,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	ss := sections.NewService(sr)
 	sc := section.NewSection(ss)
 
+	localityController := newLController.NewLocalityController()
 	mux := r.Group("api/")
 	{
 		warehouse := mux.Group("warehouses")
@@ -94,11 +89,6 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			seller.DELETE("/:id", sellerCont.Delete())
 			seller.PATCH("/:id", sellerCont.Update())
 
-			seller.GET("/", sellerControllers.GetAll())
-			seller.GET("/:id", sellerControllers.GetByIdSeller())
-			seller.POST("/", sellerControllers.Store())
-			seller.DELETE("/:id", sellerControllers.Delete())
-			seller.PATCH("/:id", sellerControllers.Update())
 
 		}
 
@@ -118,6 +108,14 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			products.POST("/", pc.Create())
 			products.PATCH("/:id", pc.Update())
 			products.DELETE("/:id", pc.Delete())
+		}
+
+		locality := mux.Group("localities")
+		{
+			
+			locality.GET("/", localityController.ReportAll())
+			locality.GET("/:id", localityController.ReportById())
+			locality.POST("/", localityController.Create())
 		}
 	}
 
