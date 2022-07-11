@@ -451,3 +451,4 @@ INSERT INTO `fresh_market`.`product` (`id`, `description`, `expiration_rate`, `f
 
 INSERT INTO `fresh_market`.`product_record` (`id`, `last_update_date`, `purchase_code`, `sale_price`, `product_id`) VALUES (1, curdate(), 5, 10, 1);
 
+INSERT INTO seller(cid, company_name, address, telephone, locality_id) VALUES(1, "none", "none", "none", 1);

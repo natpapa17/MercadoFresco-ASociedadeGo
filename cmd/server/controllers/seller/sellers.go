@@ -3,19 +3,19 @@ package controllers
 import (
 	"fmt"
 	"net/http"
-	
+
 	"strconv"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/services"
 
 	"github.com/gin-gonic/gin"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/web"
 )
 
 type SellerController struct {
-	service sellers.Service
+	service services.Service
 }
 
-func NewSeller(s sellers.Service) *SellerController {
+func NewSeller(s services.Service) *SellerController {
 	return &SellerController{
 		service: s,
 	}
@@ -47,7 +47,7 @@ func (c *SellerController) Store() gin.HandlerFunc {
 			return
 		}
 
-		s, err := c.service.Store( req.Cid, req.CompanyName, req.Address, req.Telephone)
+		s, err := c.service.Store( req.Cid, req.CompanyName, req.Address, req.Telephone, req.LocalityId)
 		if err != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
@@ -117,7 +117,7 @@ func (c *SellerController) Update() gin.HandlerFunc {
 			return
 		}
 
-		s, err := c.service.Update(int(id), req.Cid, req.CompanyName, req.Address, req.Telephone)
+		s, err := c.service.Update(int(id), req.Cid, req.CompanyName, req.Address, req.Telephone, req.LocalityId)
 		if err != nil {
 			ctx.JSON(404, gin.H{"error": err.Error()})
 			return
@@ -147,9 +147,10 @@ func (c *SellerController) Delete() gin.HandlerFunc {
 }
 
 type request struct {
-	Cid int `json:"Cid" binding:"required"`
-	CompanyName string `json:"CompanyName" binding:"required"`
-	Address string `json:"Address" binding:"required"`
-	Telephone string `json:"Telephone" binding:"required"`
+	Cid int `json:"cid" binding:"required"`
+	CompanyName string `json:"company_name" binding:"required"`
+	Address string `json:"address" binding:"required"`
+	Telephone string `json:"telephone" binding:"required"`
+	LocalityId int `json:"locality_id" binding:"required"`
 }
 

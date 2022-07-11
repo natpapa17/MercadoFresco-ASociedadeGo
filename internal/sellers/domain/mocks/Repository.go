@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	sellers "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
+	sellers "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/domain"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -92,19 +92,19 @@ func (_m *Repository) LastID() (int, error) {
 }
 
 // Store provides a mock function with given fields: id, cid, companyName, address, telephone
-func (_m *Repository) Store(id int, cid int, companyName string, address string, telephone string) (sellers.Seller, error) {
-	ret := _m.Called(id, cid, companyName, address, telephone)
+func (_m *Repository) Store(id int, cid int, companyName string, address string, telephone string, localityId int) (sellers.Seller, error) {
+	ret := _m.Called(id, cid, companyName, address, telephone, localityId)
 
 	var r0 sellers.Seller
-	if rf, ok := ret.Get(0).(func(int, int, string, string, string) sellers.Seller); ok {
-		r0 = rf(id, cid, companyName, address, telephone)
+	if rf, ok := ret.Get(0).(func(int, int, string, string, string, int) sellers.Seller); ok {
+		r0 = rf(id, cid, companyName, address, telephone, localityId)
 	} else {
 		r0 = ret.Get(0).(sellers.Seller)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(int, int, string, string, string) error); ok {
-		r1 = rf(id, cid, companyName, address, telephone)
+	if rf, ok := ret.Get(1).(func(int, int, string, string, string, int) error); ok {
+		r1 = rf(id, cid, companyName, address, telephone, localityId)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -113,19 +113,19 @@ func (_m *Repository) Store(id int, cid int, companyName string, address string,
 }
 
 // Update provides a mock function with given fields: id, cid, companyName, address, telephone
-func (_m *Repository) Update(id int, cid int, companyName string, address string, telephone string) (sellers.Seller, error) {
-	ret := _m.Called(id, cid, companyName, address, telephone)
+func (_m *Repository) Update(id int, cid int, companyName string, address string, telephone string, localityId int) (sellers.Seller, error) {
+	ret := _m.Called(id, cid, companyName, address, telephone, localityId)
 
 	var r0 sellers.Seller
-	if rf, ok := ret.Get(0).(func(int, int, string, string, string) sellers.Seller); ok {
-		r0 = rf(id, cid, companyName, address, telephone)
+	if rf, ok := ret.Get(0).(func(int, int, string, string, string, int) sellers.Seller); ok {
+		r0 = rf(id, cid, companyName, address, telephone, localityId)
 	} else {
 		r0 = ret.Get(0).(sellers.Seller)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(int, int, string, string, string) error); ok {
-		r1 = rf(id, cid, companyName, address, telephone)
+	if rf, ok := ret.Get(1).(func(int, int, string, string, string, int) error); ok {
+		r1 = rf(id, cid, companyName, address, telephone, localityId)
 	} else {
 		r1 = ret.Error(1)
 	}
