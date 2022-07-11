@@ -14,11 +14,3 @@ type Product struct {
 	Product_Type_Id                  int     `json:"product_type_id"`
 	Seller_Id                        int     `json:"seller_id"`
 }
-
-type ProductRecords struct {
-	Id               int    `json:"id"`
-	Last_Update_Data string `json:"last_update_data"`
-	Purchase_Price   int    `json:"purchase_price"`
-	Sale_Price       int    `json:"sale_price"`
-	Product_Id       int    `json:"product_id"`
-}

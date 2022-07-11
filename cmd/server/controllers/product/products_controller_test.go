@@ -180,7 +180,7 @@ func TestCreateProduct(t *testing.T) {
 		req, _ := http.NewRequest(http.MethodPost, "/products", makeValidCreateBody())
 		r.ServeHTTP(rr, req)
 
-		assert.Equal(t, http.StatusNotFound, rr.Code)
+		assert.Equal(t, http.StatusConflict, rr.Code)
 	})
 
 	t.Run("create_fail_422", func(t *testing.T) {

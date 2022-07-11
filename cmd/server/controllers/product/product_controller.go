@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/products"
@@ -32,7 +33,6 @@ func (c *ProductController) GetAll() gin.HandlerFunc {
 
 func (c *ProductController) GetById() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		fmt.Print("teste")
 		id, err := strconv.Atoi(ctx.Param("id"))
 		if err != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{
@@ -100,6 +100,10 @@ func (c *ProductController) Create() gin.HandlerFunc {
 		p, err := c.service.Create(req.ProductCode, req.Description, req.Width, req.Height, req.Length, req.NetWeight, req.ExpirationRate, req.RecommendedFreezingTemperature, req.FreezingRate, req.ProductTypeId, req.SellerId)
 
 		if err != nil {
+			if strings.Contains(err.Error(), "is already in use") {
+				ctx.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+				return
+			}
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
 		}

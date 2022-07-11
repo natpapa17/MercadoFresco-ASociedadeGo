@@ -8,11 +8,15 @@ import (
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/buyer"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/product"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/record"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/section"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/db"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 	carrier_factories "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/carriers/factories"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/employee"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/products"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/records"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/records/products_rec"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/adapters"
@@ -21,14 +25,15 @@ import (
 )
 
 func ConfigRoutes(r *gin.Engine) *gin.Engine {
-	productsFilePath, err := filepath.Abs("" + filepath.Join("data", "products.json"))
-	if err != nil {
-		log.Fatal("can't load products data file")
-	}
-	productsFile := store.New(store.FileType, productsFilePath)
-	pr := products.NewRepository(productsFile)
+
+	pr := products.NewMysqlRepository(db.GetInstance())
 	ps := products.NewProductService(pr)
 	pc := product.NewProductController(ps)
+
+	rr := records.NewMysqlRepository(db.GetInstance())
+	rrp := products_rec.NewMysqlProductRepository(db.GetInstance())
+	rs := records.NewRecordsService(rr, rrp)
+	rc := record.NewRecordController(rs)
 
 	BuyersFilePath, err := filepath.Abs("" + filepath.Join("data", "buyers.json"))
 	if err != nil {
@@ -130,6 +135,13 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			carriers.POST("/", carrierController.CreateCarrier)
 			carriers.GET("/:id", carrierController.GetNumberOfCarriersPerLocality)
 		}
+
+		records := mux.Group("records")
+		{
+			records.GET("/", rc.GetRecordsPerProduct())
+			records.POST("/:id", rc.Create())
+		}
+
 	}
 
 	return r
