@@ -7,3 +7,9 @@ type Records struct {
 	Sale_Price       int    `json:"sale_price"`
 	Product_Id       int    `json:"product_id"`
 }
+
+type ReportRecords struct {
+	Product_Id    int
+	Description   string
+	Records_Count int
+}

@@ -89,9 +89,9 @@ func (r *mysqlRepository) Create(product_code string, description string, width 
 		return Product{}, err
 	}
 
-	const query = `INSERT INTO products (product_code, description, width, height, length, net_weight, expiration_rate, recommended_freezing_temperature, freezing_rate, product_type_id, seller_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	const query = `INSERT INTO product (product_code, description, width, height, length, net_weight, expiration_rate, recommended_freezing_temperature, freezing_rate, product_type_id, seller_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
-	res, err := tx.Exec(query, product_code, description, width, height, length, net_weight, expiration_rate, recommended_freezing_temperature, freezing_rate, product_code, seller_id)
+	res, err := tx.Exec(query, product_code, description, width, height, length, net_weight, expiration_rate, recommended_freezing_temperature, freezing_rate, product_type_id, seller_id)
 
 	if err != nil {
 		_ = tx.Rollback()

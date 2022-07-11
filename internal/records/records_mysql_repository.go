@@ -2,12 +2,10 @@ package records
 
 import (
 	"database/sql"
-	"errors"
 )
 
 type Repository interface {
 	GetRecordsPerProduct(product_id int) (int, error)
-	GetByProductId(id int) (Records, error)
 	Create(last_update_date string, purchase_price int, sale_price int, product_id int) (Records, error)
 }
 
@@ -22,7 +20,7 @@ func NewMysqlRepository(db *sql.DB) Repository {
 }
 
 func (r *mysqlRepository) GetRecordsPerProduct(product_id int) (int, error) {
-	const query = `SELECT COUNT(*) FROM records WHERE product_id=?`
+	const query = `SELECT COUNT(*) FROM product_record WHERE product_id=?`
 
 	quantity := 0
 	err := r.db.QueryRow(query, product_id).Scan(&quantity)
@@ -34,23 +32,6 @@ func (r *mysqlRepository) GetRecordsPerProduct(product_id int) (int, error) {
 	return quantity, nil
 }
 
-func (r *mysqlRepository) GetByProductId(product_id int) (Records, error) {
-	const query = `SELECT id, last_update_date, purchase_price, sale_price, product_id FROM records WHERE id=?`
-
-	rec := Records{}
-	err := r.db.QueryRow(query, product_id).Scan(&rec.Id, &rec.Last_Update_Date, &rec.Purchase_Price, &rec.Sale_Price, &rec.Product_Id)
-
-	if errors.Is(err, sql.ErrNoRows) {
-		return Records{}, errors.New("product not found")
-	}
-
-	if err != nil {
-		return Records{}, err
-	}
-
-	return rec, nil
-}
-
 func (r *mysqlRepository) Create(last_update_date string, purchase_price int, sale_price int, product_id int) (Records, error) {
 	tx, err := r.db.Begin()
 
@@ -58,7 +39,7 @@ func (r *mysqlRepository) Create(last_update_date string, purchase_price int, sa
 		return Records{}, err
 	}
 
-	const query = `INSERT INTO records (last_update_date, purchase_price, sale_price, product_id) values (?, ?, ?, ?)`
+	const query = `INSERT INTO product_record (last_update_date, purchase_price, sale_price, product_id) values (?, ?, ?, ?)`
 
 	res, err := tx.Exec(query, last_update_date, purchase_price, sale_price, product_id)
 

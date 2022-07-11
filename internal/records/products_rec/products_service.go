@@ -5,12 +5,12 @@ type Service interface {
 }
 
 type service struct {
-	repository Repository
+	repository ProductRepository
 }
 
-func NewProductService(r Repository) Service {
+func NewProductService(p ProductRepository) Service {
 	return &service{
-		repository: r,
+		repository: p,
 	}
 }
 

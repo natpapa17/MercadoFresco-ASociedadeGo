@@ -1,45 +1,52 @@
 package records
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/records/products_rec"
+)
 
 type Service interface {
-	GetRecordsPerProduct(product_id int) (int, error)
-	GetByProductId(id int) (Records, error)
+	GetRecordsPerProduct(product_id int) (ReportRecords, error)
 	Create(last_update_date string, purchase_price int, sale_price int, product_id int) (Records, error)
 }
 
 type service struct {
-	repository Repository
+	repository        Repository
+	productRepository products_rec.ProductRepository
 }
 
-func NewRecordsService(r Repository) Service {
+func NewRecordsService(r Repository, p products_rec.ProductRepository) Service {
 	return &service{
-		repository: r,
+		repository:        r,
+		productRepository: p,
 	}
 }
 
-func (s *service) GetRecordsPerProduct(product_id int) (int, error) {
+func (s *service) GetRecordsPerProduct(product_id int) (ReportRecords, error) {
+	product, err := s.productRepository.GetById(product_id)
+
+	if err != nil {
+		return ReportRecords{}, err
+	}
+
 	rs, err := s.repository.GetRecordsPerProduct(product_id)
 
 	if err != nil {
-		return 0, err
+		return ReportRecords{}, err
 	}
 
-	return rs, nil
-}
-
-func (s *service) GetByProductId(id int) (Records, error) {
-	rs, err := s.repository.GetByProductId(id)
-
-	if err != nil {
-		return Records{}, err
+	result := ReportRecords{
+		Product_Id:    product_id,
+		Description:   product.Description,
+		Records_Count: rs,
 	}
 
-	return rs, nil
+	return result, nil
 }
 
 func (s *service) Create(last_update_date string, purchase_price int, sale_price int, product_id int) (Records, error) {
-	hasProductId, err := s.repository.GetByProductId(product_id)
+	hasProductId, err := s.productRepository.GetById(product_id)
 
 	if hasProductId.Id != 0 {
 		return Records{}, errors.New("product already in use")

@@ -1,4 +1,4 @@
-package records
+package record
 
 import (
 	"net/http"
@@ -22,51 +22,28 @@ func NewRecordController(p records.Service) *RecordController {
 
 func (c *RecordController) GetRecordsPerProduct() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		id, err := strconv.Atoi(ctx.Param("id"))
+		ids := ctx.QueryArray("id")
 
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
+		result := []records.ReportRecords{}
+
+		for _, string_id := range ids {
+			id, _ := strconv.Atoi(string_id)
+
+			r, err := c.service.GetRecordsPerProduct(id)
+
+			if err != nil {
+				ctx.JSON(http.StatusNotFound, gin.H{
+					"error": err.Error(),
+				})
+				return
+			}
+
+			result = append(result, r)
 		}
-		r, err := c.service.GetRecordsPerProduct(id)
 
-		if err == nil {
-			ctx.JSON(http.StatusOK, gin.H{
-				"data": r,
-			})
-			return
-		}
-
-		if err != nil {
-			ctx.JSON(http.StatusNotFound, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-	}
-}
-
-func (c *RecordController) GetByProductId() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		id, err := strconv.Atoi(ctx.Param("id"))
-
-		if err != nil {
-			ctx.JSON(http.StatusNotFound, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-		r, err := c.service.GetByProductId(id)
-
-		if err != nil {
-			ctx.JSON(http.StatusNotFound, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-		ctx.JSON(http.StatusOK, r)
+		ctx.JSON(http.StatusOK, gin.H{
+			"data": result,
+		})
 	}
 }
 

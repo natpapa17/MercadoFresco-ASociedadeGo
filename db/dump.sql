@@ -105,8 +105,8 @@ CREATE TABLE IF NOT EXISTS `fresh_market`.`product` (
   `description` VARCHAR(255) NOT NULL,
   `expiration_rate` DECIMAL(19,2) NOT NULL,
   `freezing_rate` DECIMAL(19,2) NOT NULL,
-  `heigth` DECIMAL(19,2) NOT NULL,
-  `lenght` DECIMAL(19,2) NOT NULL,
+  `height` DECIMAL(19,2) NOT NULL,
+  `length` DECIMAL(19,2) NOT NULL,
   `net_weight` DECIMAL(19,2) NOT NULL,
   `product_code` VARCHAR(255) NOT NULL,
   `recommended_freezing_temperature` DECIMAL(19,2) NOT NULL,
@@ -430,3 +430,9 @@ ENGINE = InnoDB;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+INSERT INTO `fresh_market`.`product_type` (`id`, `description`) VALUES (1, "processados");
+INSERT INTO `fresh_market`.`country` (`id`,`name`) VALUES (1, "brasil");
+INSERT INTO `fresh_market`.`province` (`id`, `name`, `country_id`) VALUES (1, "sao paulo", 1);
+INSERT INTO `fresh_market`.`locality` (`id`, `name`, `province_id`) VALUES (1, "sao paulo", 1);
+INSERT INTO `fresh_market`.`seller` (`id`, `cid`, `company_name`, `address`, `telephone`, `locality_id`) VALUES (1, "teste", "teste", "teste", "teste", 1);

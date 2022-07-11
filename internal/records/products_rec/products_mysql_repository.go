@@ -8,26 +8,19 @@ type ProductMysqlRepository struct {
 	db *sql.DB
 }
 
-func NewMysqlRepository(db *sql.DB) Repository {
+func NewMysqlProductRepository(db *sql.DB) ProductRepository {
 	return &ProductMysqlRepository{
 		db: db,
 	}
 }
 
 func (r *ProductMysqlRepository) GetById(id int) (Product, error) {
-	const query = `SELECT * FROM product WHERE id=?`
-
-	rows, err := r.db.Query(query)
-
-	if err != nil {
-		return Product{}, err
-	}
-
-	defer rows.Close()
-
+	const query = `SELECT id, description FROM product WHERE id=?`
 	product := Product{}
 
-	if err = rows.Err(); err != nil {
+	err := r.db.QueryRow(query, id).Scan(&product.Id, &product.Description)
+
+	if err != nil {
 		return Product{}, err
 	}
 

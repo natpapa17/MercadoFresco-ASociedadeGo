@@ -1,5 +1,5 @@
 package products_rec
 
-type Repository interface {
+type ProductRepository interface {
 	GetById(id int) (Product, error)
 }
