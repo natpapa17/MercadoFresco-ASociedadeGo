@@ -53,7 +53,7 @@ func TestReportAll(t *testing.T) {
 	FROM fresh_market.locality
 	INNER JOIN seller ON locality.Id = seller.locality_id
 	GROUP BY locality_Id;`
-	t.Run("ReportAll - OK", func(t *testing.T) {
+	t.Run("ReportAll OK", func(t *testing.T) {
 		rows := sqlmock.NewRows([]string{
 			"LocalityId",
 			"LocalityName",
@@ -76,7 +76,7 @@ func TestReportAll(t *testing.T) {
 		assert.Equal(t, result[0].Locality_id, reports[0].Locality_id)
 		assert.Equal(t, result[1].Locality_id, reports[1].Locality_id)
 	})
-	t.Run("GenerateReportAll - Fail Scan", func(t *testing.T) {
+	t.Run(" Fail Scan", func(t *testing.T) {
 		rows := sqlmock.NewRows([]string{
 			"locality_id",
 			"Name",
@@ -88,7 +88,7 @@ func TestReportAll(t *testing.T) {
 		_, err = localityRepo.ReportAll()
 		assert.Error(t, err)
 	})
-	t.Run("GetAll - Fail Select/Read", func(t *testing.T) {
+	t.Run(" Fail Select/Read", func(t *testing.T) {
 		_, err = localityRepo.ReportAll()
 		assert.Error(t, err)
 		mock.ExpectQuery(query).WillReturnError(sql.ErrNoRows)
@@ -126,7 +126,7 @@ func TestReportById(t *testing.T) {
 
 		assert.Equal(t, localityReports[0].Locality_id, result.Locality_id)
 	})
-	t.Run("Generate report by ID - Fail prepar query", func(t *testing.T) {
+	t.Run("Fail prepar query", func(t *testing.T) {
 
 		db, mock, err := sqlmock.New()
 		assert.NoError(t, err)
@@ -138,7 +138,7 @@ func TestReportById(t *testing.T) {
 		assert.Equal(t, fmt.Errorf("Fail to prepar query"), err)
 
 	})
-	t.Run("Get ID - Locality Not found", func(t *testing.T) {
+	t.Run(" Locality Not found", func(t *testing.T) {
 
 		db, mock, err := sqlmock.New()
 		assert.NoError(t, err)
