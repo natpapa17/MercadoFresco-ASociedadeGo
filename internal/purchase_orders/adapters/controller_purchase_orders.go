@@ -128,8 +128,8 @@ func (br *purchaseOrdersRequest) Validate() error {
 }
 
 func CustomError(e error) bool {
-	var be *buyers.BusinessRuleError
-	var fe *buyers.NoElementInFileError
+	var be *purchase_orders.BusinessRuleError
+	var fe *purchase_orders.NoElementInFileError
 
 	if errors.As(e, &be) {
 		return true
