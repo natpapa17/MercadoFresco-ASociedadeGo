@@ -5,5 +5,5 @@ import (
 )
 
 type PurchaseOrderRepository interface {
-	Create(OrderNumber string, OrderDate string, TrackingCode string, BuyerId int, ProductRecordId int, OrderStatusId int) (domain.Purchase_Order, error)
+	Create(orderNumber string, orderDate string, trackingCode string, buyerId int, productRecordId int, orderStatusId int) (domain.Purchase_Order, error)
 }
