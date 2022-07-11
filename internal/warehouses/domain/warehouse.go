@@ -1,4 +1,4 @@
-package warehouses
+package domain
 
 type Warehouse struct {
 	Id                 int     `json:"id"`
@@ -8,3 +8,5 @@ type Warehouse struct {
 	MinimumCapacity    int     `json:"minimum_capacity"`
 	MinimumTemperature float64 `json:"minimum_temperature"`
 }
+
+type Warehouses []Warehouse
