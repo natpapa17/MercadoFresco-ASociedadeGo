@@ -19,7 +19,7 @@ type PurchaseOrderController struct {
 }
 
 func CreatePurchaseOrderController(pos purchase_orders.Service) *PurchaseOrderController {
-	return &BuyerController{
+	return &PurchaseOrderController{
 		service: pos,
 	}
 }
@@ -89,7 +89,7 @@ func (bc *PurchaseOrderController) GetPurchaseOrderById(ctx *gin.Context) {
 }
 
 
-type buyerRequest struct {
+type purchaseOrdersRequest struct {
 	ID int `json:"id"`
 	OrderNumber string `json:"order_number"`
 	OrderDate string `json:"order_date"`
@@ -99,7 +99,7 @@ type buyerRequest struct {
 	OrderStatusId int `json:"order_status_id"`
 }
 
-func (br *buyerRequest) Validate() error {
+func (br *purchaseOrdersRequest) Validate() error {
 	if strings.TrimSpace(br.OrderNumber) == "" {
 		return errors.New("order number can't be empty")
 	}
@@ -121,7 +121,7 @@ func (br *buyerRequest) Validate() error {
 	}
 
 	if strings.TrimSpace(br.OrderStatusId) == "" {
-		return errors.New("order status can't be empty")
+		return errors.New("order status id can't be empty")
 	}
 
 	return nil
