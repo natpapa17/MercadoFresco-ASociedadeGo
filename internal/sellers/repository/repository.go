@@ -42,7 +42,7 @@ func (r *repository) LastID() (int, error) {
 func (r *repository) GetAll() ([]domain.Seller, error) {
 	var sl []domain.Seller 
 	if err := r.db.Read(&sl); err != nil {
-		return []domain.Seller{}, nil
+		return []domain.Seller{},err
 	}
 	return sl, nil
 }

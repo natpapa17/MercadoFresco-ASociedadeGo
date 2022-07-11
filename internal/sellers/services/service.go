@@ -1,7 +1,7 @@
 package services
 import(
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/domain"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/repository"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/repository/mySql"
 
 ) 
 

@@ -13,8 +13,17 @@ type mySqlRepository struct {
 	db *sql.DB
 }
 
+type Repository interface{
+	GetAll() ([]domain.Seller, error)
+	GetById(id int) (domain.Seller, error)
+	Store(id int, cid int, companyName string, address string , telephone string , localityId int) (domain.Seller , error)
+	LastID() (int, error)
+	Update(id , cid int, companyName, address, telephone string, localityId int) (domain.Seller, error)
+	Delete(id int) error
+}
+
 func (r *mySqlRepository) Delete(id int) error {
-	const query = `DELETE FROM sellers WHERE id=?`
+	const query = `DELETE FROM seller WHERE id=?`
 
 	res, err := r.db.Exec(query, id)
 
@@ -36,7 +45,7 @@ func (r *mySqlRepository) Delete(id int) error {
 }
 
 func (r *mySqlRepository) GetAll() ([]domain.Seller, error) {
-	const query = `SELECT * FROM sellers`
+	const query = `SELECT * FROM seller`
 
 	rows, err := r.db.Query(query)
 
@@ -63,20 +72,26 @@ func (r *mySqlRepository) GetAll() ([]domain.Seller, error) {
 
 
 func (r *mySqlRepository) GetById(id int) (domain.Seller, error) {
-	const query = `SELECT * FROM sellers WHERE id=?`
-
-	row := r.db.QueryRow(query, id)
-
-	s := domain.Seller{}
-	row.Scan(&s.Id, &s.Cid, &s.CompanyName, &s.Address, &s.Telephone)
-
-	if err := row.Err(); err != nil {
+	stmt, err := r.db.Prepare("SELECT * FROM seller WHERE id = ?")
+	if err != nil {
 		return domain.Seller{}, err
 	}
+	defer stmt.Close()
 
+	seller := domain.Seller{}
 
-
-	return s, nil
+	err = stmt.QueryRow(id).Scan(
+		&seller.Id,
+		&seller.Cid,
+		&seller.CompanyName,
+		&seller.Address,
+		&seller.Telephone,
+		&seller.LocalityId,
+	)
+	if err != nil {
+		return seller, fmt.Errorf("Seller %d not found", id)
+	}
+	return seller, nil
 }
 
 func (*mySqlRepository) LastID() (int, error) {
@@ -84,45 +99,70 @@ func (*mySqlRepository) LastID() (int, error) {
 }
 
 func (r *mySqlRepository) Store( id, cid int, companyName string, address string, telephone string, localityId int) (domain.Seller, error) {
-	tx, err := r.db.Begin()
+	stmt, err := r.db.Prepare(`INSERT INTO seller
+	(cid,
+	company_name,
+	address,
+   	telephone,
+	locality_id) 
+   	VALUES(?,?,?,?,?)`)
 
 	if err != nil {
 		return domain.Seller{}, err
 	}
+	defer stmt.Close()
 
-	const query = `INSERT INTO seller (cid, companyName, address, telephone, localityId) VALUES (?, ?, ?, ?, ?, ?)`
-
-	res, err := tx.Exec(query, cid, companyName, address, telephone, localityId)
-
+	rows, err := stmt.Exec(
+		cid,
+		companyName,
+		address,
+		telephone,
+		localityId,
+	)
 	if err != nil {
-		_ = tx.Rollback()
 		return domain.Seller{}, err
 	}
-
-	if err = tx.Commit(); err != nil {
+	lastID, err := rows.LastInsertId()
+	if err != nil {
 		return domain.Seller{}, err
 	}
-
-	a, err := res.LastInsertId()
-		if err != nil {
-			return domain.Seller{}, err
-		}
-
-	return domain.Seller{
-		Id:                 int(a),
-		Cid:      cid,
-		CompanyName:            companyName,
-		Address:          address,
-		Telephone:    telephone,
-		LocalityId: localityId,
-		
-	}, nil
+	newSeller := domain.Seller{int(lastID), cid, companyName, address, telephone, localityId}
+	return newSeller, nil
 }
 
 
-func (r *mySqlRepository) Update(id int, cid int, companyName string, address string, telephone string, localityId int) (domain.Seller, error) {
+func (r *mySqlRepository) Update(id int, cid int, companyName string, address string, telephone string, locality_Id int) (domain.Seller, error) {
 	
-	panic("unimplemented")
+	updatedSeller := domain.Seller{id, cid, companyName, address, telephone, locality_Id}
+	stmt, err := r.db.Prepare(`UPDATE seller SET 
+	 	cid=?,
+	  	company_name=?,
+		address=?,
+		telephone=?,
+		locality_id=? WHERE id=?`)
+	if err != nil {
+		return domain.Seller{}, err
+	}
+
+	defer stmt.Close()
+
+	rows, err := stmt.Exec(
+		cid,
+		companyName,
+		address,
+		telephone,
+		locality_Id,
+		id)
+	if err != nil {
+		
+		return updatedSeller, err
+	}
+
+	_, err = rows.RowsAffected()
+	if err != nil {
+		return domain.Seller{}, err
+	}
+	return updatedSeller, nil
 }
 
 
