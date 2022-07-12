@@ -65,7 +65,7 @@ func (r *mySqlRepository) Create(name string, province_id int) (domain.Locality 
 	}, nil
 	
 }
-//getby id country e provincy no repository
+
 
 
 func (r *mySqlRepository) GetAll() ([]domain.Locality, error) {

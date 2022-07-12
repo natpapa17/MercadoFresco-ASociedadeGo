@@ -16,8 +16,7 @@ import (
 
 
 func TestGetAll(t *testing.T) {
-	mockRepo := mocks.NewRepository(t)
-
+	mockRepo := mocks.NewNRepository(t)
 	s := domain.Seller{
 		Id:    1,
 		Cid:  1,
@@ -59,7 +58,7 @@ func TestGetAll(t *testing.T) {
 
 
 func TestDelete(t *testing.T) {
-	mockRepo := mocks.NewRepository(t)
+	mockRepo := mocks.NewNRepository(t)
 	s := sellers.NewService(mockRepo)
 	t.Run("Should call Delete from seller repository with correct id", func(t *testing.T) {
 		mockRepo.
@@ -97,7 +96,7 @@ func TestDelete(t *testing.T) {
 
 
 func TestStore(t *testing.T){
-	mockRepo := mocks.NewRepository(t)
+	mockRepo := mocks.NewNRepository(t)
 	expectSeller := domain.Seller{
 		Id:    1,
 		Cid:  1,
@@ -108,8 +107,8 @@ func TestStore(t *testing.T){
 	}
 
 	t.Run("if the fields are correct, the new seller will be stored", func(t *testing.T) {
-		mockRepo.On("LastID").Return(1, nil).Once()
-		mockRepo.On("Store",  mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int")).Return(expectSeller, nil).Once()
+		
+		mockRepo.On("Store",   mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int")).Return(expectSeller, nil).Once()
 
 		service := sellers.NewService(mockRepo)
 
@@ -121,9 +120,9 @@ func TestStore(t *testing.T){
 }
 
 func TestUpdate(t *testing.T){
-	mockRepo := mocks.NewRepository(t)
+	mockRepo := mocks.NewNRepository(t)
 	expectSeller := domain.Seller{
-		Id:    1,
+		
 		Cid:  1,
 		CompanyName:  "None",
 		Address: "none",
@@ -134,7 +133,7 @@ func TestUpdate(t *testing.T){
 	
 		mockRepo.On("Update", mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int")).Return(expectSeller, nil).Once()
 		service := sellers.NewService(mockRepo)
-		result, _ := service.Update( int(1),int(219), "Name", "Addres", "telephone", 1)
+		result, _ := service.Update( int(1),int(219), "Name", "Addres", "telephone", int(1))
 		
 		assert.Equal(t, expectSeller, result)
 
@@ -155,7 +154,7 @@ func TestUpdate(t *testing.T){
 
 
 func TestGetById(t *testing.T){
-	mockRepo := mocks.NewRepository(t)
+	mockRepo := mocks.NewNRepository(t)
 
 	expectedSellersList := []domain.Seller{
 		{

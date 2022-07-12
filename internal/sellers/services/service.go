@@ -14,11 +14,11 @@ type Service interface {
 }
 
 type service struct {
-	repository repository.Repository
+	repository repository.NRepository
 
 }
 
-func NewService(r repository.Repository) Service {
+func NewService(r repository.NRepository) Service {
 	return &service{
 		repository: r,
 	}
@@ -43,15 +43,9 @@ func (s service) GetById (id int) (domain.Seller, error){
 
 
 func (s service) Store(cid int, companyName string, address string , telephone string, localityId int) (domain.Seller, error) {
-	lastID, err := s.repository.LastID()
 
-	if err != nil {
-		return domain.Seller{}, err
-	}
 
-	lastID++
-
-	seller, err := s.repository.Store(lastID, cid, companyName, address, telephone, localityId)
+	seller, err := s.repository.Store( cid, companyName, address, telephone, localityId)
 
 	if err != nil {
 		return domain.Seller{}, err

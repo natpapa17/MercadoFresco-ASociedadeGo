@@ -2,22 +2,21 @@ package repository
 
 import (
 	"database/sql"
-	
+
 	"fmt"
 
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/domain"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/repository"
 )
 
 type mySqlRepository struct {
 	db *sql.DB
 }
 
-type Repository interface{
+type NRepository interface{
 	GetAll() ([]domain.Seller, error)
 	GetById(id int) (domain.Seller, error)
-	Store(id int, cid int, companyName string, address string , telephone string , localityId int) (domain.Seller , error)
-	LastID() (int, error)
+	Store( cid int, companyName string, address string , telephone string , localityId int) (domain.Seller , error)
+	
 	Update(id , cid int, companyName, address, telephone string, localityId int) (domain.Seller, error)
 	Delete(id int) error
 }
@@ -94,11 +93,9 @@ func (r *mySqlRepository) GetById(id int) (domain.Seller, error) {
 	return seller, nil
 }
 
-func (*mySqlRepository) LastID() (int, error) {
-	panic("unimplemented")
-}
 
-func (r *mySqlRepository) Store( id, cid int, companyName string, address string, telephone string, localityId int) (domain.Seller, error) {
+
+func (r *mySqlRepository) Store(  cid int, companyName string, address string, telephone string, localityId int) (domain.Seller, error) {
 	stmt, err := r.db.Prepare(`INSERT INTO seller
 	(cid,
 	company_name,
@@ -166,7 +163,7 @@ func (r *mySqlRepository) Update(id int, cid int, companyName string, address st
 }
 
 
-func CreateMySQLRepository(db *sql.DB) repository.Repository {
+func CreateMySQLRepository(db *sql.DB) NRepository {
 	return &mySqlRepository{
 		db: db,
 	}
