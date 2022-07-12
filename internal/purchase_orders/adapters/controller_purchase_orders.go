@@ -59,29 +59,42 @@ func (poc *PurchaseOrderController) CreatePurchaseOrder(ctx *gin.Context) {
 	})
 }
 
+// transferir para buyer
 func (bc *PurchaseOrderController) GetPurchaseOrderById(ctx *gin.Context) {
-	id, err := strconv.Atoi(ctx.Param("id"))
+	ids := ctx.QueryArray("id")
 
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid id",
-		})
-		return
-	}
+	returnArray := []
 
-	b, err := bc.service.GetPurchaseOrderById(id)
-	if err != nil {
-		if CustomError(err) {
-			ctx.JSON(http.StatusNotFound, gin.H{
-				"error": err.Error(),
+	
+	for _, stringId := range ids {
+		id, err := strconv.Atoi(stringId)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"error": "invalid id",
 			})
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "internal server error",
-		})
-		return
+		
+		b, err := bc.service.GetPurchaseOrderById(id)
+		if err != nil {
+			if CustomError(err) {
+				ctx.JSON(http.StatusNotFound, gin.H{
+					"error": err.Error(),
+				})
+				return
+			}
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"error": "internal server error",
+			})
+			return
+		}
+		returnArray = append(returnArray,b)
+
+		return 
+
 	}
+
+
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": b,
