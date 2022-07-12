@@ -35,3 +35,29 @@ func (r *localityMySQLRepositoryAdapter) GetById(id int) (domain.Locality, error
 
 	return locality, nil
 }
+
+func (r *localityMySQLRepositoryAdapter) GetAll() (domain.Localities, error) {
+	const query = `SELECT id, name, province_id FROM locality`
+
+	rows, err := r.db.Query(query)
+
+	if err != nil {
+		return domain.Localities{}, err
+	}
+
+	defer rows.Close()
+
+	localities := domain.Localities{}
+
+	for rows.Next() {
+		locality := domain.Locality{}
+		rows.Scan(&locality.Id, &locality.Name, &locality.ProvinceId)
+		localities = append(localities, locality)
+	}
+
+	if err = rows.Err(); err != nil {
+		return domain.Localities{}, err
+	}
+
+	return localities, nil
+}

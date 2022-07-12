@@ -5,3 +5,5 @@ type Locality struct {
 	Name       string `json:"locality_name"`
 	ProvinceId int    `json:"province_name"`
 }
+
+type Localities []Locality

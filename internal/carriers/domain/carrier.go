@@ -9,8 +9,10 @@ type Carrier struct {
 	LocalityId  int    `json:"locality_id"`
 }
 
-type NumberOfCarriersPerLocality struct {
+type ReportNumberOfCarriersPerLocality struct {
 	LocalityId    int    `json:"locality_id"`
 	LocalityName  string `json:"locality_name"`
 	CarriersCount int    `json:"carriers_count"`
 }
+
+type ReportsNumberOfCarriersPerLocality []ReportNumberOfCarriersPerLocality

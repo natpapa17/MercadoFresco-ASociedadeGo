@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/carriers/domain"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/carriers/usecases"
 )
 
@@ -67,11 +66,28 @@ func (cc *CarrierController) CreateCarrier(ctx *gin.Context) {
 }
 
 func (cc *CarrierController) GetNumberOfCarriersPerLocality(ctx *gin.Context) {
-	ids := ctx.QueryArray("id")
+	stringIds := ctx.QueryArray("id")
 
-	result := []domain.NumberOfCarriersPerLocality{}
+	if len(stringIds) == 0 {
+		report, err := cc.service.GetAllNumberOfCarriersPerLocality()
 
-	for _, stringId := range ids {
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"error": "internal server error",
+			})
+			return
+		}
+
+		ctx.JSON(http.StatusOK, gin.H{
+			"data": report,
+		})
+
+		return
+	}
+
+	ids := []int{}
+
+	for _, stringId := range stringIds {
 		id, err := strconv.Atoi(stringId)
 
 		if err != nil {
@@ -80,31 +96,27 @@ func (cc *CarrierController) GetNumberOfCarriersPerLocality(ctx *gin.Context) {
 			})
 			return
 		}
-		report, err := cc.service.GetNumberOfCarriersPerLocality(id)
 
-		if err == nil {
-			result = append(result, report)
-			continue
-		}
+		ids = append(ids, id)
+	}
 
-		if errors.Is(err, usecases.ErrInvalidLocalityId) {
-			continue
-		}
+	reports, err := cc.service.GetNumberOfCarriersPerLocalities(ids)
 
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "internal server error",
 		})
 	}
 
-	if len(result) == 0 {
+	if len(reports) == 0 {
 		ctx.JSON(http.StatusNotFound, gin.H{
-			"data": result,
+			"data": reports,
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"data": result,
+		"data": reports,
 	})
 }
 
