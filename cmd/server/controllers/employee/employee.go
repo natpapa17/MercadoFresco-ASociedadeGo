@@ -11,10 +11,10 @@ import (
 )
 
 type employeeRequest struct {
-	Card_number_id int    `json:"card_number_id" binding:"required"`
+	Card_number_id int    `json:"card_number_id"`
 	First_name     string `json:"first_name" binding:"required"`
 	Last_name      string `json:"last_name" binding:"required"`
-	Warehouse_id   int    `json:"warehouse_id" binding:"required"`
+	Warehouse_id   int    `json:"warehouse_id"`
 }
 
 func (er *employeeRequest) Validate() error {
@@ -75,7 +75,7 @@ func (ec *EmployeeController) CreateEmployee(ctx *gin.Context) {
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+			"error": "internal server error",
 		})
 		return
 	}
@@ -118,7 +118,7 @@ func (ec *EmployeeController) GetByIdEmployee(ctx *gin.Context) {
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+			"error": "internal server error",
 		})
 		return
 	}

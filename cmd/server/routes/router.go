@@ -64,11 +64,12 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 		log.Fatal("can't load employee data file")
 	}
 	employeeFile := store.New(store.FileType, employeeFilePath)
+	wer := employee.CreateWarehouseRepository(warehouseFile)
 	er := employee.CreateRepository(employeeFile)
-	es := employee.CreateService(er, wr)
+	es := employee.CreateService(er, wer)
 	ec := employees.CreateEmployeeController(es)
 
-	mux := r.Group("api/")
+	mux := r.Group("api/v1")
 	{
 		warehouse := mux.Group("warehouses")
 		{
