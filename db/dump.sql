@@ -450,5 +450,3 @@ INSERT INTO `fresh_market`.`seller` (`id`, `cid`, `company_name`, `address`, `te
 INSERT INTO `fresh_market`.`product` (`id`, `description`, `expiration_rate`, `freezing_rate`, `height`, `length`, `net_weight`, `product_code`, `recommended_freezing_temperature`, `width`, `seller_id`, `product_type_id`) VALUES (1, "Cafe", 1, 2, 6.4 , 4.5, 3.4, "PROD01", 1.3, 1.2, 1, 1);
 
 INSERT INTO `fresh_market`.`product_record` (`id`, `last_update_date`, `purchase_code`, `sale_price`, `product_id`) VALUES (1, curdate(), 5, 10, 1);
-
-INSERT INTO seller(cid, company_name, address, telephone, locality_id) VALUES(1, "none", "none", "none", 1);
