@@ -27,7 +27,7 @@ func NewService(r Repository) Service {
 	}
 }
 
-func (s service) GetAll(ctx context.Context) ([]Section, error) {
+func (s *service) GetAll(ctx context.Context) ([]Section, error) {
 	ss, err := s.repository.GetAll(ctx)
 	if err != nil {
 		return nil, err
@@ -35,7 +35,7 @@ func (s service) GetAll(ctx context.Context) ([]Section, error) {
 	return ss, nil
 }
 
-func (s service) GetById(ctx context.Context, id int) (Section, error) {
+func (s *service) GetById(ctx context.Context, id int) (Section, error) {
 	ss, err := s.repository.GetById(ctx, id)
 	if err != nil {
 		return Section{}, err

@@ -1,17 +1,21 @@
 package routes
 
 import (
+	product_batch2 "github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/product_batch"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/product_batch"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/product_batch/repository/mysql"
 	"log"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/section"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/db"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/employee"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/products"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
-	sf "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections/repository/file"
+	sm "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections/repository/mysql"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
@@ -50,10 +54,16 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	sellerService := sellers.NewService(sellerRepo)
 	sellerControllers := controllers.NewSeller(sellerService)
 
-	sdb := store.New(store.FileType, "data/sections.json")
-	sr := sf.NewRepository(sdb)
+	// Common
+	mdb := db.GetInstance()
+	// Section
+	sr := sm.NewMySQLRepository(mdb)
 	ss := sections.NewService(sr)
 	sc := section.NewSection(ss)
+	// Product Batch
+	pbr := mysql.NewMySQLRepository(mdb)
+	pbs := product_batch.NewService(pbr)
+	pbc := product_batch2.NewSection(pbs)
 
 	//Employee:
 	employeeFilePath, err := filepath.Abs("" + filepath.Join("data", "employee.json"))
@@ -102,6 +112,12 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			sec.GET("/:id", sc.GetById())
 			sec.PATCH("/:id", sc.UpdateById())
 			sec.DELETE("/:id", sc.Delete())
+			sec.GET("/reportProducts", pbc.GetById())
+		}
+
+		pb := mux.Group("productBatches")
+		{
+			pb.POST("/", pbc.Add())
 		}
 
 		employee := mux.Group("employees")
