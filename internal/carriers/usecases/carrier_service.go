@@ -8,7 +8,8 @@ import (
 
 type CarrierService interface {
 	Create(cid string, companyName string, address string, telephone string, localityId int) (domain.Carrier, error)
-	GetNumberOfCarriersPerLocality(localityId int) (domain.NumberOfCarriersPerLocality, error)
+	GetNumberOfCarriersPerLocalities(localitiesIds []int) (domain.ReportsNumberOfCarriersPerLocality, error)
+	GetAllNumberOfCarriersPerLocality() (domain.ReportsNumberOfCarriersPerLocality, error)
 }
 
 type carrierService struct {
@@ -53,28 +54,62 @@ func (s *carrierService) Create(cid string, companyName string, address string, 
 	return carrier, nil
 }
 
-func (s *carrierService) GetNumberOfCarriersPerLocality(localityId int) (domain.NumberOfCarriersPerLocality, error) {
-	locality, err := s.localityRepository.GetById(localityId)
+func (s *carrierService) GetNumberOfCarriersPerLocalities(localitiesIds []int) (domain.ReportsNumberOfCarriersPerLocality, error) {
+	reports := domain.ReportsNumberOfCarriersPerLocality{}
 
-	if errors.Is(err, ErrNoElementFound) {
-		return domain.NumberOfCarriersPerLocality{}, ErrInvalidLocalityId
+	for _, localityId := range localitiesIds {
+		locality, err := s.localityRepository.GetById(localityId)
+
+		if errors.Is(err, ErrNoElementFound) {
+			continue
+		}
+
+		if err != nil {
+			return domain.ReportsNumberOfCarriersPerLocality{}, err
+		}
+
+		carriersPerLocality, err := s.carrierRepository.GetNumberOfCarriersPerLocality(localityId)
+
+		if err != nil {
+			return domain.ReportsNumberOfCarriersPerLocality{}, err
+		}
+
+		report := domain.ReportNumberOfCarriersPerLocality{
+			LocalityId:    locality.Id,
+			LocalityName:  locality.Name,
+			CarriersCount: carriersPerLocality,
+		}
+
+		reports = append(reports, report)
 	}
+
+	return reports, nil
+}
+
+func (s *carrierService) GetAllNumberOfCarriersPerLocality() (domain.ReportsNumberOfCarriersPerLocality, error) {
+	localities, err := s.localityRepository.GetAll()
 
 	if err != nil {
-		return domain.NumberOfCarriersPerLocality{}, err
+		return domain.ReportsNumberOfCarriersPerLocality{}, err
 	}
 
-	carriersPerLocality, err := s.carrierRepository.GetNumberOfCarriersPerLocality(localityId)
+	reports := domain.ReportsNumberOfCarriersPerLocality{}
 
-	if err != nil {
-		return domain.NumberOfCarriersPerLocality{}, err
+	for _, locality := range localities {
+		carriersPerLocality, err := s.carrierRepository.GetNumberOfCarriersPerLocality(locality.Id)
+
+		if err != nil {
+			return domain.ReportsNumberOfCarriersPerLocality{}, err
+		}
+
+		report := domain.ReportNumberOfCarriersPerLocality{
+			LocalityId:    locality.Id,
+			LocalityName:  locality.Name,
+			CarriersCount: carriersPerLocality,
+		}
+
+		reports = append(reports, report)
 	}
 
-	result := domain.NumberOfCarriersPerLocality{
-		LocalityId:    locality.Id,
-		LocalityName:  locality.Name,
-		CarriersCount: carriersPerLocality,
-	}
-
-	return result, nil
+	return reports, nil
 }

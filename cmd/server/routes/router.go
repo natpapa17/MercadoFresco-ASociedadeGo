@@ -49,8 +49,6 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	warehouseController := factories.MakeWarehouseController()
 	carrierController := carrier_factories.MakeCarrierController()
 
-
-
 	sellerCont := newController.NewSellerController()
 
 	sdb := store.New(store.FileType, "data/sections.json")
@@ -60,7 +58,6 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 
 	localityController := newLController.NewLocalityController()
 
-	
 	employeeFilePath, err := filepath.Abs("" + filepath.Join("data", "employee.json"))
 	if err != nil {
 		log.Fatal("can't load employee data file")
@@ -104,7 +101,6 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			seller.DELETE("/:id", sellerCont.Delete())
 			seller.PATCH("/:id", sellerCont.Update())
 
-
 		}
 
 		sec := mux.Group("section")
@@ -127,10 +123,11 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 
 		locality := mux.Group("localities")
 		{
-			
+
 			locality.GET("/", localityController.ReportAll())
 			locality.GET("/:id", localityController.ReportById())
 			locality.POST("/", localityController.Create())
+			locality.GET("/reportCarriers", carrierController.GetNumberOfCarriersPerLocality)
 		}
 		employee := mux.Group("employees")
 		{
@@ -144,7 +141,6 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 		carriers := mux.Group("carriers")
 		{
 			carriers.POST("/", carrierController.CreateCarrier)
-			carriers.GET("/:id", carrierController.GetNumberOfCarriersPerLocality)
 		}
 
 		records := mux.Group("records")
