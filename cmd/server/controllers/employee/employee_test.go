@@ -324,3 +324,61 @@ func TestGetByIdEmployee(t *testing.T) {
 		assert.Equal(t, "{\"data\":{\"id\":1,\"card_number_id\":568,\"first_name\":\"Valid_Name\",\"Last_name\":\"Valid_Last_Name\",\"warehouse_id\":1}}", rr.Body.String())
 	})
 }
+
+func TestDeleteByIdWarehouse(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	mockEmployeeService := mocks.NewEmployeeServiceInterface(t)
+	sut := employeeController.CreateEmployeeController(mockEmployeeService)
+
+	response := gin.Default()
+	response.DELETE("/employees/:id", sut.DeleteByIdEmployee)
+
+	t.Run("Should return an error and 400 status if a invalid id is provided", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodDelete, "/employees/invalid_id", nil)
+		response.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		assert.Equal(t, "{\"error\":\"invalid id\"}", rr.Body.String())
+	})
+
+	t.Run("Should call DeleteById from Employee Service with correct id", func(t *testing.T) {
+		mockEmployeeService.On("DeleteById", mock.AnythingOfType("int")).Return(nil).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodDelete, "/employees/1", nil)
+		response.ServeHTTP(rr, req)
+
+		mockEmployeeService.AssertCalled(t, "DeleteById", 1)
+	})
+
+	t.Run("Should return an error and 404 status if DeleteById from Employee Service returns not find the correspondent element", func(t *testing.T) {
+		mockEmployeeService.On("DeleteById", mock.AnythingOfType("int")).Return(&employee.NoElementInFileError{Err: errors.New("any_message")}).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodDelete, "/employees/404", nil)
+		response.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+		assert.Equal(t, "{\"error\":\"any_message\"}", rr.Body.String())
+	})
+
+	t.Run("Should return an error and 500 status if DeleteById from Employee Service returns an error", func(t *testing.T) {
+		mockEmployeeService.On("DeleteById", mock.AnythingOfType("int")).Return(errors.New("any_message")).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodDelete, "/employees/1", nil)
+		response.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+		assert.Equal(t, "{\"error\":\"any_message\"}", rr.Body.String())
+	})
+
+	t.Run("Should 200 status and data on success", func(t *testing.T) {
+		mockEmployeeService.On("DeleteById", mock.AnythingOfType("int")).Return(nil).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodDelete, "/employees/1", nil)
+		response.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNoContent, rr.Code)
+		assert.Empty(t, rr.Body.String())
+	})
+}

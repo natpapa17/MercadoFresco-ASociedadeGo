@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "id": 2,
+    "card_number_id": 6,
+    "first_name": "Marcos",
+    "Last_name": "Mantovani",
+    "warehouse_id": 1
+  }
+]
