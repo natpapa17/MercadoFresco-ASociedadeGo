@@ -75,7 +75,7 @@ func (ec *EmployeeController) CreateEmployee(ctx *gin.Context) {
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "internal server error",
+			"error": err.Error(),
 		})
 		return
 	}
@@ -118,7 +118,7 @@ func (ec *EmployeeController) GetByIdEmployee(ctx *gin.Context) {
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "internal server error",
+			"error": err.Error(),
 		})
 		return
 	}

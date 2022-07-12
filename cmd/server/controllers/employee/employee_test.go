@@ -149,7 +149,7 @@ func TestCreateEmployee(t *testing.T) {
 		response.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusInternalServerError, rr.Code)
-		assert.Equal(t, "{\"error\":\"internal server error\"}", rr.Body.String())
+		assert.Equal(t, "{\"error\":\"any_message\"}", rr.Body.String())
 	})
 
 	t.Run("Should return 201 status and data on sucess at creating employee", func(t *testing.T) {
@@ -198,46 +198,48 @@ func TestUpdateEmployee(t *testing.T) {
 		}
 	})
 
-	// t.Run("Should call UpdateById from Warehouse Service with correct values", func(t *testing.T) {
-	// 	mockEmployeeService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int")).Return(makeDBEmployee(), nil).Once()
-	// 	mockEmployeeService.On("GetById", mock.AnythingOfType("int")).Return(makeDBEmployee(), nil).Once()
-	// 	rr := httptest.NewRecorder()
-	// 	req, _ := http.NewRequest(http.MethodPatch, "/employees/1", makeValidCreateBody())
-	// 	response.ServeHTTP(rr, req)
+	t.Run("Should call UpdateById from employee Service with correct values", func(t *testing.T) {
+		mockEmployeeService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int")).Return(makeDBEmployee(), nil).Once()
+		mockEmployeeService.On("GetById", mock.AnythingOfType("int")).Return(makeDBEmployee(), nil).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodPatch, "/employees/1", makeValidCreateBody())
+		response.ServeHTTP(rr, req)
 
-	// 	mockEmployeeService.AssertCalled(t, "UpdateById", 1)
-	// 	mockEmployeeService.AssertCalled(t, "UpdateById", 1, "valid_code", "updated_address", "(44) 99909-9999", 10, 8.7)
-	// })
+		mockEmployeeService.AssertCalled(t, "UpdateById", 1, 568, "Valid_Name", "Valid_Last_Name", 1)
+	})
 
-	// t.Run("Should return an error and 404 status if UpdateById from Warehouse Service returns an Business Rule error", func(t *testing.T) {
-	// 	mockWarehouseService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(warehouses.Warehouse{}, &warehouses.BusinessRuleError{Err: errors.New("any_message")}).Once()
-	// 	rr := httptest.NewRecorder()
-	// 	req, _ := http.NewRequest(http.MethodPatch, "/warehouses/1", makeValidUpdateBody())
-	// 	r.ServeHTTP(rr, req)
+	t.Run("Should return an error and 404 status if UpdateById from employee Service returns an Business Rule error", func(t *testing.T) {
+		mockEmployeeService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int")).Return(employee.Employee{}, &employee.BusinessRuleError{Err: errors.New("any_message")}).Once()
+		mockEmployeeService.On("GetById", mock.AnythingOfType("int")).Return(employee.Employee{}, nil).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodPatch, "/employees/1", makeValidCreateBody())
+		response.ServeHTTP(rr, req)
 
-	// 	assert.Equal(t, http.StatusNotFound, rr.Code)
-	// 	assert.Equal(t, "{\"error\":\"any_message\"}", rr.Body.String())
-	// })
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+		assert.Equal(t, "{\"error\":\"any_message\"}", rr.Body.String())
+	})
 
-	// t.Run("Should return an error and 500 status if UpdateById from Warehouse Service did not returns an custom error", func(t *testing.T) {
-	// 	mockWarehouseService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(warehouses.Warehouse{}, errors.New("any_message")).Once()
-	// 	rr := httptest.NewRecorder()
-	// 	req, _ := http.NewRequest(http.MethodPatch, "/warehouses/1", makeValidUpdateBody())
-	// 	r.ServeHTTP(rr, req)
+	t.Run("Should return an error and 500 status if UpdateById from Employee Service did not returns an custom error", func(t *testing.T) {
+		mockEmployeeService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int")).Return(employee.Employee{}, errors.New("any_message")).Once()
+		mockEmployeeService.On("GetById", mock.AnythingOfType("int")).Return(employee.Employee{}, nil).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodPatch, "/employees/1", makeValidCreateBody())
+		response.ServeHTTP(rr, req)
 
-	// 	assert.Equal(t, http.StatusInternalServerError, rr.Code)
-	// 	assert.Equal(t, "{\"error\":\"internal server error\"}", rr.Body.String())
-	// })
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+		assert.Equal(t, "{\"error\":\"any_message\"}", rr.Body.String())
+	})
 
-	// t.Run("Should 200 status and data on success", func(t *testing.T) {
-	// 	mockWarehouseService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("float64")).Return(makeUpdatedDBWarehouse(), nil).Once()
-	// 	rr := httptest.NewRecorder()
-	// 	req, _ := http.NewRequest(http.MethodPatch, "/warehouses/1", makeValidCreateBody())
-	// 	r.ServeHTTP(rr, req)
+	t.Run("Should 200 status and data on success", func(t *testing.T) {
+		mockEmployeeService.On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int")).Return(makeDBEmployee(), nil).Once()
+		mockEmployeeService.On("GetById", mock.AnythingOfType("int")).Return(employee.Employee{}, nil).Once()
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodPatch, "/employees/1", makeValidCreateBody())
+		response.ServeHTTP(rr, req)
 
-	// 	assert.Equal(t, http.StatusOK, rr.Code)
-	// 	assert.Equal(t, "{\"data\":{\"id\":1,\"warehouse_code\":\"valid_code\",\"address\":\"updated_address\",\"telephone\":\"(99) 99999-9999\",\"minimum_capacity\":10,\"minimum_temperature\":5}}", rr.Body.String())
-	// })
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, "{\"data\":{\"id\":1,\"card_number_id\":568,\"first_name\":\"Valid_Name\",\"Last_name\":\"Valid_Last_Name\",\"warehouse_id\":1}}", rr.Body.String())
+	})
 }
 
 func TestGetAllEmployees(t *testing.T) {
@@ -309,7 +311,7 @@ func TestGetByIdEmployee(t *testing.T) {
 		response.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusInternalServerError, rr.Code)
-		assert.Equal(t, "{\"error\":\"internal server error\"}", rr.Body.String())
+		assert.Equal(t, "{\"error\":\"any_message\"}", rr.Body.String())
 	})
 
 	t.Run("Should 200 status and data on success", func(t *testing.T) {
