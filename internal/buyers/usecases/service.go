@@ -4,17 +4,17 @@ import "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/domain"
 
 type Service interface {
 	Create(firstName string, lastName string, address string, document string) (domain.Buyer, error)
-	GetAll() (domain.Buyer, error)
+	GetAll() (domain.Buyers, error)
 	GetBuyerById(id int) (domain.Buyer, error)
 	UpdateBuyerById(id int, firstName string, lastName string, address string, document string) (domain.Buyer, error)
 	DeleteBuyerById(id int) error
 }
 
 type service struct {
-	repository Repository
+	repository BuyerRepository
 }
 
-func CreateBuyerService(r Repository) Service {
+func CreateBuyerService(r BuyerRepository) Service {
 	return &service{
 		repository: r,
 	}
@@ -30,11 +30,11 @@ func (s *service) Create(firstName string, lastName string, address string, docu
 	return buyer, nil
 }
 
-func (s *service) GetAll() (domain.Buyer, error) {
+func (s *service) GetAll() (domain.Buyers, error) {
 	ws, err := s.repository.GetAll()
 
 	if err != nil {
-		return domain.Buyer{}, err
+		return domain.Buyers{}, err
 	}
 
 	return ws, nil

@@ -2,23 +2,21 @@ package adapters
 
 import (
 	"errors"
-	_"fmt"
+	_ "fmt"
 	"net/http"
 	_ "regexp"
 	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/usecases"
-
 )
 
 type BuyerController struct {
 	service usecases.Service
 }
 
-func CreateBuyerController(bs buyers.Service) *BuyerController {
+func CreateBuyerController(bs usecases.Service) *BuyerController {
 	return &BuyerController{
 		service: bs,
 	}
@@ -199,12 +197,7 @@ func (br *buyerRequest) Validate() error {
 }
 
 func CustomError(e error) bool {
-	var be *buyers.BusinessRuleError
-	var fe *buyers.NoElementInFileError
-
-	if errors.As(e, &be) {
-		return true
-	}
+	var fe *usecases.ErrNoElementFound
 
 	if errors.As(e, &fe) {
 		return true

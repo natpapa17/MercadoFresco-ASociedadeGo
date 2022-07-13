@@ -6,7 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/buyer"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/adapters"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/usecases"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/product"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/section"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/warehouse"
@@ -33,9 +34,9 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 		log.Fatal("can't load buyers data file")
 	}
 	buyersFile := store.New(store.FileType, BuyersFilePath)
-	br := buyers.CreateBuyerRepository(buyersFile)
-	bs := buyers.CreateBuyerService(br)
-	bc := buyer.CreateBuyerController(bs)
+	br := adapters.CreateBuyerMySQLRepository(buyersFile)
+	bs := usecases.CreateBuyerService(br)
+	bc := adapters.CreateBuyerController(bs)
 
 	warehouseFilePath, err := filepath.Abs("" + filepath.Join("data", "warehouses.json"))
 	if err != nil {

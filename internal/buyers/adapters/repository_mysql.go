@@ -14,7 +14,7 @@ type buyerMySQLRepository struct{
 }
 
 func CreateBuyerMySQLRepository(db *sql.DB) usecases.BuyerRepository {
-	return &buyerRepository{
+	return &buyerMySQLRepository{
 		db: db,
 	}
 }
@@ -100,7 +100,7 @@ func (r *buyerMySQLRepository) GetBuyerById(id int) (domain.Buyer, error) {
 func (r *buyerMySQLRepository) UpdateBuyerById(id int, firstName string, lastName string, address string, document string) (domain.Buyer, error) {
 	const query = `UPDATE buyer SET first_name=?, last_name=?, address=?, document_number=? WHERE id=?`
 
-	res, err := tx.Exec(query, firstName, lastName, address, document, id)
+	res, err := r.db.Exec(query, firstName, lastName, address, document, id)
 
 	if err != nil {
 		return domain.Buyer{}, nil
