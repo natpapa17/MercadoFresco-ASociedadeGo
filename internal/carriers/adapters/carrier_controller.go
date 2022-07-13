@@ -106,6 +106,7 @@ func (cc *CarrierController) GetNumberOfCarriersPerLocality(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "internal server error",
 		})
+		return
 	}
 
 	if len(reports) == 0 {
