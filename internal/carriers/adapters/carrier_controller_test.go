@@ -132,15 +132,20 @@ func TestCreateCarrier(t *testing.T) {
 		}
 	}
 
-	gin.SetMode(gin.TestMode)
+	makeSut := func() (*gin.Engine, *mocks.CarrierService) {
+		gin.SetMode(gin.TestMode)
 
-	mockCarrierService := mocks.NewCarrierService(t)
-	sut := adapters.CreateCarryController(mockCarrierService)
+		mockCarrierService := mocks.NewCarrierService(t)
+		sut := adapters.CreateCarryController(mockCarrierService)
 
-	r := gin.Default()
-	r.POST("/carriers", sut.CreateCarrier)
+		r := gin.Default()
+		r.POST("/carriers", sut.CreateCarrier)
+
+		return r, mockCarrierService
+	}
 
 	t.Run("Should return an error and 422 status if body request contains unprocessable data", func(t *testing.T) {
+		r, _ := makeSut()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodPost, "/carriers", makeUnprocessableCreateBody())
 		r.ServeHTTP(rr, req)
@@ -150,6 +155,7 @@ func TestCreateCarrier(t *testing.T) {
 	})
 
 	t.Run("Should return an error and 400 status if body request contains invalid data", func(t *testing.T) {
+		r, _ := makeSut()
 		testCases := makeInvalidCreateBodiesTestCases()
 		for _, tc := range testCases {
 			rr := httptest.NewRecorder()
@@ -161,6 +167,7 @@ func TestCreateCarrier(t *testing.T) {
 	})
 
 	t.Run("Should call Create from Carrier Service with correct values", func(t *testing.T) {
+		r, mockCarrierService := makeSut()
 		mockCarrierService.On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int")).Return(makeDbCarrier(), nil).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodPost, "/carriers", makeValidCreateBody())
@@ -170,6 +177,7 @@ func TestCreateCarrier(t *testing.T) {
 	})
 
 	t.Run("Should return an error and 409 status if Carrier cid is in use", func(t *testing.T) {
+		r, mockCarrierService := makeSut()
 		mockCarrierService.On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int")).Return(domain.Carrier{}, usecases.ErrCidInUse).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodPost, "/carriers", makeValidCreateBody())
@@ -180,6 +188,7 @@ func TestCreateCarrier(t *testing.T) {
 	})
 
 	t.Run("Should return an error and 400 status if locality id did not exists", func(t *testing.T) {
+		r, mockCarrierService := makeSut()
 		mockCarrierService.On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int")).Return(domain.Carrier{}, usecases.ErrInvalidLocalityId).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodPost, "/carriers", makeValidCreateBody())
@@ -190,6 +199,7 @@ func TestCreateCarrier(t *testing.T) {
 	})
 
 	t.Run("Should return an error and 500 status if Create from Warehouse Service did not returns an custom error", func(t *testing.T) {
+		r, mockCarrierService := makeSut()
 		mockCarrierService.On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int")).Return(domain.Carrier{}, errors.New("any_message")).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodPost, "/carriers", makeValidCreateBody())
@@ -200,6 +210,7 @@ func TestCreateCarrier(t *testing.T) {
 	})
 
 	t.Run("Should 201 status and data on success", func(t *testing.T) {
+		r, mockCarrierService := makeSut()
 		mockCarrierService.On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int")).Return(makeDbCarrier(), nil).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodPost, "/carriers", makeValidCreateBody())
