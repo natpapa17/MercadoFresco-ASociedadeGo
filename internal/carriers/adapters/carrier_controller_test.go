@@ -209,3 +209,136 @@ func TestCreateCarrier(t *testing.T) {
 		assert.Equal(t, "{\"data\":{\"id\":1,\"cid\":\"valid_cid\",\"company_name\":\"valid_company_name\",\"address\":\"valid_address\",\"telephone\":\"(44) 9999-9999\",\"locality_id\":1}}", rr.Body.String())
 	})
 }
+
+func Test_GetNumberOfCarriersPerLocality(t *testing.T) {
+	makeSut := func() (*gin.Engine, *mocks.CarrierService) {
+		gin.SetMode(gin.TestMode)
+
+		mockCarrierService := mocks.NewCarrierService(t)
+		sut := adapters.CreateCarryController(mockCarrierService)
+
+		server := gin.Default()
+		server.GET("/carriers", sut.GetNumberOfCarriersPerLocality)
+
+		return server, mockCarrierService
+	}
+
+	makeExpectedReportBodyResponse := func() string {
+		return "{\"data\":[{\"locality_id\":1,\"locality_name\":\"any_name_1\",\"carriers_count\":1},{\"locality_id\":2,\"locality_name\":\"any_name_2\",\"carriers_count\":2},{\"locality_id\":3,\"locality_name\":\"any_name_3\",\"carriers_count\":3}]}"
+	}
+
+	makeReportsNumberOfCarriersPerLocality := func() domain.ReportsNumberOfCarriersPerLocality {
+		return domain.ReportsNumberOfCarriersPerLocality{
+			domain.ReportNumberOfCarriersPerLocality{
+				LocalityId:    1,
+				LocalityName:  "any_name_1",
+				CarriersCount: 1,
+			},
+			domain.ReportNumberOfCarriersPerLocality{
+				LocalityId:    2,
+				LocalityName:  "any_name_2",
+				CarriersCount: 2,
+			},
+			domain.ReportNumberOfCarriersPerLocality{
+				LocalityId:    3,
+				LocalityName:  "any_name_3",
+				CarriersCount: 3,
+			},
+		}
+	}
+	t.Run("Should call GetAllNumberOfCarriersPerLocality from Carrier Service if no id is provided", func(t *testing.T) {
+		server, mockCarrierService := makeSut()
+		mockCarrierService.On("GetAllNumberOfCarriersPerLocality").Return(makeReportsNumberOfCarriersPerLocality, nil)
+
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/carriers", nil)
+		server.ServeHTTP(rr, req)
+
+		mockCarrierService.AssertCalled(t, "GetAllNumberOfCarriersPerLocality")
+		mockCarrierService.AssertNumberOfCalls(t, "GetAllNumberOfCarriersPerLocality", 1)
+	})
+
+	t.Run("Should return 500 status and error if GetAllNumberOfCarriersPerLocality from Carrier Service returns an error", func(t *testing.T) {
+		server, mockCarrierService := makeSut()
+		mockCarrierService.On("GetAllNumberOfCarriersPerLocality").Return(domain.ReportsNumberOfCarriersPerLocality{}, errors.New("any_error"))
+
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/carriers", nil)
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+		assert.Equal(t, "{\"error\":\"internal server error\"}", rr.Body.String())
+
+	})
+
+	t.Run("Should return 200 status and reports on success", func(t *testing.T) {
+		server, mockCarrierService := makeSut()
+		mockCarrierService.On("GetAllNumberOfCarriersPerLocality").Return(makeReportsNumberOfCarriersPerLocality, nil)
+
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/carriers", nil)
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, makeExpectedReportBodyResponse(), rr.Body.String())
+	})
+
+	t.Run("Should return 400 if invalid id is provided", func(t *testing.T) {
+		server, _ := makeSut()
+
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/carriers?id=a", nil)
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		assert.Equal(t, "{\"error\":\"invalid locality_id\"}", rr.Body.String())
+	})
+
+	t.Run("Should call GetNumberOfCarriersPerLocalities with a slice of provided ids", func(t *testing.T) {
+		server, mockCarrierService := makeSut()
+		mockCarrierService.On("GetNumberOfCarriersPerLocalities", mock.Anything).Return(makeReportsNumberOfCarriersPerLocality(), nil)
+
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/carriers?id=1&id=2&id=3", nil)
+		server.ServeHTTP(rr, req)
+
+		mockCarrierService.AssertNumberOfCalls(t, "GetNumberOfCarriersPerLocalities", 1)
+		mockCarrierService.AssertCalled(t, "GetNumberOfCarriersPerLocalities", []int{1, 2, 3})
+	})
+
+	t.Run("Should return 500 status and error if GetNumberOfCarriersPerLocalities from Carrier Service returns an error", func(t *testing.T) {
+		server, mockCarrierService := makeSut()
+		mockCarrierService.On("GetNumberOfCarriersPerLocalities", mock.Anything).Return(domain.ReportsNumberOfCarriersPerLocality{}, errors.New("any_error"))
+
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/carriers?id=1&id=2&id=3", nil)
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+		assert.Equal(t, "{\"error\":\"internal server error\"}", rr.Body.String())
+	})
+
+	t.Run("Should return 404 status and empty report if GetNumberOfCarriersPerLocalities from Carrier Service returns an empty slice", func(t *testing.T) {
+		server, mockCarrierService := makeSut()
+		mockCarrierService.On("GetNumberOfCarriersPerLocalities", mock.Anything).Return(domain.ReportsNumberOfCarriersPerLocality{}, nil)
+
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/carriers?id=1&id=2&id=3", nil)
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+		assert.Equal(t, "{\"data\":[]}", rr.Body.String())
+	})
+
+	t.Run("Should return 200 status and reports on success", func(t *testing.T) {
+		server, mockCarrierService := makeSut()
+		mockCarrierService.On("GetNumberOfCarriersPerLocalities", mock.Anything).Return(makeReportsNumberOfCarriersPerLocality(), nil)
+
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/carriers?id=1&id=2&id=3", nil)
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, makeExpectedReportBodyResponse(), rr.Body.String())
+	})
+}
