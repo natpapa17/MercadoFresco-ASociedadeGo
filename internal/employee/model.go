@@ -8,6 +8,8 @@ type Employee struct {
 	Warehouse_id   int    `json:"warehouse_id"`
 }
 
+type Employees []Employee
+
 type Warehouse struct {
 	Id                 int     `json:"id"`
 	WarehouseCode      string  `json:"warehouse_code"`

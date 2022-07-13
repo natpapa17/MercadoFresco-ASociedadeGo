@@ -68,19 +68,9 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 
 	localityController := newLController.NewLocalityController()
 
-	employeeFilePath, err := filepath.Abs("" + filepath.Join("data", "employee.json"))
-	if err != nil {
-		log.Fatal("can't load employee data file")
-	}
-	employeeFile := store.New(store.FileType, employeeFilePath)
-	er := employee.CreateRepository(employeeFile)
-	warehouseFilePath, err := filepath.Abs("" + filepath.Join("data", "warehouses.json"))
-	if err != nil {
-		log.Fatal("can't load warehouse data file")
-	}
-	warehouseFile := store.New(store.FileType, warehouseFilePath)
-	wr := employee.CreateWarehouseRepository(warehouseFile)
-	es := employee.CreateService(er, wr)
+	wrwsql := employee.CreateWarehouseMySQLRepository(db.GetInstance())
+	ersql := employee.CreateEmployeeMysqlRepository(db.GetInstance())
+	es := employee.CreateService(ersql, wrwsql)
 	ec := controllers.CreateEmployeeController(es)
 
 	mux := r.Group("api/v1")

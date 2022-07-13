@@ -1,9 +1,8 @@
 package employee
 
 import (
+	"database/sql"
 	"errors"
-
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
 
 type WareHouseRepository interface {
@@ -11,27 +10,28 @@ type WareHouseRepository interface {
 }
 
 type warehouseRepository struct {
-	file store.Store
+	db *sql.DB
 }
 
-func CreateWarehouseRepository(file store.Store) WareHouseRepository {
+func CreateWarehouseMySQLRepository(db *sql.DB) WareHouseRepository {
 	return &warehouseRepository{
-		file: file,
+		db: db,
 	}
 }
 
 func (r *warehouseRepository) GetById(id int) (Warehouse, error) {
-	var ws []Warehouse
+	const query = `SELECT id, warehouse_code, address, telephone, minimum_capacity,	minimum_temperature FROM warehouse WHERE id=?`
 
-	if err := r.file.Read(&ws); err != nil {
+	w := Warehouse{}
+	err := r.db.QueryRow(query, id).Scan(&w.Id, &w.WarehouseCode, &w.Address, &w.Telephone, &w.MinimumCapacity, &w.MinimumTemperature)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return Warehouse{}, &NoElementInFileError{errors.New("can't find element with this id")}
+	}
+
+	if err != nil {
 		return Warehouse{}, err
 	}
 
-	for _, w := range ws {
-		if w.Id == id {
-			return w, nil
-		}
-	}
-
-	return Warehouse{}, &NoElementInFileError{errors.New("can't find element with this id")}
+	return w, nil
 }
