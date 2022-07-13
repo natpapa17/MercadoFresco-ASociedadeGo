@@ -7,3 +7,12 @@ type Employee struct {
 	Last_name      string `json:"Last_name"`
 	Warehouse_id   int    `json:"warehouse_id"`
 }
+
+type Warehouse struct {
+	Id                 int     `json:"id"`
+	WarehouseCode      string  `json:"warehouse_code"`
+	Address            string  `json:"address"`
+	Telephone          string  `json:"telephone"`
+	MinimumCapacity    int     `json:"minimum_capacity"`
+	MinimumTemperature float64 `json:"minimum_temperature"`
+}

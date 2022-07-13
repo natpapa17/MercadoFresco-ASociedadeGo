@@ -4,15 +4,15 @@ import (
 	"log"
 	"path/filepath"
 
+	controllers "github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/employee"
 	product_batch2 "github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/product_batch"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/localities/newLController"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/product_batch"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/product_batch/repository/mysql"
-
-	"github.com/gin-gonic/gin"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/localities/newLController"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/newController"
 
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
+	"github.com/gin-gonic/gin"
+
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/buyer"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/product"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/record"
@@ -26,7 +26,6 @@ import (
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/records/products_rec"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
 	sm "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections/repository/mysql"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/adapters"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/factories"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
@@ -80,7 +79,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 		log.Fatal("can't load warehouse data file")
 	}
 	warehouseFile := store.New(store.FileType, warehouseFilePath)
-	wr := adapters.CreateWarehouseFileRepository(warehouseFile)
+	wr := employee.CreateWarehouseRepository(warehouseFile)
 	es := employee.CreateService(er, wr)
 	ec := controllers.CreateEmployeeController(es)
 
