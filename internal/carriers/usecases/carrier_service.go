@@ -37,12 +37,12 @@ func (s *carrierService) Create(cid string, companyName string, address string, 
 
 	_, err = s.localityRepository.GetById(localityId)
 
-	if errors.Is(err, ErrNoElementFound) {
+	if err != nil && errors.Is(err, ErrNoElementFound) {
 		return domain.Carrier{}, ErrInvalidLocalityId
 	}
 
 	if err != nil {
-		return domain.Carrier{}, nil
+		return domain.Carrier{}, err
 	}
 
 	carrier, err := s.carrierRepository.Create(cid, companyName, address, telephone, localityId)

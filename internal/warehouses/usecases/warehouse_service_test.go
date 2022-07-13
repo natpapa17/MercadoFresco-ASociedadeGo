@@ -11,41 +11,28 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func makeCreateParams() (string, string, string, int, float64) {
-	return "valid_code", "valid_address", "(99) 99999-9999", 10, 5.0
-}
-
-func makeUpdateByIdParams() (int, string, string, string, int, float64) {
-	return 1, "valid_code", "updated_address", "(99) 99999-9999", 20, 15.0
-}
-
-func makeWarehouse() domain.Warehouse {
-	return domain.Warehouse{
-		Id:                 1,
-		WarehouseCode:      "valid_code",
-		Address:            "valid_address",
-		Telephone:          "(99) 99999-9999",
-		MinimumCapacity:    10,
-		MinimumTemperature: 5.0,
-	}
-}
-
-func makeUpdatedWarehouse() domain.Warehouse {
-	return domain.Warehouse{
-		Id:                 1,
-		WarehouseCode:      "valid_code",
-		Address:            "updated_address",
-		Telephone:          "(99) 99999-9999",
-		MinimumCapacity:    20,
-		MinimumTemperature: 15.0,
-	}
-}
-
 func TestCreate(t *testing.T) {
-	mockWarehouseRepository := mocks.NewWarehouseRepository(t)
-	sut := usecases.CreateWarehouseService(mockWarehouseRepository)
+	makeSut := func() (usecases.WarehouseService, *mocks.WarehouseRepository) {
+		mockWarehouseRepository := mocks.NewWarehouseRepository(t)
+		sut := usecases.CreateWarehouseService(mockWarehouseRepository)
 
+		return sut, mockWarehouseRepository
+	}
+	makeCreateParams := func() (string, string, string, int, float64) {
+		return "valid_code", "valid_address", "(99) 99999-9999", 10, 5.0
+	}
+	makeWarehouse := func() domain.Warehouse {
+		return domain.Warehouse{
+			Id:                 1,
+			WarehouseCode:      "valid_code",
+			Address:            "valid_address",
+			Telephone:          "(99) 99999-9999",
+			MinimumCapacity:    10,
+			MinimumTemperature: 5.0,
+		}
+	}
 	t.Run("Should call GetByWarehouseCode from Warehouse Repository with correct code", func(t *testing.T) {
+		sut, mockWarehouseRepository := makeSut()
 		mockWarehouseRepository.
 			On("GetByWarehouseCode", mock.AnythingOfType("string")).
 			Return(domain.Warehouse{}, usecases.ErrNoElementFound).
@@ -61,6 +48,7 @@ func TestCreate(t *testing.T) {
 	})
 
 	t.Run("Should return error if warehouse code provided is in use", func(t *testing.T) {
+		sut, mockWarehouseRepository := makeSut()
 		mockWarehouseRepository.On("GetByWarehouseCode", mock.AnythingOfType("string")).Return(makeWarehouse(), nil).Once()
 
 		_, err := sut.Create(makeCreateParams())
@@ -69,6 +57,7 @@ func TestCreate(t *testing.T) {
 	})
 
 	t.Run("Should return error if GetByWarehouseCode from Warehouse Repository returns an error other than noElementInFile", func(t *testing.T) {
+		sut, mockWarehouseRepository := makeSut()
 		mockWarehouseRepository.On("GetByWarehouseCode", mock.AnythingOfType("string")).Return(domain.Warehouse{}, errors.New("any_error")).Once()
 
 		_, err := sut.Create(makeCreateParams())
@@ -77,6 +66,7 @@ func TestCreate(t *testing.T) {
 	})
 
 	t.Run("Should call Create from Warehouse Repository with correct values", func(t *testing.T) {
+		sut, mockWarehouseRepository := makeSut()
 		mockWarehouseRepository.
 			On("GetByWarehouseCode", mock.AnythingOfType("string")).
 			Return(domain.Warehouse{}, usecases.ErrNoElementFound).
@@ -91,6 +81,7 @@ func TestCreate(t *testing.T) {
 	})
 
 	t.Run("Should return error if Create from Warehouse Repository returns an error", func(t *testing.T) {
+		sut, mockWarehouseRepository := makeSut()
 		mockWarehouseRepository.
 			On("GetByWarehouseCode", mock.AnythingOfType("string")).
 			Return(domain.Warehouse{}, usecases.ErrNoElementFound).
@@ -104,6 +95,7 @@ func TestCreate(t *testing.T) {
 	})
 
 	t.Run("Should return an Warehouse on success", func(t *testing.T) {
+		sut, mockWarehouseRepository := makeSut()
 		mockWarehouseRepository.
 			On("GetByWarehouseCode", mock.AnythingOfType("string")).
 			Return(domain.Warehouse{}, usecases.ErrNoElementFound).
@@ -121,10 +113,24 @@ func TestCreate(t *testing.T) {
 }
 
 func TestGetAll(t *testing.T) {
-	mockWarehouseRepository := mocks.NewWarehouseRepository(t)
-	sut := usecases.CreateWarehouseService(mockWarehouseRepository)
+	makeSut := func() (usecases.WarehouseService, *mocks.WarehouseRepository) {
+		mockWarehouseRepository := mocks.NewWarehouseRepository(t)
+		sut := usecases.CreateWarehouseService(mockWarehouseRepository)
 
+		return sut, mockWarehouseRepository
+	}
+	makeWarehouse := func() domain.Warehouse {
+		return domain.Warehouse{
+			Id:                 1,
+			WarehouseCode:      "valid_code",
+			Address:            "valid_address",
+			Telephone:          "(99) 99999-9999",
+			MinimumCapacity:    10,
+			MinimumTemperature: 5.0,
+		}
+	}
 	t.Run("Should call GetAll from Warehouse Repository", func(t *testing.T) {
+		sut, mockWarehouseRepository := makeSut()
 		mockWarehouseRepository.
 			On("GetAll").
 			Return(domain.Warehouses{makeWarehouse()}, nil).
@@ -136,6 +142,7 @@ func TestGetAll(t *testing.T) {
 	})
 
 	t.Run("Should return an error if GetAll from Warehouse Repository returns an error", func(t *testing.T) {
+		sut, mockWarehouseRepository := makeSut()
 		mockWarehouseRepository.
 			On("GetAll").
 			Return(domain.Warehouses{}, errors.New("any_error")).
@@ -147,6 +154,7 @@ func TestGetAll(t *testing.T) {
 	})
 
 	t.Run("Should return an slice of Warehouses on success", func(t *testing.T) {
+		sut, mockWarehouseRepository := makeSut()
 		mockWarehouseRepository.
 			On("GetAll").
 			Return(domain.Warehouses{makeWarehouse()}, nil).
@@ -160,10 +168,24 @@ func TestGetAll(t *testing.T) {
 }
 
 func TestGetById(t *testing.T) {
-	mockWarehouseRepository := mocks.NewWarehouseRepository(t)
-	sut := usecases.CreateWarehouseService(mockWarehouseRepository)
+	makeSut := func() (usecases.WarehouseService, *mocks.WarehouseRepository) {
+		mockWarehouseRepository := mocks.NewWarehouseRepository(t)
+		sut := usecases.CreateWarehouseService(mockWarehouseRepository)
 
+		return sut, mockWarehouseRepository
+	}
+	makeWarehouse := func() domain.Warehouse {
+		return domain.Warehouse{
+			Id:                 1,
+			WarehouseCode:      "valid_code",
+			Address:            "valid_address",
+			Telephone:          "(99) 99999-9999",
+			MinimumCapacity:    10,
+			MinimumTemperature: 5.0,
+		}
+	}
 	t.Run("Should call GetById from Warehouse Repository with correct id", func(t *testing.T) {
+		sut, mockWarehouseRepository := makeSut()
 		mockWarehouseRepository.
 			On("GetById", mock.AnythingOfType("int")).
 			Return(makeWarehouse(), nil).
@@ -175,6 +197,7 @@ func TestGetById(t *testing.T) {
 	})
 
 	t.Run("Should return an error if GetById from Warehouse Repository returns an error", func(t *testing.T) {
+		sut, mockWarehouseRepository := makeSut()
 		mockWarehouseRepository.
 			On("GetById", mock.AnythingOfType("int")).
 			Return(domain.Warehouse{}, errors.New("any_error")).
@@ -186,6 +209,7 @@ func TestGetById(t *testing.T) {
 	})
 
 	t.Run("Should return an Warehouses on success", func(t *testing.T) {
+		sut, mockWarehouseRepository := makeSut()
 		mockWarehouseRepository.
 			On("GetById", mock.AnythingOfType("int")).
 			Return(makeWarehouse(), nil).
@@ -199,10 +223,37 @@ func TestGetById(t *testing.T) {
 }
 
 func TestUpdateById(t *testing.T) {
-	mockWarehouseRepository := mocks.NewWarehouseRepository(t)
-	sut := usecases.CreateWarehouseService(mockWarehouseRepository)
+	makeSut := func() (usecases.WarehouseService, *mocks.WarehouseRepository) {
+		mockWarehouseRepository := mocks.NewWarehouseRepository(t)
+		sut := usecases.CreateWarehouseService(mockWarehouseRepository)
 
+		return sut, mockWarehouseRepository
+	}
+	makeUpdateByIdParams := func() (int, string, string, string, int, float64) {
+		return 1, "valid_code", "updated_address", "(99) 99999-9999", 20, 15.0
+	}
+	makeUpdatedWarehouse := func() domain.Warehouse {
+		return domain.Warehouse{
+			Id:                 1,
+			WarehouseCode:      "valid_code",
+			Address:            "updated_address",
+			Telephone:          "(99) 99999-9999",
+			MinimumCapacity:    20,
+			MinimumTemperature: 15.0,
+		}
+	}
+	makeWarehouse := func() domain.Warehouse {
+		return domain.Warehouse{
+			Id:                 1,
+			WarehouseCode:      "valid_code",
+			Address:            "valid_address",
+			Telephone:          "(99) 99999-9999",
+			MinimumCapacity:    10,
+			MinimumTemperature: 5.0,
+		}
+	}
 	t.Run("Should call GetByWarehouseCode from Warehouse Repository with correct code", func(t *testing.T) {
+		sut, mockWarehouseRepository := makeSut()
 		mockWarehouseRepository.
 			On("GetByWarehouseCode", mock.AnythingOfType("string")).
 			Return(domain.Warehouse{}, usecases.ErrNoElementFound).
@@ -218,6 +269,7 @@ func TestUpdateById(t *testing.T) {
 	})
 
 	t.Run("Should return error if new warehouse code provided is in use", func(t *testing.T) {
+		sut, mockWarehouseRepository := makeSut()
 		dbWarehouse := makeWarehouse()
 		dbWarehouse.Id = 3
 		mockWarehouseRepository.On("GetByWarehouseCode", mock.AnythingOfType("string")).Return(dbWarehouse, nil).Once()
@@ -228,6 +280,7 @@ func TestUpdateById(t *testing.T) {
 	})
 
 	t.Run("Should return error if GetByWarehouseCode from Warehouse Repository returns an error other than noElementInFile", func(t *testing.T) {
+		sut, mockWarehouseRepository := makeSut()
 		mockWarehouseRepository.On("GetByWarehouseCode", mock.AnythingOfType("string")).Return(domain.Warehouse{}, errors.New("any_error")).Once()
 
 		_, err := sut.UpdateById(makeUpdateByIdParams())
@@ -236,6 +289,7 @@ func TestUpdateById(t *testing.T) {
 	})
 
 	t.Run("Should call UpdateById from Warehouse Repository with correct values", func(t *testing.T) {
+		sut, mockWarehouseRepository := makeSut()
 		mockWarehouseRepository.
 			On("GetByWarehouseCode", mock.AnythingOfType("string")).
 			Return(domain.Warehouse{}, usecases.ErrNoElementFound).
@@ -250,6 +304,7 @@ func TestUpdateById(t *testing.T) {
 	})
 
 	t.Run("Should return error if UpdateById from Warehouse Repository returns an error", func(t *testing.T) {
+		sut, mockWarehouseRepository := makeSut()
 		mockWarehouseRepository.
 			On("GetByWarehouseCode", mock.AnythingOfType("string")).
 			Return(domain.Warehouse{}, usecases.ErrNoElementFound).
@@ -263,6 +318,7 @@ func TestUpdateById(t *testing.T) {
 	})
 
 	t.Run("Should return an Updated Warehouse on success", func(t *testing.T) {
+		sut, mockWarehouseRepository := makeSut()
 		mockWarehouseRepository.
 			On("GetByWarehouseCode", mock.AnythingOfType("string")).
 			Return(domain.Warehouse{}, usecases.ErrNoElementFound).
@@ -280,10 +336,14 @@ func TestUpdateById(t *testing.T) {
 }
 
 func TestDeleteById(t *testing.T) {
-	mockWarehouseRepository := mocks.NewWarehouseRepository(t)
-	sut := usecases.CreateWarehouseService(mockWarehouseRepository)
+	makeSut := func() (usecases.WarehouseService, *mocks.WarehouseRepository) {
+		mockWarehouseRepository := mocks.NewWarehouseRepository(t)
+		sut := usecases.CreateWarehouseService(mockWarehouseRepository)
 
+		return sut, mockWarehouseRepository
+	}
 	t.Run("Should call DeleteById from Warehouse Repository with correct id", func(t *testing.T) {
+		sut, mockWarehouseRepository := makeSut()
 		mockWarehouseRepository.
 			On("DeleteById", mock.AnythingOfType("int")).
 			Return(nil).
@@ -295,6 +355,7 @@ func TestDeleteById(t *testing.T) {
 	})
 
 	t.Run("Should return an error if DeleteById from Warehouse Repository returns an error", func(t *testing.T) {
+		sut, mockWarehouseRepository := makeSut()
 		mockWarehouseRepository.
 			On("DeleteById", mock.AnythingOfType("int")).
 			Return(errors.New("any_error")).
@@ -306,6 +367,7 @@ func TestDeleteById(t *testing.T) {
 	})
 
 	t.Run("Should return nil on success", func(t *testing.T) {
+		sut, mockWarehouseRepository := makeSut()
 		mockWarehouseRepository.
 			On("DeleteById", mock.AnythingOfType("int")).
 			Return(nil).
