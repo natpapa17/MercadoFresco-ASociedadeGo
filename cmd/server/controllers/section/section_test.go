@@ -73,7 +73,7 @@ func TestGetAll(t *testing.T) {
 
 	t.Run("find_all", func(t *testing.T) {
 		mockService.
-			On("GetAll").
+			On("GetAll", mock.Anything).
 			Return([]sections.Section{createValidSectionWithParams(1, 1, 1, 1, 1, 1, 1, 1, 1), createValidSectionWithParams(2, 2, 1, 1, 1, 1, 1, 1, 1), createValidSectionWithParams(3, 3, 1, 1, 1, 1, 1, 1, 1)}, nil).
 			Once()
 
@@ -96,7 +96,7 @@ func TestAdd(t *testing.T) {
 
 	t.Run("create_ok", func(t *testing.T) {
 		mockService.
-			On("Add", mock.AnythingOfType("int"), mock.AnythingOfType("float32"), mock.AnythingOfType("float32"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
+			On("Add", mock.Anything, mock.AnythingOfType("int"), mock.AnythingOfType("float32"), mock.AnythingOfType("float32"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
 			Return(createValidSectionWithParams(1, 99, 1, 1, 2, 1, 4, 1, 1), nil).
 			Once()
 
@@ -121,7 +121,7 @@ func TestAdd(t *testing.T) {
 
 	t.Run("create_conflict", func(t *testing.T) {
 		mockService.
-			On("Add", mock.AnythingOfType("int"), mock.AnythingOfType("float32"), mock.AnythingOfType("float32"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
+			On("Add", mock.Anything, mock.AnythingOfType("int"), mock.AnythingOfType("float32"), mock.AnythingOfType("float32"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
 			Return(sections.Section{}, errors.New("section already exists")).
 			Once()
 
@@ -144,7 +144,7 @@ func TestGetById(t *testing.T) {
 
 	t.Run("find_by_id_non_existent", func(t *testing.T) {
 		mockService.
-			On("GetById", mock.AnythingOfType("int")).
+			On("GetById", mock.Anything, mock.AnythingOfType("int")).
 			Return(sections.Section{}, errors.New("Id not found.")).
 			Once()
 
@@ -158,7 +158,7 @@ func TestGetById(t *testing.T) {
 
 	t.Run("find_by_id_existent", func(t *testing.T) {
 		mockService.
-			On("GetById", mock.AnythingOfType("int")).
+			On("GetById", mock.Anything, mock.AnythingOfType("int")).
 			Return(createValidSectionWithParams(1, 1, 1, 1, 2, 1, 4, 1, 1), nil).
 			Once()
 
@@ -182,7 +182,7 @@ func TestUpdateById(t *testing.T) {
 
 	t.Run("update_ok", func(t *testing.T) {
 		mockService.
-			On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("sections.Section")).
+			On("UpdateById", mock.Anything, mock.AnythingOfType("int"), mock.AnythingOfType("sections.Section")).
 			Return(createValidSectionWithParams(1, 1, 1, 1, 5, 1, 10, 1, 1), nil).
 			Once()
 
@@ -196,7 +196,7 @@ func TestUpdateById(t *testing.T) {
 
 	t.Run("update_non_existent", func(t *testing.T) {
 		mockService.
-			On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("sections.Section")).
+			On("UpdateById", mock.Anything, mock.AnythingOfType("int"), mock.AnythingOfType("sections.Section")).
 			Return(sections.Section{}, errors.New("inexistent section")).
 			Once()
 
@@ -220,7 +220,7 @@ func TestDelete(t *testing.T) {
 
 	t.Run("delete_non_existent", func(t *testing.T) {
 		mockService.
-			On("Delete", mock.AnythingOfType("int")).
+			On("Delete", mock.Anything, mock.AnythingOfType("int")).
 			Return(errors.New("Id not found")).
 			Once()
 
@@ -234,7 +234,7 @@ func TestDelete(t *testing.T) {
 
 	t.Run("update_ok", func(t *testing.T) {
 		mockService.
-			On("Delete", mock.AnythingOfType("int")).
+			On("Delete", mock.Anything, mock.AnythingOfType("int")).
 			Return(nil).
 			Once()
 

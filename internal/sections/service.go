@@ -1,19 +1,20 @@
 package sections
 
 import (
+	"context"
 	"errors"
 )
 
 var ss []Section = []Section{}
 
 type Service interface {
-	GetAll() ([]Section, error)
-	GetById(id int) (Section, error)
-	LastID() (int, error)
-	HasSectionNumber(number int) (bool, error)
-	Add(sectionNumber int, currentTemperature float32, minimumTemprarature float32, currentCapacity int, minimumCapacity int, maximumCapacity int, warehouseID int, productTypeID int) (Section, error)
-	UpdateById(id int, section Section) (Section, error)
-	Delete(id int) error
+	GetAll(ctx context.Context) ([]Section, error)
+	GetById(ctx context.Context, id int) (Section, error)
+	LastID(ctx context.Context) (int, error)
+	HasSectionNumber(ctx context.Context, number int) (bool, error)
+	Add(ctx context.Context, sectionNumber int, currentTemperature float32, minimumTemprarature float32, currentCapacity int, minimumCapacity int, maximumCapacity int, warehouseID int, productTypeID int) (Section, error)
+	UpdateById(ctx context.Context, id int, section Section) (Section, error)
+	Delete(ctx context.Context, id int) error
 }
 
 type service struct {
@@ -26,40 +27,40 @@ func NewService(r Repository) Service {
 	}
 }
 
-func (s service) GetAll() ([]Section, error) {
-	ss, err := s.repository.GetAll()
+func (s *service) GetAll(ctx context.Context) ([]Section, error) {
+	ss, err := s.repository.GetAll(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return ss, nil
 }
 
-func (s service) GetById(id int) (Section, error) {
-	ss, err := s.repository.GetById(id)
+func (s *service) GetById(ctx context.Context, id int) (Section, error) {
+	ss, err := s.repository.GetById(ctx, id)
 	if err != nil {
 		return Section{}, err
 	}
 	return ss, nil
 }
 
-func (s *service) LastID() (int, error) {
-	id, err := s.repository.LastID()
+func (s *service) LastID(ctx context.Context) (int, error) {
+	id, err := s.repository.LastID(ctx)
 	if err != nil {
 		return 0, err
 	}
 	return id, nil
 }
 
-func (s *service) HasSectionNumber(number int) (bool, error) {
-	has, err := s.repository.HasSectionNumber(number)
+func (s *service) HasSectionNumber(ctx context.Context, number int) (bool, error) {
+	has, err := s.repository.HasSectionNumber(ctx, number)
 	if err != nil {
 		return true, err
 	}
 	return has, nil
 }
 
-func (s *service) Add(sectionNumber int, currentTemperature float32, minimumTemprarature float32, currentCapacity int, minimumCapacity int, maximumCapacity int, warehouseID int, productTypeID int) (Section, error) {
-	has, err := s.HasSectionNumber(sectionNumber)
+func (s *service) Add(ctx context.Context, sectionNumber int, currentTemperature float32, minimumTemprarature float32, currentCapacity int, minimumCapacity int, maximumCapacity int, warehouseID int, productTypeID int) (Section, error) {
+	has, err := s.HasSectionNumber(ctx, sectionNumber)
 	if err != nil {
 		return Section{}, errors.New("unable to add")
 	}
@@ -68,22 +69,22 @@ func (s *service) Add(sectionNumber int, currentTemperature float32, minimumTemp
 		return Section{}, errors.New("section already exists")
 	}
 
-	id, err := s.LastID()
+	id, err := s.LastID(ctx)
 	if err != nil {
 		return Section{}, errors.New("unable to add")
 	}
 
 	id++
 
-	ss, err := s.repository.Add(id, sectionNumber, currentTemperature, minimumTemprarature, currentCapacity, minimumCapacity, maximumCapacity, warehouseID, productTypeID)
+	ss, err := s.repository.Add(ctx, id, sectionNumber, currentTemperature, minimumTemprarature, currentCapacity, minimumCapacity, maximumCapacity, warehouseID, productTypeID)
 	if err != nil {
 		return Section{}, err
 	}
 	return ss, nil
 }
 
-func (s *service) UpdateById(id int, section Section) (Section, error) {
-	has, err := s.HasSectionNumber(id)
+func (s *service) UpdateById(ctx context.Context, id int, section Section) (Section, error) {
+	has, err := s.HasSectionNumber(ctx, id)
 
 	if err != nil {
 		return Section{}, errors.New("unable to update")
@@ -93,15 +94,15 @@ func (s *service) UpdateById(id int, section Section) (Section, error) {
 		return Section{}, errors.New("inexistent section")
 	}
 
-	ss, err := s.repository.UpdateById(id, section)
+	ss, err := s.repository.UpdateById(ctx, id, section)
 	if err != nil {
 		return Section{}, err
 	}
 	return ss, nil
 }
 
-func (s *service) Delete(id int) error {
-	err := s.repository.Delete(id)
+func (s *service) Delete(ctx context.Context, id int) error {
+	err := s.repository.Delete(ctx, id)
 	if err != nil {
 		return err
 	}

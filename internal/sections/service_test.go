@@ -1,6 +1,7 @@
 package sections_test
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -12,6 +13,10 @@ import (
 
 func createSectionParams() (int, float32, float32, int, int, int, int, int) {
 	return 1, 1.0, 1.0, 1, 1, 1, 1, 1
+}
+
+func createSectionParamsWithContext() (context.Context, int, float32, float32, int, int, int, int, int) {
+	return context.Background(), 1, 1.0, 1.0, 1, 1, 1, 1, 1
 }
 
 func createSectionParamsUpdated() (int, float32, float32, int, int, int, int, int) {
@@ -49,10 +54,11 @@ func createSectionFromParamsWithID(id int, sectionNumber int, currentTemperature
 func TestGetAll(t *testing.T) {
 	repo := mocks.NewRepository(t)
 	serv := sections.NewService(repo)
+	ctx := context.Background()
 
 	t.Run("find_all", func(t *testing.T) {
 		repo.
-			On("GetAll").
+			On("GetAll", mock.Anything).
 			Return([]sections.Section{
 				sections.Section{
 					ID:                 1,
@@ -78,7 +84,7 @@ func TestGetAll(t *testing.T) {
 				},
 			}, nil)
 
-		sects, _ := serv.GetAll()
+		sects, _ := serv.GetAll(ctx)
 
 		expected := []sections.Section{createSectionFromParams(createSectionParams()), createSectionFromParamsWithID(2, 2, 1.0, 1.0, 1, 1, 1, 1, 1)}
 
@@ -89,24 +95,25 @@ func TestGetAll(t *testing.T) {
 func TestGetById(t *testing.T) {
 	repo := mocks.NewRepository(t)
 	serv := sections.NewService(repo)
+	ctx := context.Background()
 
 	t.Run("find_by_id_existent", func(t *testing.T) {
 		repo.
-			On("GetById", mock.AnythingOfType("int")).
+			On("GetById", mock.Anything, mock.AnythingOfType("int")).
 			Return(createSectionFromParams(createSectionParams()), nil).
 			Once()
 
-		sect, _ := serv.GetById(1)
+		sect, _ := serv.GetById(ctx, 1)
 
 		assert.Equal(t, createSectionFromParams(1, 1.0, 1.0, 1, 1, 1, 1, 1), sect)
 	})
 
 	t.Run("find_by_id_non_existent", func(t *testing.T) {
 		repo.
-			On("GetById", mock.AnythingOfType("int")).
+			On("GetById", mock.Anything, mock.AnythingOfType("int")).
 			Return(sections.Section{}, errors.New("Id not found."))
 
-		_, err := serv.GetById(1)
+		_, err := serv.GetById(ctx, 1)
 
 		assert.EqualError(t, err, "Id not found.")
 	})
@@ -118,34 +125,34 @@ func TestAdd(t *testing.T) {
 
 	t.Run("create_ok", func(t *testing.T) {
 		repo.
-			On("HasSectionNumber", mock.AnythingOfType("int")).
+			On("HasSectionNumber", mock.Anything, mock.AnythingOfType("int")).
 			Return(false, nil)
 
 		repo.
-			On("LastID").
+			On("LastID", mock.Anything).
 			Return(0, nil)
 
 		repo.
-			On("Add", mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("float32"), mock.AnythingOfType("float32"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
+			On("Add", mock.Anything, mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("float32"), mock.AnythingOfType("float32"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
 			Return(createSectionFromParams(createSectionParams()), nil).
 			Once()
 
-		sect, _ := serv.Add(createSectionParams())
+		sect, _ := serv.Add(createSectionParamsWithContext())
 
 		assert.Equal(t, createSectionFromParams(createSectionParams()), sect)
 	})
 
 	t.Run("create_conflict", func(t *testing.T) {
 		repo.
-			On("HasSectionNumber", mock.AnythingOfType("int")).
+			On("HasSectionNumber", mock.Anything, mock.AnythingOfType("int")).
 			Return(true, errors.New("section already exists"))
 
 		repo.
-			On("Add", mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("float32"), mock.AnythingOfType("float32"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
+			On("Add", mock.Anything, mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("float32"), mock.AnythingOfType("float32"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
 			Return(sections.Section{}, errors.New("section already exists")).
 			Once()
 
-		_, err := serv.Add(createSectionParams())
+		_, err := serv.Add(createSectionParamsWithContext())
 
 		assert.EqualError(t, err, "section already exists")
 
@@ -155,33 +162,34 @@ func TestAdd(t *testing.T) {
 func TestUpdateById(t *testing.T) {
 	repo := mocks.NewRepository(t)
 	serv := sections.NewService(repo)
+	ctx := context.Background()
 
 	t.Run("update_existent", func(t *testing.T) {
 		repo.
-			On("HasSectionNumber", mock.AnythingOfType("int")).
+			On("HasSectionNumber", mock.Anything, mock.AnythingOfType("int")).
 			Return(true, nil).
 			Once()
 
 		repo.
-			On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("sections.Section")).
+			On("UpdateById", mock.Anything, mock.AnythingOfType("int"), mock.AnythingOfType("sections.Section")).
 			Return(createSectionFromParams(createSectionParamsUpdated()), nil).
 			Once()
 
-		sect, _ := serv.UpdateById(1, sections.Section{1, 1, 3.0, 1.0, 3, 1, 4, 1, 1})
+		sect, _ := serv.UpdateById(ctx, 1, sections.Section{1, 1, 3.0, 1.0, 3, 1, 4, 1, 1})
 
 		assert.Equal(t, createSectionFromParams(createSectionParamsUpdated()), sect)
 	})
 
 	t.Run("update_inexistent", func(t *testing.T) {
 		repo.
-			On("HasSectionNumber", mock.AnythingOfType("int")).
+			On("HasSectionNumber", mock.Anything, mock.AnythingOfType("int")).
 			Return(false, nil)
 
 		repo.
-			On("UpdateById", mock.AnythingOfType("int"), mock.AnythingOfType("sections.Section")).
+			On("UpdateById", mock.Anything, mock.AnythingOfType("int"), mock.AnythingOfType("sections.Section")).
 			Return(sections.Section{}, errors.New("inexistent section"))
 
-		_, err := serv.UpdateById(3, sections.Section{1, 1, 3.0, 1.0, 3, 1, 4, 1, 1})
+		_, err := serv.UpdateById(ctx, 3, sections.Section{1, 1, 3.0, 1.0, 3, 1, 4, 1, 1})
 
 		assert.EqualError(t, err, "inexistent section")
 	})
@@ -190,25 +198,26 @@ func TestUpdateById(t *testing.T) {
 func TestDelete(t *testing.T) {
 	repo := mocks.NewRepository(t)
 	serv := sections.NewService(repo)
+	ctx := context.Background()
 
 	t.Run("delete_non_existent", func(t *testing.T) {
 		repo.
-			On("Delete", mock.AnythingOfType("int")).
+			On("Delete", mock.Anything, mock.AnythingOfType("int")).
 			Return(errors.New("Id not found")).
 			Once()
 
-		err := serv.Delete(9)
+		err := serv.Delete(ctx, 9)
 
 		assert.EqualError(t, err, "Id not found")
 	})
 
 	t.Run("delete_ok", func(t *testing.T) {
 		repo.
-			On("Delete", mock.AnythingOfType("int")).
+			On("Delete", mock.Anything, mock.AnythingOfType("int")).
 			Return(nil).
 			Once()
 
-		err := serv.Delete(1)
+		err := serv.Delete(ctx, 1)
 
 		assert.Equal(t, nil, err)
 	})

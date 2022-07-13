@@ -4,11 +4,15 @@ import (
 	"log"
 	"path/filepath"
 
-	"github.com/gin-gonic/gin"
+	controllers "github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/employee"
+	product_batch2 "github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/product_batch"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/localities/newLController"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/product_batch"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/product_batch/repository/mysql"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/newController"
 
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
+	"github.com/gin-gonic/gin"
+
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/buyer"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/product"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/record"
@@ -21,7 +25,7 @@ import (
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/records"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/records/products_rec"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/adapters"
+	sm "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections/repository/mysql"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/factories"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/pkg/store"
 )
@@ -51,10 +55,16 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 
 	sellerCont := newController.NewSellerController()
 
-	sdb := store.New(store.FileType, "data/sections.json")
-	sr := sections.NewRepository(sdb)
+	// Common
+	mdb := db.GetInstance()
+	// Section
+	sr := sm.NewMySQLRepository(mdb)
 	ss := sections.NewService(sr)
 	sc := section.NewSection(ss)
+	// Product Batch
+	pbr := mysql.NewMySQLRepository(mdb)
+	pbs := product_batch.NewService(pbr)
+	pbc := product_batch2.NewSection(pbs)
 
 	localityController := newLController.NewLocalityController()
 
@@ -69,7 +79,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 		log.Fatal("can't load warehouse data file")
 	}
 	warehouseFile := store.New(store.FileType, warehouseFilePath)
-	wr := adapters.CreateWarehouseFileRepository(warehouseFile)
+	wr := employee.CreateWarehouseRepository(warehouseFile)
 	es := employee.CreateService(er, wr)
 	ec := controllers.CreateEmployeeController(es)
 
@@ -110,6 +120,12 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			sec.GET("/:id", sc.GetById())
 			sec.PATCH("/:id", sc.UpdateById())
 			sec.DELETE("/:id", sc.Delete())
+			sec.GET("/reportProducts", pbc.GetById())
+		}
+
+		pb := mux.Group("productBatches")
+		{
+			pb.POST("/", pbc.Add())
 		}
 
 		products := mux.Group("products")
