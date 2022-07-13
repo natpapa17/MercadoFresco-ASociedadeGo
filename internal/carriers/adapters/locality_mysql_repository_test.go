@@ -14,12 +14,17 @@ import (
 )
 
 func TestGetById(t *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	makeSut := func() (usecases.LocalityRepository, sqlmock.Sqlmock) {
+		db, mock, err := sqlmock.New()
+		if err != nil {
+			t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+		}
+		sut := adapters.CreateLocalityMySQLRepository(db)
+
+		return sut, mock
 	}
-	sut := adapters.CreateLocalityMySQLRepository(db)
 	t.Run("Should execute correct query in database", func(t *testing.T) {
+		sut, mock := makeSut()
 		rows := sqlmock.NewRows([]string{"id", "name", "province_id"})
 		rows.AddRow(1, "valid_name", 1)
 		mock.ExpectQuery("SELECT id, name, province_id FROM locality").WithArgs(1).WillReturnRows(rows)
@@ -31,6 +36,7 @@ func TestGetById(t *testing.T) {
 	})
 
 	t.Run("Should return ErrNoElementFound if can't find element in database", func(t *testing.T) {
+		sut, mock := makeSut()
 		mock.ExpectQuery("SELECT id, name, province_id FROM locality").WithArgs(1).WillReturnError(sql.ErrNoRows)
 
 		result, err := sut.GetById(1)
@@ -43,6 +49,7 @@ func TestGetById(t *testing.T) {
 	})
 
 	t.Run("Should return error if query fails", func(t *testing.T) {
+		sut, mock := makeSut()
 		mock.ExpectQuery("SELECT id, name, province_id FROM locality").WithArgs(1).WillReturnError(errors.New("query_error"))
 
 		result, err := sut.GetById(1)
@@ -55,6 +62,7 @@ func TestGetById(t *testing.T) {
 	})
 
 	t.Run("Should return an locality on success", func(t *testing.T) {
+		sut, mock := makeSut()
 		rows := sqlmock.NewRows([]string{"id", "name", "province_id"})
 		rows.AddRow(1, "valid_name", 1)
 		mock.ExpectQuery("SELECT id, name, province_id FROM locality").WithArgs(1).WillReturnRows(rows)
@@ -90,12 +98,17 @@ func TestGetAll(t *testing.T) {
 		}
 	}
 
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	makeSut := func() (usecases.LocalityRepository, sqlmock.Sqlmock) {
+		db, mock, err := sqlmock.New()
+		if err != nil {
+			t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+		}
+		sut := adapters.CreateLocalityMySQLRepository(db)
+
+		return sut, mock
 	}
-	sut := adapters.CreateLocalityMySQLRepository(db)
 	t.Run("Should execute correct query in database", func(t *testing.T) {
+		sut, mock := makeSut()
 		rows := sqlmock.NewRows([]string{"id", "name", "province_id"})
 		rows.AddRow(1, "valid_name", 1)
 		rows.AddRow(2, "valid_name", 2)
@@ -109,6 +122,7 @@ func TestGetAll(t *testing.T) {
 	})
 
 	t.Run("Should return error if query fails", func(t *testing.T) {
+		sut, mock := makeSut()
 		mock.ExpectQuery("SELECT id, name, province_id FROM locality").WithArgs().WillReturnError(errors.New("query_error"))
 		result, err := sut.GetAll()
 
@@ -120,6 +134,7 @@ func TestGetAll(t *testing.T) {
 	})
 
 	t.Run("Should return locality slice on success", func(t *testing.T) {
+		sut, mock := makeSut()
 		rows := sqlmock.NewRows([]string{"id", "name", "province_id"})
 		rows.AddRow(1, "valid_name", 1)
 		rows.AddRow(2, "valid_name", 2)
