@@ -56,7 +56,23 @@ func TestGetAll(t *testing.T) {
 	mockProductRepository := mocks.NewRepository(t)
 	service := products.NewProductService(mockProductRepository)
 
-	t.Run("find_all", func(t *testing.T) {
+	t.Run("Should call GetAll from Product Repository", func(t *testing.T) {
+		mockProductRepository.On("GetAll").Return([]products.Product{makeProduct()}, nil).Once()
+
+		service.GetAll()
+
+		mockProductRepository.AssertCalled(t, "GetAll")
+	})
+
+	t.Run("Should return an error if GetAll from Product Repository returns an error", func(t *testing.T) {
+		mockProductRepository.On("GetAll").Return([]products.Product{makeProduct()}, errors.New("any_error")).Once()
+
+		_, err := service.GetAll()
+
+		assert.EqualError(t, err, "any_error")
+	})
+
+	t.Run("Should return a slice of products on success", func(t *testing.T) {
 		mockProductRepository.
 			On("GetAll").
 			Return([]products.Product{makeProduct()}, nil).
@@ -73,16 +89,23 @@ func TestGetById(t *testing.T) {
 	mockProductRepository := mocks.NewRepository(t)
 	service := products.NewProductService(mockProductRepository)
 
-	t.Run("find_by_id_non_existent", func(t *testing.T) {
-		mockProductRepository.On("GetById", mock.AnythingOfType("int")).
-			Return(makeProduct(), errors.New("Error")).Once()
+	t.Run("Should call GetById from Product Repository with correct ID", func(t *testing.T) {
+		mockProductRepository.On("GetById", mock.AnythingOfType("int")).Return(makeProduct(), nil).Once()
+
+		service.GetById(1)
+
+		mockProductRepository.AssertCalled(t, "GetById", 1)
+	})
+
+	t.Run("Should return an error if GetById from Product Repository returns an error", func(t *testing.T) {
+		mockProductRepository.On("GetById", mock.AnythingOfType("int")).Return(makeProduct(), errors.New("any_error")).Once()
 
 		_, err := service.GetById(1)
 
-		assert.EqualError(t, err, "Error")
+		assert.EqualError(t, err, "any_error")
 	})
 
-	t.Run("find_by_id_existent", func(t *testing.T) {
+	t.Run("Should return an Product on success", func(t *testing.T) {
 		mockProductRepository.On("GetById", mock.AnythingOfType("int")).Return(makeProduct(), nil).Once()
 
 		p, err := service.GetById(1)
@@ -96,7 +119,18 @@ func TestCreate(t *testing.T) {
 	mockProductRepository := mocks.NewRepository(t)
 	service := products.NewProductService(mockProductRepository)
 
-	t.Run("creat_conflict", func(t *testing.T) {
+	t.Run("Should Call GetByCode from Product Repository with correct code", func(t *testing.T) {
+		mockProductRepository.On("GetByCode", mock.AnythingOfType("string")).Return(products.Product{}, errors.New("any_error")).Once()
+
+		mockProductRepository.On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
+			Return(makeProduct(), nil).Once()
+
+		service.Create(makeCreateParams())
+
+		mockProductRepository.AssertCalled(t, "GetByCode", "valid_code")
+	})
+
+	t.Run("Should return error if product code provided is in use", func(t *testing.T) {
 		mockProductRepository.On("GetByCode", mock.AnythingOfType("string")).Return(makeProduct(), nil).Once()
 
 		_, err := service.Create(makeCreateParams())
@@ -104,7 +138,29 @@ func TestCreate(t *testing.T) {
 		assert.EqualError(t, err, "product code: valid_code is already in use")
 	})
 
-	t.Run("create_ok", func(t *testing.T) {
+	t.Run("Should call Create from Product Repository with correct values", func(t *testing.T) {
+		mockProductRepository.On("GetByCode", mock.AnythingOfType("string")).Return(products.Product{}, errors.New("any_error")).Once()
+
+		mockProductRepository.On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
+			Return(makeProduct(), nil).Once()
+
+		service.Create(makeCreateParams())
+
+		mockProductRepository.AssertCalled(t, "Create", "valid_code", "valid_description", 1.0, 1.0, 1.0, 1.0, 1, 1.0, 1, 1, 1)
+	})
+
+	t.Run("Should return an error if Create from Product Repository returns an error", func(t *testing.T) {
+		mockProductRepository.On("GetByCode", mock.AnythingOfType("string")).Return(products.Product{}, errors.New("any_error")).Once()
+
+		mockProductRepository.On("Create", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
+			Return(products.Product{}, errors.New("any_error")).Once()
+
+		_, err := service.Create(makeCreateParams())
+
+		assert.EqualError(t, err, "any_error")
+	})
+
+	t.Run("Should create a Product with success", func(t *testing.T) {
 		mockProductRepository.
 			On("GetByCode", mock.AnythingOfType("string")).
 			Return(products.Product{}, errors.New("product code: valid_code is already in use")).
@@ -126,7 +182,18 @@ func TestUpdate(t *testing.T) {
 	mockProductRepository := mocks.NewRepository(t)
 	service := products.NewProductService(mockProductRepository)
 
-	t.Run("update_non_existent", func(t *testing.T) {
+	t.Run("Should call GetByCode from Product Repository with correct code", func(t *testing.T) {
+		mockProductRepository.On("GetByCode", mock.AnythingOfType("string")).Return(products.Product{}, errors.New("any_error")).Once()
+
+		mockProductRepository.On("Update", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
+			Return(makeUpdateProduct(), nil).Once()
+
+		service.Update(makeUpdateParams())
+
+		mockProductRepository.AssertCalled(t, "GetByCode", "update_code")
+	})
+
+	t.Run("Should return conflict if product code is already in use", func(t *testing.T) {
 		dbProduct := makeProduct()
 		dbProduct.Id = 3
 		mockProductRepository.On("GetByCode", mock.AnythingOfType("string")).Return(dbProduct, nil).Once()
@@ -134,10 +201,42 @@ func TestUpdate(t *testing.T) {
 		_, err := service.Update(makeUpdateParams())
 
 		assert.EqualError(t, err, "product code: valid_code is already in use")
-
 	})
 
-	t.Run("update_ok", func(t *testing.T) {
+	t.Run("Should call GetByCode from Product Repository with correct values", func(t *testing.T) {
+		mockProductRepository.On("GetByCode", mock.AnythingOfType("string")).Return(products.Product{}, errors.New("any_error")).Once()
+
+		mockProductRepository.On("Update", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
+			Return(makeUpdateProduct(), nil).Once()
+
+		service.Update(makeUpdateParams())
+
+		mockProductRepository.AssertCalled(t, "GetByCode", "update_code")
+	})
+
+	t.Run("Should call Update from Product Repository with correct values", func(t *testing.T) {
+		mockProductRepository.On("GetByCode", mock.AnythingOfType("string")).Return(products.Product{}, errors.New("any_error")).Once()
+
+		mockProductRepository.On("Update", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
+			Return(makeUpdateProduct(), nil).Once()
+
+		service.Update(makeUpdateParams())
+
+		mockProductRepository.AssertCalled(t, "Update", 1, "update_code", "update_description", 2.0, 2.0, 2.0, 2.0, 2, 2.0, 2, 2, 2)
+	})
+
+	t.Run("Should return error if Update from Product Repository returns an error", func(t *testing.T) {
+		mockProductRepository.On("GetByCode", mock.AnythingOfType("string")).Return(products.Product{}, errors.New("any_error")).Once()
+
+		mockProductRepository.On("Update", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("float64"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("int")).
+			Return(products.Product{}, errors.New("any_error")).Once()
+
+		_, err := service.Update(makeUpdateParams())
+
+		assert.EqualError(t, err, "any_error")
+	})
+
+	t.Run("Should return an Updated Product on success", func(t *testing.T) {
 		mockProductRepository.
 			On("GetByCode", mock.AnythingOfType("string")).
 			Return(products.Product{}, errors.New("product code in use")).
@@ -158,7 +257,15 @@ func TestDelete(t *testing.T) {
 	mockProductRepository := mocks.NewRepository(t)
 	service := products.NewProductService(mockProductRepository)
 
-	t.Run("delete_non_existent", func(t *testing.T) {
+	t.Run("Should call Delete from Product Repository with correct ID", func(t *testing.T) {
+		mockProductRepository.On("Delete", mock.AnythingOfType("int")).Return(nil).Once()
+
+		service.Delete(1)
+
+		mockProductRepository.AssertCalled(t, "Delete", 1)
+	})
+
+	t.Run("Should return an error if Delete from Product Repository returns an error", func(t *testing.T) {
 		mockProductRepository.
 			On("Delete", mock.AnythingOfType("int")).Return(errors.New("Error")).Once()
 
@@ -167,7 +274,7 @@ func TestDelete(t *testing.T) {
 		assert.EqualError(t, err, "Error")
 	})
 
-	t.Run("delete_ok", func(t *testing.T) {
+	t.Run("Should Delete a Product with success", func(t *testing.T) {
 		mockProductRepository.On("Delete", mock.AnythingOfType("int")).Return(nil)
 
 		p := service.Delete(1)
