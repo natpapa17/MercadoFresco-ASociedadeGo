@@ -16,13 +16,20 @@ func TestCreate(t *testing.T) {
 	makeCreateParams := func() (string, string, string, string, int) {
 		return "valid_cid", "valid_name", "valid_address", "valid_phone", 1
 	}
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+
+	makeSut := func() (usecases.CarrierRepository, sqlmock.Sqlmock) {
+		db, mock, err := sqlmock.New()
+		if err != nil {
+			t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+		}
+
+		sut := adapters.CreateCarrierMySQLRepository(db)
+
+		return sut, mock
 	}
-	sut := adapters.CreateCarrierMySQLRepository(db)
 
 	t.Run("Should return err if begin transaction fails", func(t *testing.T) {
+		sut, mock := makeSut()
 		mock.ExpectBegin().WillReturnError(errors.New("any_error"))
 
 		result, err := sut.Create(makeCreateParams())
@@ -35,6 +42,8 @@ func TestCreate(t *testing.T) {
 	})
 
 	t.Run("Should execute correct query in database", func(t *testing.T) {
+		sut, mock := makeSut()
+
 		mock.ExpectBegin()
 		mock.ExpectExec("INSERT INTO carrier").WillReturnResult(sqlmock.NewResult(1, 1))
 		mock.ExpectCommit()
@@ -46,6 +55,8 @@ func TestCreate(t *testing.T) {
 	})
 
 	t.Run("Should execute rollback if query fails", func(t *testing.T) {
+		sut, mock := makeSut()
+
 		mock.ExpectBegin()
 		mock.ExpectExec("INSERT INTO carrier").WillReturnError(errors.New("any_error"))
 		mock.ExpectRollback()
@@ -60,6 +71,8 @@ func TestCreate(t *testing.T) {
 	})
 
 	t.Run("Should commit in insert query success", func(t *testing.T) {
+		sut, mock := makeSut()
+
 		mock.ExpectBegin()
 		mock.ExpectExec("INSERT INTO carrier").WillReturnResult(sqlmock.NewResult(1, 1))
 		mock.ExpectCommit()
@@ -71,6 +84,8 @@ func TestCreate(t *testing.T) {
 	})
 
 	t.Run("Should return an error if commit fails", func(t *testing.T) {
+		sut, mock := makeSut()
+
 		mock.ExpectBegin()
 		mock.ExpectExec("INSERT INTO carrier").WillReturnResult(sqlmock.NewResult(1, 1))
 		mock.ExpectCommit().WillReturnError(errors.New("commit_error"))
@@ -85,6 +100,8 @@ func TestCreate(t *testing.T) {
 	})
 
 	t.Run("Should return inserted carrier on success", func(t *testing.T) {
+		sut, mock := makeSut()
+
 		mock.ExpectBegin()
 		mock.ExpectExec("INSERT INTO carrier").WillReturnResult(sqlmock.NewResult(1, 1))
 		mock.ExpectCommit()
@@ -109,24 +126,32 @@ func TestCreate(t *testing.T) {
 }
 
 func TestGetNumberOfCarriersPerLocality(t *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	makeSut := func() (usecases.CarrierRepository, sqlmock.Sqlmock) {
+		db, mock, err := sqlmock.New()
+		if err != nil {
+			t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+		}
+
+		sut := adapters.CreateCarrierMySQLRepository(db)
+
+		return sut, mock
 	}
-	sut := adapters.CreateCarrierMySQLRepository(db)
 
 	t.Run("Should execute correct query in database", func(t *testing.T) {
+		sut, mock := makeSut()
 		rows := sqlmock.NewRows([]string{"count"})
 		rows.AddRow(1)
 		mock.ExpectQuery("SELECT COUNT(.+) FROM carrier").WithArgs(1).WillReturnRows(rows)
 
 		sut.GetNumberOfCarriersPerLocality(1)
 
-		err = mock.ExpectationsWereMet()
+		err := mock.ExpectationsWereMet()
 		assert.Nil(t, err)
 	})
 
 	t.Run("Should return error if query fails", func(t *testing.T) {
+		sut, mock := makeSut()
+
 		mock.ExpectQuery("SELECT COUNT(.+) FROM carrier").WithArgs(1).WillReturnError(errors.New("query_error"))
 
 		result, err := sut.GetNumberOfCarriersPerLocality(1)
@@ -139,6 +164,8 @@ func TestGetNumberOfCarriersPerLocality(t *testing.T) {
 	})
 
 	t.Run("Should return an integer on success", func(t *testing.T) {
+		sut, mock := makeSut()
+
 		rows := sqlmock.NewRows([]string{"count"})
 		rows.AddRow(1)
 		mock.ExpectQuery("SELECT COUNT(.+) FROM carrier").WithArgs(1).WillReturnRows(rows)
@@ -154,13 +181,19 @@ func TestGetNumberOfCarriersPerLocality(t *testing.T) {
 }
 
 func TestGetByCid(t *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
-	sut := adapters.CreateCarrierMySQLRepository(db)
+	makeSut := func() (usecases.CarrierRepository, sqlmock.Sqlmock) {
+		db, mock, err := sqlmock.New()
+		if err != nil {
+			t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+		}
 
+		sut := adapters.CreateCarrierMySQLRepository(db)
+
+		return sut, mock
+	}
 	t.Run("Should execute correct query in database", func(t *testing.T) {
+		sut, mock := makeSut()
+
 		rows := sqlmock.NewRows([]string{"id", "cid", "company_name", "address", "telephone", "locality_id"})
 		rows.AddRow(1, "valid_cid", "valid_name", "valid_address", "valid_phone", 1)
 		mock.ExpectQuery("SELECT id, cid, company_name, address, telephone, locality_id FROM carrier").WithArgs("valid_cid").WillReturnRows(rows)
@@ -172,6 +205,8 @@ func TestGetByCid(t *testing.T) {
 	})
 
 	t.Run("Should return ErrNoElementFound if can't find element in database", func(t *testing.T) {
+		sut, mock := makeSut()
+
 		mock.ExpectQuery("SELECT id, cid, company_name, address, telephone, locality_id FROM carrier").WithArgs("valid_cid").WillReturnError(sql.ErrNoRows)
 
 		result, err := sut.GetByCid("valid_cid")
@@ -184,6 +219,8 @@ func TestGetByCid(t *testing.T) {
 	})
 
 	t.Run("Should return error if query fails", func(t *testing.T) {
+		sut, mock := makeSut()
+
 		mock.ExpectQuery("SELECT id, cid, company_name, address, telephone, locality_id FROM carrier").WithArgs("valid_cid").WillReturnError(errors.New("query_error"))
 
 		result, err := sut.GetByCid("valid_cid")
@@ -196,6 +233,8 @@ func TestGetByCid(t *testing.T) {
 	})
 
 	t.Run("Should return an carrier on success", func(t *testing.T) {
+		sut, mock := makeSut()
+
 		rows := sqlmock.NewRows([]string{"id", "cid", "company_name", "address", "telephone", "locality_id"})
 		rows.AddRow(1, "valid_cid", "valid_name", "valid_address", "valid_phone", 1)
 		mock.ExpectQuery("SELECT id, cid, company_name, address, telephone, locality_id FROM carrier").WithArgs("valid_cid").WillReturnRows(rows)
