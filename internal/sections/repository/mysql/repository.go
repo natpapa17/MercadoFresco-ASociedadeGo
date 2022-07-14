@@ -146,6 +146,24 @@ func (m mySQLRepository) UpdateById(ctx context.Context, id int, section section
 		}
 	}
 
+	_, err = m.db.ExecContext(
+		ctx,
+		"UPDATE section SET section_number=?, current_temperature=?, minimum_temperature=?, current_capacity=?, minimum_capacity=?, maximum_capacity=?, warehouse_id=?, product_type_id=? WHERE id=?",
+		&sect.SectionNumber,
+		&sect.CurrentTemperature,
+		&sect.MinimumTemperature,
+		&sect.CurrentCapacity,
+		&sect.MinimumCapacity,
+		&sect.MaximumCapacity,
+		&sect.WarehouseID,
+		&sect.ProductTypeID,
+		&sect.ID,
+	)
+
+	if err != nil {
+		return sections.Section{}, err
+	}
+
 	return sect, nil
 }
 
