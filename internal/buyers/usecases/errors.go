@@ -1,5 +1,10 @@
 package usecases
 
-import "errors"
 
-var ErrNoElementFound = errors.New("can't find element")
+type ErrNoElementFound struct {
+	Err error
+}
+
+func (b *ErrNoElementFound) Error() string {
+	return b.Err.Error()
+}

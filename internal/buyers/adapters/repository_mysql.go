@@ -86,7 +86,7 @@ func (r *buyerMySQLRepository) GetBuyerById(id int) (domain.Buyer, error) {
 	err := r.db.QueryRow(query, id).Scan(&b.ID, &b.FirstName, &b.LastName, &b.Address, &b.DocumentNumber)
 
 	if errors.Is(err, sql.ErrNoRows) {
-		return domain.Buyer{}, usecases.ErrNoElementFound
+		return domain.Buyer{}, &usecases.ErrNoElementFound{Err: errors.New("Id não encontrado")}
 	}
 
 	if err != nil {
@@ -114,7 +114,7 @@ func (r *buyerMySQLRepository) UpdateBuyerById(id int, firstName string, lastNam
 
 	if rows == 0 {
 		if b, _ := r.GetBuyerById(id); b.ID == 0 {
-			return domain.Buyer{}, usecases.ErrNoElementFound
+			return domain.Buyer{}, &usecases.ErrNoElementFound{Err: errors.New("elemento para update não encontrado")}
 		}
 	}
 
@@ -143,7 +143,7 @@ func (r *buyerMySQLRepository) DeleteBuyerById(id int) error {
 	}
 
 	if rows == 0 {
-		return usecases.ErrNoElementFound
+		return &usecases.ErrNoElementFound{Err: errors.New("elemento para deletar não encontrado")}
 	}
 
 	return nil

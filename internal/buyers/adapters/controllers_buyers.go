@@ -199,9 +199,10 @@ func (br *buyerRequest) Validate() error {
 func CustomError(e error) bool {
 	var fe *usecases.ErrNoElementFound
 
-	if errors.As(e, &fe) {
-		return true
-	}
+	return errors.As(e, &fe)
+// 	if errors.As(e, &fe) {
+// 		return true
+// 	}
 
-	return false
+// 	return false
 }

@@ -248,7 +248,7 @@ func TestGetBuyerById(t *testing.T) {
 	})
 
 	t.Run("Should return an error and 404 status if GetBuyerById from Buyers Service returns not find the correspondent element", func(t *testing.T) {
-		mockBuyerService.On("GetBuyerById", mock.AnythingOfType("int")).Return(domain.Buyers{}, usecases.ErrNoElementFound).Once()
+		mockBuyerService.On("GetBuyerById", mock.AnythingOfType("int")).Return(domain.Buyers{}, &usecases.ErrNoElementFound{Err: errors.New("Elemento não encontrado")}).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodGet, "/buyers/404", nil)
 		r.ServeHTTP(rr, req)
@@ -384,7 +384,7 @@ func TestDeleteBuyerByIdBuyer(t *testing.T) {
 	})
 
 	t.Run("Should return an error and 404 status if DeleteBuyerById from Buyer Service returns not find the correspondent element", func(t *testing.T) {
-		mockBuyerService.On("DeleteBuyerById", mock.AnythingOfType("int")).Return(usecases.ErrNoElementFound).Once()
+		mockBuyerService.On("DeleteBuyerById", mock.AnythingOfType("int")).Return(&usecases.ErrNoElementFound{Err: errors.New("ID não encontrado")}).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodDelete, "/buyers/404", nil)
 		r.ServeHTTP(rr, req)

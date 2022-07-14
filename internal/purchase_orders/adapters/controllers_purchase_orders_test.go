@@ -19,9 +19,12 @@ import (
 func makeUnprocessableCreateAndUpdateBody() *bytes.Buffer {
 	return bytes.NewBuffer([]byte(`
 		{
-			"last_name": "last name",
-			"address": "address",
-			"document": "doc number"
+			"order_number": "123",
+			"order_date": "01-01-2022",
+			"tracking_code": "123",
+			"buyer_id": 1,
+			"product_record_id": 1,
+			"order_status_id": 1
 		}
 	`))
 }
@@ -35,19 +38,6 @@ func makeValidCreateBody() *bytes.Buffer {
 	"buyer_id": 1,
 	"product_record_id": 1,
 	"order_status_id": 1
-	}
-`))
-}
-
-func makeValidUpdateBody() *bytes.Buffer {
-	return bytes.NewBuffer([]byte(`
-	{
-		"order_number": "123",
-		"order_date": "01-01-2022",
-		"tracking_code": "123",
-		"buyer_id": 1,
-		"product_record_id": 1,
-		"order_status_id": 1
 	}
 `))
 }

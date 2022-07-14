@@ -40,7 +40,7 @@ func makeUpdateBuyer() domain.Buyer {
 }
 
 func TestGetAll(t *testing.T) {
-	mockBuyerRepository := mocks.NewRepository(t)
+	mockBuyerRepository := mocks.NewBuyerRepository(t)
 	service := usecases.CreateBuyerService(mockBuyerRepository)
 
 	t.Run("find_all", func(t *testing.T) {
@@ -57,7 +57,7 @@ func TestGetAll(t *testing.T) {
 }
 
 func TestGetBuyerById(t *testing.T) {
-	mockBuyerRepository := mocks.NewRepository(t)
+	mockBuyerRepository := mocks.NewBuyerRepository(t)
 	service := usecases.CreateBuyerService(mockBuyerRepository)
 
 	t.Run("find_by_id_non_existent", func(t *testing.T) {
@@ -80,7 +80,7 @@ func TestGetBuyerById(t *testing.T) {
 }
 
 func TestCreate(t *testing.T) {
-	mockBuyerRepository := mocks.NewRepository(t)
+	mockBuyerRepository := mocks.NewBuyerRepository(t)
 	service := usecases.CreateBuyerService(mockBuyerRepository)
 
 	t.Run("create_ok", func(t *testing.T) {
@@ -97,7 +97,7 @@ func TestCreate(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	mockBuyerRepository := mocks.NewRepository(t)
+	mockBuyerRepository := mocks.NewBuyerRepository(t)
 	service := usecases.CreateBuyerService(mockBuyerRepository)
 
 	t.Run("update_ok", func(t *testing.T) {
@@ -114,7 +114,7 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	mockBuyerRepository := mocks.NewRepository(t)
+	mockBuyerRepository := mocks.NewBuyerRepository(t)
 	service := usecases.CreateBuyerService(mockBuyerRepository)
 
 	t.Run("delete_non_existent", func(t *testing.T) {
