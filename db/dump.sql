@@ -103,8 +103,8 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `fresh_market`.`product` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `description` VARCHAR(255) NOT NULL,
-  `expiration_rate` DECIMAL(19,2) NOT NULL,
-  `freezing_rate` DECIMAL(19,2) NOT NULL,
+  `expiration_rate` INT NOT NULL,
+  `freezing_rate` INT NOT NULL,
   `height` DECIMAL(19,2) NOT NULL,
   `length` DECIMAL(19,2) NOT NULL,
   `net_weight` DECIMAL(19,2) NOT NULL,
@@ -355,7 +355,7 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `fresh_market`.`product_record` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `last_update_date` DATETIME(6) NOT NULL,
-  `purchase_code` DECIMAL(19,2) NOT NULL,
+  `purchase_price` DECIMAL(19,2) NOT NULL,
   `sale_price` DECIMAL(19,2) NOT NULL,
   `product_id` INT NOT NULL,
   PRIMARY KEY (`id`),
