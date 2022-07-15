@@ -5,7 +5,9 @@ import (
 	"path/filepath"
 
 	controllers "github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/employee"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/inbound_orders"
 	product_batch2 "github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/product_batch"
+	inboundOrdersService "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/inbound_order"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/localities/newLController"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/product_batch"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/product_batch/repository/mysql"
@@ -65,6 +67,13 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	pbr := mysql.NewMySQLRepository(mdb)
 	pbs := product_batch.NewService(pbr)
 	pbc := product_batch2.NewSection(pbs)
+	//inbound_orders
+	ioR := inboundOrdersService.Create_Inbound_Orders_MySQLRepository(db.GetInstance())
+	eioR := inboundOrdersService.CreateEmployeeMysqlRepositoryInbound(db.GetInstance())
+	wioR := inboundOrdersService.CreateWarehouseMySQLRepository(db.GetInstance())
+	pbioR := inboundOrdersService.CreateNewMySQLRepositoryBatchProduct(db.GetInstance())
+	ioS := inboundOrdersService.CreateNewInboundService(ioR, eioR, wioR, pbioR)
+	ioC := inbound_orders.CreateNewInboundOrderController(ioS)
 
 	localityController := newLController.NewLocalityController()
 
@@ -135,6 +144,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			locality.POST("/", localityController.Create())
 			locality.GET("/reportCarriers", carrierController.GetNumberOfCarriersPerLocality)
 		}
+
 		employee := mux.Group("employees")
 		{
 			employee.GET("/", ec.GetAllEmployee)
@@ -142,6 +152,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			employee.PATCH("/:id", ec.UpdateByIdEmployee)
 			employee.DELETE("/:id", ec.DeleteByIdEmployee)
 			employee.POST("/", ec.CreateEmployee)
+			employee.GET("/reportInboundOrders", ioC.GetNumberOfOdersByEmployeeId)
 		}
 
 		carriers := mux.Group("carriers")
@@ -155,6 +166,10 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			records.POST("/:id", rc.Create())
 		}
 
+		inboundOrdersCreate := mux.Group("inboundOrders")
+		{
+			inboundOrdersCreate.POST("/", ioC.CreateInboundOrder)
+		}
 	}
 
 	return r

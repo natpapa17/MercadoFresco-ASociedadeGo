@@ -1,4 +1,4 @@
-package inbound_orders
+package inbound_order
 
 import (
 	"database/sql"

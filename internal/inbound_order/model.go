@@ -1,4 +1,4 @@
-package inbound_orders
+package inbound_order
 
 type Inbound_orders struct {
 	Id               int    `json:"id"`
@@ -18,11 +18,15 @@ type Employee struct {
 }
 
 type Inbound_orders_report struct {
-	Employee
-	Inbound_orders_count int `json:"inbound_orders_count"`
+	Id                   int    `json:"id"`
+	Card_number_id       int    `json:"card_number_id"`
+	First_name           string `json:"first_name"`
+	Last_name            string `json:"Last_name"`
+	Warehouse_id         int    `json:"warehouse_id"`
+	Inbound_orders_count int    `json:"inbound_orders_count"`
 }
 
-type Orders []Orders
+type Inbound_orders_reports []Inbound_orders_report
 
 type Warehouse struct {
 	Id int `json:"id"`

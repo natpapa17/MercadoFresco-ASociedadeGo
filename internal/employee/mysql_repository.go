@@ -58,7 +58,7 @@ func (r *employeeMYSQLRepository) Create(cardNumberId int, firstName string, las
 }
 
 func (r *employeeMYSQLRepository) GetAll() ([]Employee, error) {
-	const query = `SELECT id, id_card_number, first_name, last_name, warehouse_id, FROM employee`
+	const query = `SELECT id, id_card_number, first_name, last_name, warehouse_id FROM employee`
 
 	rows, err := r.db.Query(query)
 

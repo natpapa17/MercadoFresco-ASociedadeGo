@@ -1,4 +1,8 @@
-package inbound_orders
+package inbound_order
+
+import (
+	"errors"
+)
 
 type BusinessRuleError struct {
 	Err error
@@ -15,3 +19,5 @@ type NoElementInFileError struct {
 func (b *NoElementInFileError) Error() string {
 	return b.Err.Error()
 }
+
+var ErrNoElementFound = errors.New("can't find element")

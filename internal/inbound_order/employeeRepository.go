@@ -1,4 +1,4 @@
-package inbound_orders
+package inbound_order
 
 import (
 	"database/sql"
@@ -7,6 +7,7 @@ import (
 
 type EmployeeInboundInterface interface {
 	GetById(id int) (Employee, error)
+	CheckIfEmployeeExistById(id int) (bool, error)
 }
 
 type EmployeeMYSQLRepositoryInboundStruct struct {
@@ -34,4 +35,21 @@ func (r *EmployeeMYSQLRepositoryInboundStruct) GetById(id int) (Employee, error)
 	}
 
 	return e, nil
+}
+
+func (r *EmployeeMYSQLRepositoryInboundStruct) CheckIfEmployeeExistById(id int) (bool, error) {
+	const query = `SELECT id FROM employee WHERE id=?`
+
+	e := Employee{}
+	err := r.db.QueryRow(query, id).Scan(&e.Id)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return false, nil
+	}
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
