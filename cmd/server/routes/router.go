@@ -120,7 +120,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 
 		records := mux.Group("records")
 		{
-			records.GET("/:id", recordsController.GetRecordsPerProduct())
+			records.GET("/", recordsController.GetRecordsPerProduct())
 			records.POST("/", recordsController.Create())
 		}
 

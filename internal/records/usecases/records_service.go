@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"errors"
+	"log"
 
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/records/record_domain"
 )
@@ -26,12 +27,14 @@ func NewRecordsService(r RecordsRepository, p ProductRepository) RecordsService 
 func (s *recordsService) GetRecordsPerProduct(product_id int) (record_domain.ReportRecord, error) {
 	product, err := s.productRepository.GetById(product_id)
 
+	log.Print(product)
+
 	if err != nil {
 		return record_domain.ReportRecord{}, err
 	}
 
-	rs, err := s.recordsRepository.GetRecordsPerProduct(product_id)
-
+	rp, err := s.recordsRepository.GetRecordsPerProduct(product_id)
+	log.Print(rp)
 	if err != nil {
 		return record_domain.ReportRecord{}, err
 	}
@@ -39,9 +42,9 @@ func (s *recordsService) GetRecordsPerProduct(product_id int) (record_domain.Rep
 	result := record_domain.ReportRecord{
 		Product_Id:    product_id,
 		Description:   product.Description,
-		Records_Count: rs,
+		Records_Count: rp,
 	}
-
+	log.Print(result)
 	return result, nil
 }
 

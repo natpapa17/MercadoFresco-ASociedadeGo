@@ -23,19 +23,20 @@ func NewRecordController(p usecases.RecordsService) *RecordsController {
 
 func (c *RecordsController) GetRecordsPerProduct() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+
 		ids := ctx.QueryArray("id")
 
 		result := record_domain.ReportRecords{}
 
 		for _, string_id := range ids {
 			id, _ := strconv.Atoi(string_id)
-
 			r, err := c.service.GetRecordsPerProduct(id)
 
 			if err != nil {
 				ctx.JSON(http.StatusNotFound, gin.H{
 					"error": err.Error(),
 				})
+
 				return
 			}
 
