@@ -26,7 +26,7 @@ func (r *buyerMySQLRepository) Create(firstName string, lastName string, address
 		return domain.Buyer{}, err
 	}
 
-	const query = `INSERT INTO buyer (first_name, last_name, address, document_number) VALUES (?, ?, ?, ?, ?)`
+	const query = `INSERT INTO buyer (first_name, last_name, address, document_number) VALUES (?, ?, ?, ?)`
 
 	res, err := tx.Exec(query, firstName, lastName, address, document)
 
@@ -55,7 +55,7 @@ func (r *buyerMySQLRepository) Create(firstName string, lastName string, address
 }
 
 func (r *buyerMySQLRepository) GetAll() (domain.Buyers, error) {
-	const query = `SELECT first_name, last_name, address, document_number FROM buyer`
+	const query = `SELECT id, first_name, last_name, address, document_number FROM buyer`
 
 	rows, err := r.db.Query(query)
 	if err != nil {

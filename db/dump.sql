@@ -202,7 +202,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `fresh_market`.`buyer` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `card_number` VARCHAR(255) NOT NULL,
+  `document_number` VARCHAR(255) NOT NULL,
   `first_name` VARCHAR(255) NOT NULL,
   `last_name` VARCHAR(255) NOT NULL,
   `address` VARCHAR(255) NOT NULL,

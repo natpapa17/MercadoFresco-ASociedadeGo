@@ -2,7 +2,7 @@ package adapters
 
 import (
 	"errors"
-	_ "fmt"
+	"fmt"
 	"net/http"
 	_ "regexp"
 	"strconv"
@@ -117,6 +117,7 @@ func (bc *BuyerController) UpdateBuyerById(ctx *gin.Context) {
 		return
 	}
 
+	fmt.Println(err)
 	if err := req.Validate(); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
