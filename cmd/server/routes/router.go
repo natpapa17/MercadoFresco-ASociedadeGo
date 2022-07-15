@@ -6,17 +6,18 @@ import (
 
 	EmployeeControllers "github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/employee"
 	product_batch2 "github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/product_batch"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/db"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/localities/newLController"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/product_batch"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/product_batch/repository/mysql"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers/newController"
 
 	"github.com/gin-gonic/gin"
-
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/buyer"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/adapters"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/usecases"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/section"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
+	purchase_adapter "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/purchase_orders/adapters"
+	purchase_usecases "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/purchase_orders/usecases"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/db"
 	carrier_factories "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/carriers/factories"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/employee"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/products/product_factories"
@@ -29,17 +30,17 @@ import (
 
 func ConfigRoutes(r *gin.Engine) *gin.Engine {
 
+
+	br := adapters.CreateBuyerMySQLRepository(db.GetInstance())
+	bs := usecases.CreateBuyerService(br)
+	bc := adapters.CreateBuyerController(bs)
+
+	por := purchase_adapter.CreatePurchaseOrderMySQLRepository(db.GetInstance())
+	pos := purchase_usecases.CreatePurchaseOrderService(por)
+	poc := purchase_adapter.CreatePurchaseOrderController(pos)
+
 	productsController := product_factories.MakeProductController()
 	recordsController := record_factories.MakeRecordsController()
-
-	BuyersFilePath, err := filepath.Abs("" + filepath.Join("data", "buyers.json"))
-	if err != nil {
-		log.Fatal("can't load buyers data file")
-	}
-	buyersFile := store.New(store.FileType, BuyersFilePath)
-	br := buyers.CreateBuyerRepository(buyersFile)
-	bs := buyers.CreateBuyerService(br)
-	bc := buyer.CreateBuyerController(bs)
 
 	warehouseController := factories.MakeWarehouseController()
 	carrierController := carrier_factories.MakeCarrierController()
@@ -128,6 +129,10 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 			products.DELETE("/:id", productsController.DeleteProduct())
 		}
 
+		po := mux.Group("purchaseOrders")
+		{
+			po.POST("/", poc.CreatePurchaseOrder)
+		}
 		locality := mux.Group("localities")
 		{
 

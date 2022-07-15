@@ -1,4 +1,4 @@
-package usecases
+package domain
 
 type Buyer struct {
 	ID int `json:"id"`
@@ -7,3 +7,5 @@ type Buyer struct {
 	Address string `json:"address"`
 	DocumentNumber string `json:"document_number"`
 }
+
+type Buyers []Buyer

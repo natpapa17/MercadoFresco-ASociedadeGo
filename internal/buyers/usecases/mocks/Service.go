@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	buyers "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
+	domain "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/domain"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -13,14 +13,14 @@ type Service struct {
 }
 
 // Create provides a mock function with given fields: firstName, lastName, address, document
-func (_m *Service) Create(firstName string, lastName string, address string, document string) (buyers.Buyer, error) {
+func (_m *Service) Create(firstName string, lastName string, address string, document string) (domain.Buyer, error) {
 	ret := _m.Called(firstName, lastName, address, document)
 
-	var r0 buyers.Buyer
-	if rf, ok := ret.Get(0).(func(string, string, string, string) buyers.Buyer); ok {
+	var r0 domain.Buyer
+	if rf, ok := ret.Get(0).(func(string, string, string, string) domain.Buyer); ok {
 		r0 = rf(firstName, lastName, address, document)
 	} else {
-		r0 = ret.Get(0).(buyers.Buyer)
+		r0 = ret.Get(0).(domain.Buyer)
 	}
 
 	var r1 error
@@ -33,6 +33,7 @@ func (_m *Service) Create(firstName string, lastName string, address string, doc
 	return r0, r1
 }
 
+// DeleteBuyerById provides a mock function with given fields: id
 func (_m *Service) DeleteBuyerById(id int) error {
 	ret := _m.Called(id)
 
@@ -47,15 +48,15 @@ func (_m *Service) DeleteBuyerById(id int) error {
 }
 
 // GetAll provides a mock function with given fields:
-func (_m *Service) GetAll() ([]buyers.Buyer, error) {
+func (_m *Service) GetAll() (domain.Buyers, error) {
 	ret := _m.Called()
 
-	var r0 []buyers.Buyer
-	if rf, ok := ret.Get(0).(func() []buyers.Buyer); ok {
+	var r0 domain.Buyers
+	if rf, ok := ret.Get(0).(func() domain.Buyers); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]buyers.Buyer)
+			r0 = ret.Get(0).(domain.Buyers)
 		}
 	}
 
@@ -69,15 +70,15 @@ func (_m *Service) GetAll() ([]buyers.Buyer, error) {
 	return r0, r1
 }
 
-// GetById provides a mock function with given fields: id
-func (_m *Service) GetBuyerById(id int) (buyers.Buyer, error) {
+// GetBuyerById provides a mock function with given fields: id
+func (_m *Service) GetBuyerById(id int) (domain.Buyer, error) {
 	ret := _m.Called(id)
 
-	var r0 buyers.Buyer
-	if rf, ok := ret.Get(0).(func(int) buyers.Buyer); ok {
+	var r0 domain.Buyer
+	if rf, ok := ret.Get(0).(func(int) domain.Buyer); ok {
 		r0 = rf(id)
 	} else {
-		r0 = ret.Get(0).(buyers.Buyer)
+		r0 = ret.Get(0).(domain.Buyer)
 	}
 
 	var r1 error
@@ -90,15 +91,15 @@ func (_m *Service) GetBuyerById(id int) (buyers.Buyer, error) {
 	return r0, r1
 }
 
-// UpdateById provides a mock function with given fields: id, firstName, lastName, address, document
-func (_m *Service) UpdateBuyerById(id int, firstName string, lastName string, address string, document string) (buyers.Buyer, error) {
+// UpdateBuyerById provides a mock function with given fields: id, firstName, lastName, address, document
+func (_m *Service) UpdateBuyerById(id int, firstName string, lastName string, address string, document string) (domain.Buyer, error) {
 	ret := _m.Called(id, firstName, lastName, address, document)
 
-	var r0 buyers.Buyer
-	if rf, ok := ret.Get(0).(func(int, string, string, string, string) buyers.Buyer); ok {
+	var r0 domain.Buyer
+	if rf, ok := ret.Get(0).(func(int, string, string, string, string) domain.Buyer); ok {
 		r0 = rf(id, firstName, lastName, address, document)
 	} else {
-		r0 = ret.Get(0).(buyers.Buyer)
+		r0 = ret.Get(0).(domain.Buyer)
 	}
 
 	var r1 error

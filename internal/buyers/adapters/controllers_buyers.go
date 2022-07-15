@@ -1,22 +1,22 @@
-package buyer
+package adapters
 
 import (
 	"errors"
-	_"fmt"
+	"fmt"
 	"net/http"
 	_ "regexp"
 	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/usecases"
 )
 
 type BuyerController struct {
-	service buyers.Service
+	service usecases.Service
 }
 
-func CreateBuyerController(bs buyers.Service) *BuyerController {
+func CreateBuyerController(bs usecases.Service) *BuyerController {
 	return &BuyerController{
 		service: bs,
 	}
@@ -117,6 +117,7 @@ func (bc *BuyerController) UpdateBuyerById(ctx *gin.Context) {
 		return
 	}
 
+	fmt.Println(err)
 	if err := req.Validate(); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
@@ -197,16 +198,12 @@ func (br *buyerRequest) Validate() error {
 }
 
 func CustomError(e error) bool {
-	var be *buyers.BusinessRuleError
-	var fe *buyers.NoElementInFileError
+	var fe *usecases.ErrNoElementFound
 
-	if errors.As(e, &be) {
-		return true
-	}
+	return errors.As(e, &fe)
+// 	if errors.As(e, &fe) {
+// 		return true
+// 	}
 
-	if errors.As(e, &fe) {
-		return true
-	}
-
-	return false
+// 	return false
 }
