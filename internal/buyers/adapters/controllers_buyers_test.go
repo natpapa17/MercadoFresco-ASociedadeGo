@@ -248,7 +248,7 @@ func TestGetBuyerById(t *testing.T) {
 	})
 
 	t.Run("Should return an error and 404 status if GetBuyerById from Buyers Service returns not find the correspondent element", func(t *testing.T) {
-		mockBuyerService.On("GetBuyerById", mock.AnythingOfType("int")).Return(domain.Buyers{}, &usecases.ErrNoElementFound{Err: errors.New("Elemento não encontrado")}).Once()
+		mockBuyerService.On("GetBuyerById", mock.AnythingOfType("int")).Return(domain.Buyer{}, &usecases.ErrNoElementFound{Err: errors.New("any_message")}).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodGet, "/buyers/404", nil)
 		r.ServeHTTP(rr, req)
@@ -258,7 +258,7 @@ func TestGetBuyerById(t *testing.T) {
 	})
 
 	t.Run("Should return an error and 500 status if GetBuyerById from Buyer Service returns an error", func(t *testing.T) {
-		mockBuyerService.On("GetBuyerById", mock.AnythingOfType("int")).Return(domain.Buyers{}, errors.New("any_message")).Once()
+		mockBuyerService.On("GetBuyerById", mock.AnythingOfType("int")).Return(domain.Buyer{}, errors.New("any_message")).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodGet, "/buyers/1", nil)
 		r.ServeHTTP(rr, req)
@@ -336,7 +336,7 @@ func TestUpdateBuyerById(t *testing.T) {
 	// })
 
 	t.Run("Should return an error and 500 status if UpdateBuyerById from Buyer Service did not returns an custom error", func(t *testing.T) {
-		mockBuyerService.On("UpdateBuyerById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(domain.Buyers{}, errors.New("any_message")).Once()
+		mockBuyerService.On("UpdateBuyerById", mock.AnythingOfType("int"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(domain.Buyer{}, errors.New("any_message")).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodPatch, "/buyers/1", makeValidUpdateBody())
 		r.ServeHTTP(rr, req)
@@ -384,7 +384,7 @@ func TestDeleteBuyerByIdBuyer(t *testing.T) {
 	})
 
 	t.Run("Should return an error and 404 status if DeleteBuyerById from Buyer Service returns not find the correspondent element", func(t *testing.T) {
-		mockBuyerService.On("DeleteBuyerById", mock.AnythingOfType("int")).Return(&usecases.ErrNoElementFound{Err: errors.New("ID não encontrado")}).Once()
+		mockBuyerService.On("DeleteBuyerById", mock.AnythingOfType("int")).Return(&usecases.ErrNoElementFound{Err: errors.New("any_message")}).Once()
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodDelete, "/buyers/404", nil)
 		r.ServeHTTP(rr, req)

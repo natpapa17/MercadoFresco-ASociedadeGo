@@ -6,12 +6,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/db"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/adapters"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/usecases"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/product"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/section"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/warehouse"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers"
+	purchase_adapter "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/purchase_orders/adapters"
+	purchase_usecases "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/purchase_orders/usecases"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/products"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sellers"
@@ -29,14 +31,15 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	ps := products.NewProductService(pr)
 	pc := product.NewProductController(ps)
 
-	BuyersFilePath, err := filepath.Abs("" + filepath.Join("data", "buyers.json"))
-	if err != nil {
-		log.Fatal("can't load buyers data file")
-	}
-	buyersFile := store.New(store.FileType, BuyersFilePath)
-	br := adapters.CreateBuyerMySQLRepository(buyersFile)
+	mdb := db.GetInstance()
+
+	br := adapters.CreateBuyerMySQLRepository(mdb)
 	bs := usecases.CreateBuyerService(br)
 	bc := adapters.CreateBuyerController(bs)
+
+	por := purchase_adapter.CreatePurchaseOrderMySQLRepository(mdb)
+	pos := purchase_usecases.CreatePurchaseOrderService(por)
+	poc := purchase_adapter.CreatePurchaseOrderController(pos)
 
 	warehouseFilePath, err := filepath.Abs("" + filepath.Join("data", "warehouses.json"))
 	if err != nil {
@@ -72,7 +75,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 		{
 			buyer.GET("/", bc.GetAllBuyers)
 			buyer.GET("/:id", bc.GetBuyerById)
-			buyer.GET("/reportPurchaseOrders", po.GetPurchaseOrderById())
+			// buyer.GET("/reportPurchaseOrders", poc.GetPurchaseOrderById)
 			buyer.PATCH("/:id", bc.UpdateBuyerById)
 			buyer.DELETE("/:id", bc.DeleteBuyerById)
 			buyer.POST("/", bc.CreateBuyer)
@@ -108,7 +111,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 
 		po := mux.Group("purchaseOrders")
 		{
-			po.POST("/", po.Create())
+			po.POST("/", poc.CreatePurchaseOrder)
 		}
 	}
 

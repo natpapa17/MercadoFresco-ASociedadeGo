@@ -26,4 +26,4 @@ func (s *purchaseOrderService) Create(orderNumber string, orderDate string, trac
 	return order, nil
 }
 
-func (s *purchaseOrderService) GetPurchaseOrderById()
+// func (s *purchaseOrderService) GetPurchaseOrderById()

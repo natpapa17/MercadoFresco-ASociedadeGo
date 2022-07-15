@@ -6,6 +6,7 @@ import (
 	"net/http"
 	_ "regexp"
 	_ "strconv"
+	"strings"
 	_ "strings"
 
 	"github.com/gin-gonic/gin"
@@ -26,6 +27,13 @@ func (poc *PurchaseOrderController) CreatePurchaseOrder(ctx *gin.Context) {
 	var req purchaseOrdersRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if err := req.Validate(); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
@@ -92,6 +100,35 @@ type purchaseOrdersRequest struct {
 	BuyerId         int    `json:"buyer_id" binding:"required"`
 	ProductRecordId int    `json:"product_record_id" binding:"required"`
 	OrderStatusId   int    `json:"order_status_id" binding:"required"`
+}
+
+func (por *purchaseOrdersRequest) Validate() error {
+	if strings.TrimSpace(por.OrderNumber) == "" {
+		return errors.New("order number can't be empty")
+	}
+
+	if strings.TrimSpace(por.OrderDate) == "" {
+		return errors.New("order date can't be empty")
+	}
+
+	if strings.TrimSpace(por.TrackingCode) == "" {
+		return errors.New("tracking code can't be empty")
+	}
+
+	if por.BuyerId < 1 {
+		return errors.New("buyer id can't be empty or smaller than 1")
+	}
+
+	if por.ProductRecordId < 1 {
+		return errors.New("product record id can't be empty  or smaller than 1")
+	}
+
+	if por.OrderStatusId < 1 {
+		return errors.New("order status can't be empty  or smaller than 1")
+	}
+
+
+	return nil
 }
 
 func CustomError(e error) bool {

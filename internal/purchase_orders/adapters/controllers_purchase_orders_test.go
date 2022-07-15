@@ -21,8 +21,6 @@ func makeUnprocessableCreateAndUpdateBody() *bytes.Buffer {
 		{
 			"order_number": "123",
 			"order_date": "01-01-2022",
-			"tracking_code": "123",
-			"buyer_id": 1,
 			"product_record_id": 1,
 			"order_status_id": 1
 		}
@@ -57,7 +55,7 @@ func makeInvalidCreateAndUpdateBodiesTestCases() []TestCase {
 				"tracking_code": "123",
 				"buyer_id": 1,
 				"product_record_id": 1,
-				"order_status_id": 1,
+				"order_status_id": 1
 			}
 			`,
 			ExpectedResponseBody: "{\"error\":\"order number can't be empty\"}",
@@ -70,7 +68,7 @@ func makeInvalidCreateAndUpdateBodiesTestCases() []TestCase {
 				"tracking_code": "123",
 				"buyer_id": 1,
 				"product_record_id": 1,
-				"order_status_id": 1,
+				"order_status_id": 1
 			}
 			`,
 			ExpectedResponseBody: "{\"error\":\"order date can't be empty\"}",
@@ -83,7 +81,7 @@ func makeInvalidCreateAndUpdateBodiesTestCases() []TestCase {
 				"tracking_code": " ",
 				"buyer_id": 1,
 				"product_record_id": 1,
-				"order_status_id": 1,
+				"order_status_id": 1
 			}
 			`,
 			ExpectedResponseBody: "{\"error\":\"tracking code can't be empty\"}",
@@ -96,7 +94,7 @@ func makeInvalidCreateAndUpdateBodiesTestCases() []TestCase {
 				"tracking_code": "123",
 				"buyer_id": ,
 				"product_record_id": 1,
-				"order_status_id": 1,
+				"order_status_id": 1
 			}
 			`,
 			ExpectedResponseBody: "{\"error\":\"buyer id can't be empty\"}",
@@ -109,7 +107,7 @@ func makeInvalidCreateAndUpdateBodiesTestCases() []TestCase {
 				"tracking_code": "123",
 				"buyer_id": 1,
 				"product_record_id": ,
-				"order_status_id": 1,
+				"order_status_id": 1
 			}
 			`,
 			ExpectedResponseBody: "{\"error\":\"product record id can't be empty\"}",
@@ -122,7 +120,7 @@ func makeInvalidCreateAndUpdateBodiesTestCases() []TestCase {
 				"tracking_code": "123",
 				"buyer_id": 1,
 				"product_record_id": 1,
-				"order_status_id": ,
+				"order_status_id": 
 			}
 			`,
 			ExpectedResponseBody: "{\"error\":\"order status id can't be empty\"}",
@@ -153,7 +151,7 @@ func TestCreatePurchaseOrder(t *testing.T) {
 
 	t.Run("Should return an error and 422 status if body request contains unprocessable data", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		req, _ := http.NewRequest(http.MethodPost, "/buyers", makeUnprocessableCreateAndUpdateBody())
+		req, _ := http.NewRequest(http.MethodPost, "/purchaseOrders", makeUnprocessableCreateAndUpdateBody())
 		r.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusUnprocessableEntity, rr.Code)
@@ -197,6 +195,6 @@ func TestCreatePurchaseOrder(t *testing.T) {
 		r.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusCreated, rr.Code)
-		assert.Equal(t, "{\"data\":{\"id\":1, \"order_number\":\"123\", \"order_date\":\"01-01-2022\", \"tracking_code\":\"123\", \"buyer_id\":1, \"product_record_id\":1, \"order_status_id\":1}}", rr.Body.String())
+		assert.Equal(t, "{\"data\":{\"id\":1,\"order_number\":\"123\",\"order_date\":\"01-01-2022\",\"tracking_code\":\"123\",\"buyer_id\":1,\"product_record_id\":1,\"order_status_id\":1}}", rr.Body.String())
 	})
 }
