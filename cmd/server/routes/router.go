@@ -4,7 +4,7 @@ import (
 	"log"
 	"path/filepath"
 
-	controllers "github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/employee"
+	EmployeeControllers "github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/employee"
 	product_batch2 "github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/product_batch"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/localities/newLController"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/product_batch"
@@ -14,17 +14,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/adapters"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/buyers/usecases"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/product"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/record"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/cmd/server/controllers/section"
 	purchase_adapter "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/purchase_orders/adapters"
 	purchase_usecases "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/purchase_orders/usecases"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/db"
 	carrier_factories "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/carriers/factories"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/employee"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/products"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/records"
-	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/records/products_rec"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/products/product_factories"
+	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/records/record_factories"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
 	sm "github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections/repository/mysql"
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/warehouses/factories"
@@ -33,9 +30,6 @@ import (
 
 func ConfigRoutes(r *gin.Engine) *gin.Engine {
 
-	pr := products.NewMysqlRepository(db.GetInstance())
-	ps := products.NewProductService(pr)
-	pc := product.NewProductController(ps)
 
 	br := adapters.CreateBuyerMySQLRepository(db.GetInstance())
 	bs := usecases.CreateBuyerService(br)
@@ -45,10 +39,8 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	pos := purchase_usecases.CreatePurchaseOrderService(por)
 	poc := purchase_adapter.CreatePurchaseOrderController(pos)
 
-	rr := records.NewMysqlRepository(db.GetInstance())
-	rrp := products_rec.NewMysqlProductRepository(db.GetInstance())
-	rs := records.NewRecordsService(rr, rrp)
-	rc := record.NewRecordController(rs)
+	productsController := product_factories.MakeProductController()
+	recordsController := record_factories.MakeRecordsController()
 
 	warehouseController := factories.MakeWarehouseController()
 	carrierController := carrier_factories.MakeCarrierController()
@@ -81,7 +73,7 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 	warehouseFile := store.New(store.FileType, warehouseFilePath)
 	wr := employee.CreateWarehouseRepository(warehouseFile)
 	es := employee.CreateService(er, wr)
-	ec := controllers.CreateEmployeeController(es)
+	ec := EmployeeControllers.CreateEmployeeController(es)
 
 	mux := r.Group("api/v1")
 	{
@@ -130,11 +122,11 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 
 		products := mux.Group("products")
 		{
-			products.GET("/", pc.GetAll())
-			products.GET("/:id", pc.GetById())
-			products.POST("/", pc.Create())
-			products.PATCH("/:id", pc.Update())
-			products.DELETE("/:id", pc.Delete())
+			products.GET("/", productsController.GetAllProduct())
+			products.GET("/:id", productsController.GetByIdProduct())
+			products.POST("/", productsController.CreateProduct())
+			products.PATCH("/:id", productsController.UpdateProduct())
+			products.DELETE("/:id", productsController.DeleteProduct())
 		}
 
 		po := mux.Group("purchaseOrders")
@@ -165,8 +157,8 @@ func ConfigRoutes(r *gin.Engine) *gin.Engine {
 
 		records := mux.Group("records")
 		{
-			records.GET("/", rc.GetRecordsPerProduct())
-			records.POST("/:id", rc.Create())
+			records.GET("/", recordsController.GetRecordsPerProduct())
+			records.POST("/", recordsController.Create())
 		}
 
 	}
