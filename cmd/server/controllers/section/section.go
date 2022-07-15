@@ -31,7 +31,7 @@ func NewSection(s sections.Service) *SectionController {
 
 func (c SectionController) GetAll() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		s, err := c.service.GetAll()
+		s, err := c.service.GetAll(ctx)
 		if err != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{
 				"error": err.Error(),
@@ -53,7 +53,7 @@ func (c SectionController) GetById() gin.HandlerFunc {
 			return
 		}
 
-		s, err := c.service.GetById(id)
+		s, err := c.service.GetById(ctx, id)
 		if err != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{
 				"error": err.Error(),
@@ -75,7 +75,7 @@ func (c *SectionController) Add() gin.HandlerFunc {
 			return
 		}
 
-		s, err := c.service.Add(obj.SectionNumber, obj.CurrentTemperature, obj.MinimumTemperature, obj.CurrentCapacity, obj.MinimumCapacity, obj.MaximumCapacity, obj.WarehouseID, obj.ProductTypeID)
+		s, err := c.service.Add(ctx, obj.SectionNumber, obj.CurrentTemperature, obj.MinimumTemperature, obj.CurrentCapacity, obj.MinimumCapacity, obj.MaximumCapacity, obj.WarehouseID, obj.ProductTypeID)
 		if err != nil {
 			ctx.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 			return
@@ -102,7 +102,7 @@ func (c *SectionController) UpdateById() gin.HandlerFunc {
 			return
 		}
 
-		s, err := c.service.UpdateById(id, obj)
+		s, err := c.service.UpdateById(ctx, id, obj)
 		if err != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
@@ -122,7 +122,7 @@ func (c *SectionController) Delete() gin.HandlerFunc {
 			return
 		}
 
-		err = c.service.Delete(id)
+		err = c.service.Delete(ctx, id)
 		if err != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{
 				"error": err.Error(),
