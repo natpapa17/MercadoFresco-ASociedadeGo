@@ -292,10 +292,10 @@ CREATE TABLE IF NOT EXISTS `fresh_market`.`product_batch` (
   `batch_number` VARCHAR(255) NOT NULL,
   `current_quantity` INT NOT NULL,
   `current_temperature` DECIMAL(19,2) NOT NULL,
-  `due_data` DATETIME(6) NOT NULL,
+  `due_date` DATETIME(6) NOT NULL,
   `initial_quantity` INT NOT NULL,
   `manufacturing_date` DATETIME(6) NOT NULL,
-  `manufacturing_hour` DATETIME(6) NOT NULL,
+  `manufacturing_hour` INT NOT NULL,
   `minimum_temperature` DECIMAL(19,2) NOT NULL,
   `product_id` INT NOT NULL,
   `section_id` INT NOT NULL,
@@ -431,8 +431,22 @@ SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
-INSERT INTO `fresh_market`.`product_type` (`id`, `description`) VALUES (1, "processados");
 INSERT INTO `fresh_market`.`country` (`id`,`name`) VALUES (1, "brasil");
-INSERT INTO `fresh_market`.`province` (`id`, `name`, `country_id`) VALUES (1, "sao paulo", 1);
-INSERT INTO `fresh_market`.`locality` (`id`, `name`, `province_id`) VALUES (1, "sao paulo", 1);
+
+INSERT INTO `fresh_market`.`province` (`id`, `name`, `country_id`) VALUES (1, "parana", 1);
+INSERT INTO `fresh_market`.`province` (`id`, `name`, `country_id`) VALUES (2, "sao paulo", 1);
+INSERT INTO `fresh_market`.`province` (`id`, `name`, `country_id`) VALUES (3, "rio de janeiro", 1);
+
+INSERT INTO `fresh_market`.`locality` (`id`, `name`, `province_id`) VALUES (1, "sao paulo", 2);
+INSERT INTO `fresh_market`.`locality` (`id`, `name`, `province_id`) VALUES (2, "campo mourao", 1);
+INSERT INTO `fresh_market`.`locality` (`id`, `name`, `province_id`) VALUES (3, "sao paulo", 2);
+INSERT INTO `fresh_market`.`locality` (`id`, `name`, `province_id`) VALUES (4, "rio de janeiro", 3);
+INSERT INTO `fresh_market`.`locality` (`id`, `name`, `province_id`) VALUES (5, "maringa", 1);
+
+INSERT INTO `fresh_market`.`product_type` (`id`, `description`) VALUES (1, "processados");
+
 INSERT INTO `fresh_market`.`seller` (`id`, `cid`, `company_name`, `address`, `telephone`, `locality_id`) VALUES (1, "teste", "teste", "teste", "teste", 1);
+
+INSERT INTO `fresh_market`.`product` (`id`, `description`, `expiration_rate`, `freezing_rate`, `height`, `length`, `net_weight`, `product_code`, `recommended_freezing_temperature`, `width`, `seller_id`, `product_type_id`) VALUES (1, "Cafe", 1, 2, 6.4 , 4.5, 3.4, "PROD01", 1.3, 1.2, 1, 1);
+
+INSERT INTO `fresh_market`.`product_record` (`id`, `last_update_date`, `purchase_code`, `sale_price`, `product_id`) VALUES (1, curdate(), 5, 10, 1);

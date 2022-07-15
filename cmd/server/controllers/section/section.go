@@ -8,6 +8,17 @@ import (
 	"github.com/natpapa17/MercadoFresco-ASociedadeGo/internal/sections"
 )
 
+type SectionRequest struct {
+	SectionNumber      int     `json:"section_number" binding:"required"`
+	CurrentTemperature float32 `json:"current_temperature" binding:"required"`
+	MinimumTemperature float32 `json:"minimum_temperature" binding:"required"`
+	CurrentCapacity    int     `json:"current_capacity" binding:"required"`
+	MinimumCapacity    int     `json:"minimum_capacity" binding:"required"`
+	MaximumCapacity    int     `json:"maximum_capacity" binding:"required"`
+	WarehouseID        int     `json:"warehouse_id" binding:"required"`
+	ProductTypeID      int     `json:"product_type_id" binding:"required"`
+}
+
 type SectionController struct {
 	service sections.Service
 }
@@ -20,7 +31,7 @@ func NewSection(s sections.Service) *SectionController {
 
 func (c SectionController) GetAll() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		s, err := c.service.GetAll()
+		s, err := c.service.GetAll(ctx)
 		if err != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{
 				"error": err.Error(),
@@ -42,7 +53,7 @@ func (c SectionController) GetById() gin.HandlerFunc {
 			return
 		}
 
-		s, err := c.service.GetById(id)
+		s, err := c.service.GetById(ctx, id)
 		if err != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{
 				"error": err.Error(),
@@ -57,20 +68,20 @@ func (c SectionController) GetById() gin.HandlerFunc {
 func (c *SectionController) Add() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		var obj sections.Section
+		var obj SectionRequest
 
 		if err := ctx.ShouldBindJSON(&obj); err != nil {
 			ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 			return
 		}
 
-		s, err := c.service.Add(obj)
+		s, err := c.service.Add(ctx, obj.SectionNumber, obj.CurrentTemperature, obj.MinimumTemperature, obj.CurrentCapacity, obj.MinimumCapacity, obj.MaximumCapacity, obj.WarehouseID, obj.ProductTypeID)
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			ctx.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 			return
 		}
 
-		ctx.JSON(http.StatusOK, s)
+		ctx.JSON(http.StatusCreated, s)
 	}
 }
 
@@ -91,7 +102,7 @@ func (c *SectionController) UpdateById() gin.HandlerFunc {
 			return
 		}
 
-		s, err := c.service.UpdateById(id, obj)
+		s, err := c.service.UpdateById(ctx, id, obj)
 		if err != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
@@ -111,7 +122,7 @@ func (c *SectionController) Delete() gin.HandlerFunc {
 			return
 		}
 
-		err = c.service.Delete(id)
+		err = c.service.Delete(ctx, id)
 		if err != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{
 				"error": err.Error(),
