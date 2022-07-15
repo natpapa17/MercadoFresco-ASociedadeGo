@@ -43,7 +43,9 @@ func (c *ProductController) GetByIdProduct() gin.HandlerFunc {
 			})
 			return
 		}
+
 		p, err := c.service.GetById(id)
+
 		if err != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{
 				"error": err.Error(),
